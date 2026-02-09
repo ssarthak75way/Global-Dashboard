@@ -1,0 +1,166 @@
+:root {
+  --bg-color: #f8f9fa;
+  --text-color: #212529;
+  --primary-color: #4f46e5;
+  --secondary-color: #6366f1;
+  --sidebar-bg: #ffffff;
+  --sidebar-text: #4b5563;
+  --card-bg: #ffffff;
+  --input-bg: #ffffff;
+  --input-border: #d1d5db;
+  --border-color: #e5e7eb;
+}
+
+[data-theme="dark"] {
+  --bg-color: #111827;
+  --text-color: #f9fafb;
+  --primary-color: #6366f1;
+  --secondary-color: #818cf8;
+  --sidebar-bg: #1f2937;
+  --sidebar-text: #d1d5db;
+  --card-bg: #1f2937;
+  --input-bg: #374151;
+  --input-border: #4b5563;
+  --border-color: #374151;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  transition: background-color 0.3s, color 0.3s;
+}
+
+/* Utilities */
+.btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: var(--secondary-color);
+}
+
+.input-field {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--input-border);
+  background-color: var(--input-bg);
+  color: var(--text-color);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.input-field:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+
+/* Layout */
+.layout-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 260px;
+  background-color: var(--sidebar-bg);
+  border-right: 1px solid var(--border-color);
+  transition: width 0.3s;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar.collapsed {
+  width: 80px;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.topbar {
+  height: 64px;
+  background-color: var(--card-bg);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+}
+
+.page-content {
+  padding: 2rem;
+  overflow-y: auto;
+  height: calc(100vh - 64px);
+}
+
+.auth-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-card {
+  background-color: var(--card-bg);
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  width: 100%;
+  max-width: 400px;
+}
+
+
+/* Quill Dark Mode Overrides */
+[data-theme="dark"] .ql-snow.ql-toolbar {
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .ql-snow .ql-stroke {
+  stroke: var(--text-color);
+}
+
+[data-theme="dark"] .ql-snow .ql-fill {
+  fill: var(--text-color);
+}
+
+[data-theme="dark"] .ql-snow .ql-picker {
+  color: var(--text-color);
+}
+
+[data-theme="dark"] .ql-snow .ql-picker-options {
+  background-color: var(--card-bg);
+  color: var(--text-color);
+}
+
+[data-theme="dark"] .ql-editor.ql-blank::before {
+  color: rgba(255, 255, 255, 0.4);
+  font-style: italic;
+}
+
+[data-theme="dark"] .ql-editor {
+  color: var(--text-color);
+}
+
+/* Active states for toolbar */
+[data-theme="dark"] .ql-snow .ql-active .ql-stroke {
+  stroke: var(--primary-color);
+}
+
+[data-theme="dark"] .ql-snow .ql-active .ql-fill {
+  fill: var(--primary-color);
+}
