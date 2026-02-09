@@ -1,18 +1,21 @@
 import { Request, Response, NextFunction } from "express";
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
 import User from "../models/user.model";
 
-interface AuthRequest extends Request {
-    user?: any;
+interface DecodedToken extends JwtPayload {
+    userId: string;
 }
 
-export const protect = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+export const protect = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     let token;
 
     if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
         try {
             token = req.headers.authorization.split(" ")[1];
-            const decoded: any = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET || "access_secret");
+            const decoded = jwt.verify(
+                token,
+                process.env.ACCESS_TOKEN_SECRET || "access_secret"
+            ) as DecodedToken;
 
             const user = await User.findById(decoded.userId).select("-password -refreshToken");
 
