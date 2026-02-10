@@ -32,13 +32,14 @@ import {
     Stack,
     Paper,
     Chip,
-    Divider,
-    CircularProgress
+    Divider
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import DragIcon from "@mui/icons-material/DragIndicator";
 import TaskIcon from "@mui/icons-material/Assignment";
+import ConfirmDialog from "../components/ConfirmDialog";
+import Loader from "../components/Loader";
 
 interface Task {
     _id: string;
@@ -48,7 +49,25 @@ interface Task {
     order: number;
 }
 
-const SortableTask = ({ task, onDelete }: { task: Task; onDelete: (id: string) => void }) => {
+const taskStyles = {
+    card: {
+        mb: 2,
+        cursor: 'grab',
+        transition: 'transform 0.3s ease-in-out',
+        '&:hover': { boxShadow: 3, transform: 'translateY(-2px)' },
+        border: '1px solid',
+        borderColor: 'divider',
+        position: 'relative'
+    },
+    cardContent: { p: '16px !important', display: 'flex', alignItems: 'flex-start', gap: 2 },
+    dragHandle: { mt: 0.5, color: 'text.disabled', cursor: 'grab' },
+    title: { fontWeight: 600, mb: 0.5 },
+    chip: { height: 20, fontSize: '0.65rem', fontWeight: 700 },
+    deleteButton: { opacity: 0.6, '&:hover': { opacity: 1 } },
+    flexGrow: { flexGrow: 1 }
+};
+
+const SortableTask = ({ task, onDeleteClick }: { task: Task; onDeleteClick: (id: string) => void }) => {
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: task._id });
 
     const style = {
@@ -62,21 +81,14 @@ const SortableTask = ({ task, onDelete }: { task: Task; onDelete: (id: string) =
             ref={setNodeRef}
             style={style}
             {...attributes}
-            sx={{
-                mb: 2,
-                cursor: 'grab',
-                '&:hover': { boxShadow: 3 },
-                border: '1px solid',
-                borderColor: 'divider',
-                position: 'relative'
-            }}
+            sx={taskStyles.card}
         >
-            <CardContent sx={{ p: '16px !important', display: 'flex', alignItems: 'flex-start', gap: 2 }}>
-                <Box {...listeners} sx={{ mt: 0.5, color: 'text.disabled', cursor: 'grab' }}>
+            <CardContent sx={taskStyles.cardContent}>
+                <Box {...listeners} sx={taskStyles.dragHandle}>
                     <DragIcon fontSize="small" />
                 </Box>
-                <Box sx={{ flexGrow: 1 }}>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 0.5 }}>
+                <Box sx={taskStyles.flexGrow}>
+                    <Typography variant="subtitle1" sx={taskStyles.title}>
                         {task.title}
                     </Typography>
                     <Stack direction="row" spacing={1} alignItems="center">
@@ -85,7 +97,7 @@ const SortableTask = ({ task, onDelete }: { task: Task; onDelete: (id: string) =
                             size="small"
                             color="primary"
                             variant="outlined"
-                            sx={{ height: 20, fontSize: '0.65rem', fontWeight: 700 }}
+                            sx={taskStyles.chip}
                         />
                         <Typography variant="caption" color="text.secondary">
                             Task ID: {task._id.slice(-4)}
@@ -94,9 +106,9 @@ const SortableTask = ({ task, onDelete }: { task: Task; onDelete: (id: string) =
                 </Box>
                 <IconButton
                     size="small"
-                    onClick={(e) => { e.stopPropagation(); onDelete(task._id); }}
+                    onClick={(e) => { e.stopPropagation(); onDeleteClick(task._id); }}
                     color="error"
-                    sx={{ opacity: 0.6, '&:hover': { opacity: 1 } }}
+                    sx={taskStyles.deleteButton}
                 >
                     <DeleteIcon fontSize="small" />
                 </IconButton>
@@ -109,6 +121,8 @@ const Board = () => {
     const [tasks, setTasks] = useState<Task[]>([]);
     const [loading, setLoading] = useState(true);
     const [activeId, setActiveId] = useState<string | null>(null);
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [taskToDelete, setTaskToDelete] = useState<string | null>(null);
 
     const sensors = useSensors(
         useSensor(PointerSensor),
@@ -146,13 +160,28 @@ const Board = () => {
         }
     };
 
-    const onDeleteTask = async (id: string) => {
+    const handleDeleteClick = (id: string) => {
+        setTaskToDelete(id);
+        setDeleteDialogOpen(true);
+    };
+
+    const handleDeleteConfirm = async () => {
+        if (!taskToDelete) return;
+
         try {
-            await api.delete(`/tasks/${id}`);
-            setTasks(tasks.filter(t => t._id !== id));
+            await api.delete(`/tasks/${taskToDelete}`);
+            setTasks(tasks.filter(t => t._id !== taskToDelete));
         } catch (error) {
             console.error("Error deleting task", error);
+        } finally {
+            setDeleteDialogOpen(false);
+            setTaskToDelete(null);
         }
+    };
+
+    const handleDeleteCancel = () => {
+        setDeleteDialogOpen(false);
+        setTaskToDelete(null);
     };
 
     const handleDragStart = (event: DragStartEvent) => {
@@ -163,28 +192,77 @@ const Board = () => {
         const { active, over } = event;
 
         if (over && active.id !== over.id) {
-            setTasks((items) => {
-                const oldIndex = items.findIndex(item => item._id === active.id);
-                const newIndex = items.findIndex(item => item._id === over.id);
-                return arrayMove(items, oldIndex, newIndex);
-            });
+            // Store previous state for rollback on error
+            const previousTasks = [...tasks];
+
+            // Optimistically update local state
+            const reorderedTasks = (() => {
+                const oldIndex = tasks.findIndex(item => item._id === active.id);
+                const newIndex = tasks.findIndex(item => item._id === over.id);
+                return arrayMove(tasks, oldIndex, newIndex);
+            })();
+
+            setTasks(reorderedTasks);
+
+            // Prepare payload with updated order values
+            const tasksWithOrder = reorderedTasks.map((task, index) => ({
+                _id: task._id,
+                status: task.status,
+                order: index,
+            }));
+
+            // Persist to backend
+            try {
+                await api.put("/tasks/reorder", { tasks: tasksWithOrder });
+            } catch (error) {
+                console.error("Error updating task order", error);
+                // Revert to previous state on error
+                setTasks(previousTasks);
+            }
         }
         setActiveId(null);
     };
 
+    const boardStyles = {
+        loadingContainer: { display: 'flex', justifyContent: 'center', py: 8 },
+        container: { p: { xs: 2, md: 4 } },
+        header: { mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 2 },
+        headerTitle: { fontWeight: 800, mb: 1 },
+        addTaskPaper: {
+            p: 1,
+            display: 'flex',
+            alignItems: 'center',
+            width: { xs: '100%', sm: 400 },
+            borderRadius: 2,
+            border: '1px solid',
+            borderColor: 'divider'
+        },
+        addTaskInput: { '& .MuiOutlinedInput-notchedOutline': { border: 'none' } },
+        divider: { height: 28, mx: 1 },
+        addButton: { px: 2 },
+        boardContainer: { maxWidth: 800, mx: 'auto' },
+        emptyStatePaper: { p: 4, textAlign: 'center', bgcolor: 'transparent', border: '2px dashed', borderColor: 'divider' },
+        emptyStateIcon: { fontSize: 48, color: 'text.disabled', mb: 2 },
+        dragOverlayCard: { boxShadow: 6, border: '1px solid', borderColor: 'primary.main' },
+        dragOverlayContent: { p: '16px !important', display: 'flex', alignItems: 'flex-start', gap: 2 },
+        dragOverlayIconBox: { mt: 0.5, color: 'primary.main' },
+        dragOverlayTitle: { fontWeight: 600, mb: 0.5 },
+        dragOverlayChip: { height: 20, fontSize: '0.65rem', fontWeight: 700 }
+    };
+
     if (loading) return (
-        <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
-            <CircularProgress />
+        <Box sx={boardStyles.loadingContainer}>
+            <Loader />
         </Box>
     );
 
     const activeTask = activeId ? tasks.find(t => t._id === activeId) : null;
 
     return (
-        <Box sx={{ p: { xs: 2, md: 4 } }}>
-            <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 2 }}>
+        <Box sx={boardStyles.container}>
+            <Box sx={boardStyles.header}>
                 <Box>
-                    <Typography variant="h4" sx={{ fontWeight: 800, mb: 1 }}>
+                    <Typography variant="h4" sx={boardStyles.headerTitle}>
                         Project Board
                     </Typography>
                     <Typography variant="body1" color="text.secondary">
@@ -194,15 +272,7 @@ const Board = () => {
                 <Paper
                     component="form"
                     onSubmit={handleSubmit(onAddTask)}
-                    sx={{
-                        p: 1,
-                        display: 'flex',
-                        alignItems: 'center',
-                        width: { xs: '100%', sm: 400 },
-                        borderRadius: 2,
-                        border: '1px solid',
-                        borderColor: 'divider'
-                    }}
+                    sx={boardStyles.addTaskPaper}
                     elevation={0}
                 >
                     <TextField
@@ -211,22 +281,22 @@ const Board = () => {
                         fullWidth
                         {...register("title", { required: true })}
                         error={!!errors.title}
-                        sx={{ '& .MuiOutlinedInput-notchedOutline': { border: 'none' } }}
+                        sx={boardStyles.addTaskInput}
                     />
-                    <Divider sx={{ height: 28, mx: 1 }} orientation="vertical" />
+                    <Divider sx={boardStyles.divider} orientation="vertical" />
                     <Button
                         type="submit"
                         variant="contained"
                         size="small"
                         startIcon={<AddIcon />}
-                        sx={{ px: 2 }}
+                        sx={boardStyles.addButton}
                     >
                         Add
                     </Button>
                 </Paper>
             </Box>
 
-            <Box sx={{ maxWidth: 800, mx: 'auto' }}>
+            <Box sx={boardStyles.boardContainer}>
                 <DndContext
                     sensors={sensors}
                     collisionDetection={closestCenter}
@@ -239,13 +309,13 @@ const Board = () => {
                     >
                         <Stack spacing={0}>
                             {tasks.length === 0 ? (
-                                <Paper sx={{ p: 4, textAlign: 'center', bgcolor: 'transparent', border: '2px dashed', borderColor: 'divider' }} elevation={0}>
-                                    <TaskIcon sx={{ fontSize: 48, color: 'text.disabled', mb: 2 }} />
+                                <Paper sx={boardStyles.emptyStatePaper} elevation={0}>
+                                    <TaskIcon sx={boardStyles.emptyStateIcon} />
                                     <Typography color="text.secondary">No tasks found. Create one to get started!</Typography>
                                 </Paper>
                             ) : (
                                 tasks.map((task) => (
-                                    <SortableTask key={task._id} task={task} onDelete={onDeleteTask} />
+                                    <SortableTask key={task._id} task={task} onDeleteClick={handleDeleteClick} />
                                 ))
                             )}
                         </Stack>
@@ -261,13 +331,13 @@ const Board = () => {
                         }),
                     }}>
                         {activeId && activeTask ? (
-                            <Card sx={{ boxShadow: 6, border: '1px solid', borderColor: 'primary.main' }}>
-                                <CardContent sx={{ p: '16px !important', display: 'flex', alignItems: 'flex-start', gap: 2 }}>
-                                    <Box sx={{ mt: 0.5, color: 'primary.main' }}>
+                            <Card sx={boardStyles.dragOverlayCard}>
+                                <CardContent sx={boardStyles.dragOverlayContent}>
+                                    <Box sx={boardStyles.dragOverlayIconBox}>
                                         <DragIcon fontSize="small" />
                                     </Box>
-                                    <Box sx={{ flexGrow: 1 }}>
-                                        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 0.5 }}>
+                                    <Box sx={taskStyles.flexGrow}>
+                                        <Typography variant="subtitle1" sx={boardStyles.dragOverlayTitle}>
                                             {activeTask.title}
                                         </Typography>
                                         <Chip
@@ -275,7 +345,7 @@ const Board = () => {
                                             size="small"
                                             color="primary"
                                             variant="filled"
-                                            sx={{ height: 20, fontSize: '0.65rem', fontWeight: 700 }}
+                                            sx={boardStyles.dragOverlayChip}
                                         />
                                     </Box>
                                 </CardContent>
@@ -284,6 +354,17 @@ const Board = () => {
                     </DragOverlay>
                 </DndContext>
             </Box>
+
+            <ConfirmDialog
+                open={deleteDialogOpen}
+                title="Delete Task?"
+                message="Are you sure you want to delete this task? This action cannot be undone."
+                confirmText="Delete"
+                cancelText="Cancel"
+                severity="error"
+                onConfirm={handleDeleteConfirm}
+                onCancel={handleDeleteCancel}
+            />
         </Box>
     );
 };

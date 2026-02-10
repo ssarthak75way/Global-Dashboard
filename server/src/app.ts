@@ -33,7 +33,7 @@ app.get("/", (req: Request, res: Response) => {
 interface CustomError extends Error {
     status?: number;
     statusCode?: number;
-    errors?: any;
+    errors?: unknown;
 }
 
 // Error Handling Middleware

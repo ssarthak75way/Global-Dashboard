@@ -12,7 +12,6 @@ import {
     Card,
     CardContent,
     CardHeader,
-    CircularProgress,
     Fade,
     Collapse,
     Grow,
@@ -20,7 +19,8 @@ import {
     DialogTitle,
     DialogContent,
     DialogActions,
-    Grid
+    Grid,
+    Theme
 } from "@mui/material";
 import {
     Favorite as LikeIcon,
@@ -39,6 +39,7 @@ import api from "../api/axios";
 import { formatDistanceToNow } from "date-fns";
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
+import Loader from "../components/Loader";
 
 interface Comment {
     _id: string;
@@ -212,20 +213,98 @@ const Feed = () => {
         setExpandedComments(prev => ({ ...prev, [postId]: !prev[postId] }));
     };
 
+    const styles = {
+        loadingContainer: { display: "flex", justifyContent: "center", mt: 8 },
+        mainContainer: { maxWidth: 800, mx: "auto", pb: 8 },
+        header: { mb: 6 },
+        title: { fontWeight: 900, letterSpacing: -1.5, mb: 1 },
+        subtitle: { fontWeight: 500 },
+        createPostPaper: {
+            p: 3,
+            mb: 6,
+            borderRadius: 1,
+            border: "1px solid",
+            borderColor: isExpanded ? "primary.main" : "divider",
+            bgcolor: (theme: Theme) => theme.palette.mode === "light" ? "white" : "rgba(255,255,255,0.03)",
+            transition: "all 0.3s ease",
+            boxShadow: isExpanded ? "0 8px 32px rgba(0,0,0,0.1)" : "none"
+        },
+        createPostCollapsedStack: { cursor: "text" },
+        createPostAvatar: { bgcolor: "primary.main", fontWeight: 700 },
+        createPostPlaceholder: { flexGrow: 1, color: "text.secondary", fontSize: "1.1rem" },
+        createPostAddIcon: { border: "1px solid", borderColor: "primary.light" },
+        createPostFormStack: { mb: 2 },
+        createPostTitleInput: { "& .MuiInput-root": { fontSize: "1.5rem", fontWeight: 900 } },
+        qlContainerBox: {
+            mb: 3,
+            "& .ql-container": { border: "none", fontSize: "1.1rem", minHeight: "150px" },
+            "& .ql-toolbar": { border: "none", borderTop: "1px solid", borderColor: "divider", mt: 2 }
+        },
+        imagePreviewBox: { mb: 2, position: "relative", width: "fit-content" },
+        imagePreviewImage: { maxWidth: "100%", maxHeight: "300px", borderRadius: "12px" },
+        imagePreviewCancel: { position: "absolute", top: -10, right: -10, bgcolor: "error.main", color: "white", transition: "all 0.3s ease", "&:hover": { bgcolor: "error.dark" } },
+        actionButtonsBox: { display: "flex", justifyContent: "space-between", alignItems: "center", pt: 2, borderTop: "1px solid", borderColor: "divider" },
+        uploadButton: { borderRadius: "20px", textTransform: "none" },
+        submitButton: { borderRadius: "20px", px: 4, fontWeight: 700, textTransform: "none" },
+        postCard: {
+            borderRadius: 1,
+            border: "1px solid",
+            borderColor: "divider",
+            transition: "all 0.3s ease",
+            "&:hover": { borderColor: "primary.light", transform: "translateY(-4px)" }
+        },
+        postCardHeaderAvatar: { bgcolor: "secondary.main", fontWeight: 700 },
+        postCardHeaderTitle: { fontWeight: 800 },
+        postCardTimeIcon: { fontSize: "0.85rem", color: "text.disabled" },
+        postEditIcon: { color: "primary.main" },
+        postDeleteIcon: { color: "error.main" },
+        postContent: { pt: 0 },
+        postTitle: { fontWeight: 800, mb: 2, lineHeight: 1.3 },
+        postImageContainer: { mb: 2, borderRadius: 1, overflow: "hidden", border: "1px solid", borderColor: "divider" },
+        postImage: { width: "100%", height: "400px", display: "block" },
+        postHtmlContent: {
+            mb: 3,
+            "& p": { mb: 2, lineHeight: 1.6, fontSize: "1.05rem" },
+            "& h1, h2, h3": { mb: 2, fontWeight: 800 },
+            "& code": { bgcolor: "action.hover", p: 0.5, borderRadius: 1, fontFamily: "monospace" },
+            "& pre": { bgcolor: "action.hover", p: 2, borderRadius: 2, overflowX: "auto", mb: 2 },
+            "& img": { maxWidth: "100%", borderRadius: 1 },
+            "& blockquote": { borderLeft: "4px solid", borderColor: "primary.main", pl: 2, ml: 0, fontStyle: "italic", mb: 2 },
+            "& ul, ol": { pl: 3, mb: 2 }
+        },
+        divider: { mb: 2, opacity: 0.5 },
+        commentsSection: { mt: 3, pt: 2, borderTop: "1px dashed", borderColor: "divider" },
+        commentsHeader: { display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 },
+        addCommentButton: { borderRadius: "20px" },
+        commentBox: { p: 2, bgcolor: "action.hover", borderRadius: 3, height: "100%" },
+        commentHeaderStack: { mb: 1 },
+        commentAvatar: { width: 24, height: 24, fontSize: "0.75rem", bgcolor: "secondary.main" },
+        commentAuthor: { fontWeight: 800 },
+        commentText: {
+            "& p": { m: 0 },
+            "& strong": { fontWeight: 700 },
+            "& em": { fontStyle: "italic" }
+        },
+        dialogTitle: { fontWeight: 800 },
+        dialogQuillBox: { mt: 1, "& .ql-container": { minHeight: "150px", fontSize: "1rem" } },
+        dialogActions: { p: 3 },
+        respondButton: { borderRadius: "20px", fontWeight: 700 }
+    };
+
     if (loading) return (
-        <Box sx={{ display: "flex", justifyContent: "center", mt: 8 }}>
-            <CircularProgress />
+        <Box sx={styles.loadingContainer}>
+            <Loader />
         </Box>
     );
 
     return (
         <Fade in timeout={800}>
-            <Box sx={{ maxWidth: 800, mx: "auto", pb: 8 }}>
-                <Box sx={{ mb: 6 }}>
-                    <Typography variant="h3" sx={{ fontWeight: 900, letterSpacing: -1.5, mb: 1 }}>
+            <Box sx={styles.mainContainer}>
+                <Box sx={styles.header}>
+                    <Typography variant="h3" sx={styles.title}>
                         Social Feed
                     </Typography>
-                    <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 500 }}>
+                    <Typography variant="body1" color="text.secondary" sx={styles.subtitle}>
                         Share your engineering journey and connect with others.
                     </Typography>
                 </Box>
@@ -233,32 +312,23 @@ const Feed = () => {
                 {/* Create Post */}
                 <Paper
                     elevation={0}
-                    sx={{
-                        p: 3,
-                        mb: 6,
-                        borderRadius: 1,
-                        border: "1px solid",
-                        borderColor: isExpanded ? "primary.main" : "divider",
-                        bgcolor: theme => theme.palette.mode === "light" ? "white" : "rgba(255,255,255,0.03)",
-                        transition: "all 0.3s ease",
-                        boxShadow: isExpanded ? "0 8px 32px rgba(0,0,0,0.1)" : "none"
-                    }}
+                    sx={styles.createPostPaper}
                 >
                     {!isExpanded ? (
-                        <Stack direction="row" spacing={2} alignItems="center" onClick={() => setIsExpanded(true)} sx={{ cursor: "text" }}>
-                            <Avatar sx={{ bgcolor: "primary.main", fontWeight: 700 }}>
+                        <Stack direction="row" spacing={2} alignItems="center" onClick={() => setIsExpanded(true)} sx={styles.createPostCollapsedStack}>
+                            <Avatar sx={styles.createPostAvatar}>
                                 {user?.email[0].toUpperCase()}
                             </Avatar>
-                            <Box sx={{ flexGrow: 1, color: "text.secondary", fontSize: "1.1rem" }}>
+                            <Box sx={styles.createPostPlaceholder}>
                                 {editingPostId ? "Editing your story..." : "What's on your mind?"}
                             </Box>
-                            <IconButton color="primary" sx={{ border: "1px solid", borderColor: "primary.light" }}>
+                            <IconButton color="primary" sx={styles.createPostAddIcon}>
                                 <AddIcon />
                             </IconButton>
                         </Stack>
                     ) : (
                         <Box component="form" onSubmit={handleCreatePost}>
-                            <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
+                            <Stack direction="row" spacing={2} sx={styles.createPostFormStack}>
                                 <TextField
                                     fullWidth
                                     placeholder="Title of your story..."
@@ -266,7 +336,7 @@ const Feed = () => {
                                     autoFocus
                                     value={title}
                                     onChange={(e) => setTitle(e.target.value)}
-                                    sx={{ "& .MuiInput-root": { fontSize: "1.5rem", fontWeight: 900 } }}
+                                    sx={styles.createPostTitleInput}
                                     InputProps={{ disableUnderline: true }}
                                 />
                                 <IconButton onClick={resetForm} size="small">
@@ -274,11 +344,7 @@ const Feed = () => {
                                 </IconButton>
                             </Stack>
 
-                            <Box sx={{
-                                mb: 3,
-                                "& .ql-container": { border: "none", fontSize: "1.1rem", minHeight: "150px" },
-                                "& .ql-toolbar": { border: "none", borderTop: "1px solid", borderColor: "divider", mt: 2 }
-                            }}>
+                            <Box sx={styles.qlContainerBox}>
                                 <ReactQuill
                                     theme="snow"
                                     className="ql-editor"
@@ -290,19 +356,19 @@ const Feed = () => {
                             </Box>
 
                             {imageUrl && (
-                                <Box sx={{ mb: 2, position: "relative", width: "fit-content" }}>
-                                    <img src={imageUrl} alt="Preview" style={{ maxWidth: "100%", maxHeight: "300px", borderRadius: "12px" }} />
+                                <Box sx={styles.imagePreviewBox}>
+                                    <img src={imageUrl} alt="Preview" style={styles.imagePreviewImage} />
                                     <IconButton
                                         size="small"
                                         onClick={() => setImageUrl(null)}
-                                        sx={{ position: "absolute", top: -10, right: -10, bgcolor: "error.main", color: "white", "&:hover": { bgcolor: "error.dark" } }}
+                                        sx={styles.imagePreviewCancel}
                                     >
                                         <CancelIcon fontSize="small" />
                                     </IconButton>
                                 </Box>
                             )}
 
-                            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", pt: 2, borderTop: "1px solid", borderColor: "divider" }}>
+                            <Box sx={styles.actionButtonsBox}>
                                 <Box>
                                     <input
                                         accept="image/*"
@@ -315,9 +381,9 @@ const Feed = () => {
                                         <Button
                                             component="span"
                                             variant="outlined"
-                                            startIcon={uploading ? <CircularProgress size={20} /> : <PhotoCamera />}
+                                            startIcon={uploading ? <Loader size={20} /> : <PhotoCamera />}
                                             disabled={uploading}
-                                            sx={{ borderRadius: "20px", textTransform: "none" }}
+                                            sx={styles.uploadButton}
                                         >
                                             {uploading ? "Uploading..." : "Add Image"}
                                         </Button>
@@ -327,8 +393,8 @@ const Feed = () => {
                                     type="submit"
                                     variant="contained"
                                     disabled={submitting || uploading || !title.trim() || !content.trim() || content === "<p><br></p>"}
-                                    startIcon={submitting ? <CircularProgress size={20} /> : (editingPostId ? <CreateIcon /> : <CreateIcon />)}
-                                    sx={{ borderRadius: "20px", px: 4, fontWeight: 700, textTransform: "none" }}
+                                    startIcon={submitting ? <Loader size={20} /> : (editingPostId ? <CreateIcon /> : <CreateIcon />)}
+                                    sx={styles.submitButton}
                                 >
                                     {editingPostId ? "Update Story" : "Publish"}
                                 </Button>
@@ -343,24 +409,18 @@ const Feed = () => {
                         <Grow in key={post._id} timeout={500 + index * 100}>
                             <Card
                                 elevation={0}
-                                sx={{
-                                    borderRadius: 1,
-                                    border: "1px solid",
-                                    borderColor: "divider",
-                                    transition: "all 0.3s ease",
-                                    "&:hover": { borderColor: "primary.light", transform: "translateY(-4px)" }
-                                }}
+                                sx={styles.postCard}
                             >
                                 <CardHeader
                                     avatar={
-                                        <Avatar sx={{ bgcolor: "secondary.main", fontWeight: 700 }}>
+                                        <Avatar sx={styles.postCardHeaderAvatar}>
                                             {post.author.name?.[0].toUpperCase() || post.author.email[0].toUpperCase()}
                                         </Avatar>
                                     }
-                                    title={<Typography sx={{ fontWeight: 800 }}>{post.author.name || post.author.email.split("@")[0]}</Typography>}
+                                    title={<Typography sx={styles.postCardHeaderTitle}>{post.author.name || post.author.email.split("@")[0]}</Typography>}
                                     subheader={
                                         <Stack direction="row" spacing={1} alignItems="center">
-                                            <TimeIcon sx={{ fontSize: "0.85rem", color: "text.disabled" }} />
+                                            <TimeIcon sx={styles.postCardTimeIcon} />
                                             <Typography variant="caption" color="text.disabled">
                                                 {formatDistanceToNow(new Date(post.createdAt))} ago
                                             </Typography>
@@ -369,42 +429,33 @@ const Feed = () => {
                                     action={
                                         post.author._id === user?._id && (
                                             <Stack direction="row">
-                                                <IconButton size="small" onClick={() => handleEditInitiate(post)} sx={{ color: "primary.main" }}>
+                                                <IconButton size="small" onClick={() => handleEditInitiate(post)} sx={styles.postEditIcon}>
                                                     <EditIcon fontSize="small" />
                                                 </IconButton>
-                                                <IconButton size="small" onClick={() => handleDelete(post._id)} sx={{ color: "error.main" }}>
+                                                <IconButton size="small" onClick={() => handleDelete(post._id)} sx={styles.postDeleteIcon}>
                                                     <DeleteIcon fontSize="small" />
                                                 </IconButton>
                                             </Stack>
                                         )
                                     }
                                 />
-                                <CardContent sx={{ pt: 0 }}>
-                                    <Typography variant="h5" sx={{ fontWeight: 800, mb: 2, lineHeight: 1.3 }}>
+                                <CardContent sx={styles.postContent}>
+                                    <Typography variant="h5" sx={styles.postTitle}>
                                         {post.title}
                                     </Typography>
 
                                     {post.imageUrl && (
-                                        <Box sx={{ mb: 2, borderRadius: 1, overflow: "hidden", border: "1px solid", borderColor: "divider" }}>
-                                            <img src={post.imageUrl} alt={post.title} style={{ width: "100%", height: "400px", display: "block" }} />
+                                        <Box sx={styles.postImageContainer}>
+                                            <img src={post.imageUrl} alt={post.title} style={styles.postImage} />
                                         </Box>
                                     )}
 
                                     <Box
-                                        sx={{
-                                            mb: 3,
-                                            "& p": { mb: 2, lineHeight: 1.6, fontSize: "1.05rem" },
-                                            "& h1, h2, h3": { mb: 2, fontWeight: 800 },
-                                            "& code": { bgcolor: "action.hover", p: 0.5, borderRadius: 1, fontFamily: "monospace" },
-                                            "& pre": { bgcolor: "action.hover", p: 2, borderRadius: 2, overflowX: "auto", mb: 2 },
-                                            "& img": { maxWidth: "100%", borderRadius: 1 },
-                                            "& blockquote": { borderLeft: "4px solid", borderColor: "primary.main", pl: 2, ml: 0, fontStyle: "italic", mb: 2 },
-                                            "& ul, ol": { pl: 3, mb: 2 }
-                                        }}
+                                        sx={styles.postHtmlContent}
                                         dangerouslySetInnerHTML={{ __html: post.content }}
                                     />
 
-                                    <Divider sx={{ mb: 2, opacity: 0.5 }} />
+                                    <Divider sx={styles.divider} />
 
                                     <Stack direction="row" spacing={3}>
                                         <Stack direction="row" spacing={0.5} alignItems="center">
@@ -423,8 +474,8 @@ const Feed = () => {
 
                                     {/* Comments Section */}
                                     <Collapse in={expandedComments[post._id]}>
-                                        <Box sx={{ mt: 3, pt: 2, borderTop: "1px dashed", borderColor: "divider" }}>
-                                            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+                                        <Box sx={styles.commentsSection}>
+                                            <Box sx={styles.commentsHeader}>
                                                 <Typography variant="subtitle2" color="text.secondary">
                                                     Comments ({post.comments.length})
                                                 </Typography>
@@ -433,7 +484,7 @@ const Feed = () => {
                                                     startIcon={<CommentIcon />}
                                                     onClick={() => openCommentModal(post._id)}
                                                     variant="outlined"
-                                                    sx={{ borderRadius: "20px" }}
+                                                    sx={styles.addCommentButton}
                                                 >
                                                     Add Comment
                                                 </Button>
@@ -442,12 +493,12 @@ const Feed = () => {
                                             <Grid container spacing={2}>
                                                 {post.comments.map(comment => (
                                                     <Grid item xs={12} md={6} key={comment._id}>
-                                                        <Box sx={{ p: 2, bgcolor: "action.hover", borderRadius: 3, height: "100%" }}>
-                                                            <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1 }}>
-                                                                <Avatar sx={{ width: 24, height: 24, fontSize: "0.75rem", bgcolor: "secondary.main" }}>
+                                                        <Box sx={styles.commentBox}>
+                                                            <Stack direction="row" spacing={1} alignItems="center" sx={styles.commentHeaderStack}>
+                                                                <Avatar sx={styles.commentAvatar}>
                                                                     {comment.user?.name?.[0]?.toUpperCase() || "?"}
                                                                 </Avatar>
-                                                                <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>
+                                                                <Typography variant="subtitle2" sx={styles.commentAuthor}>
                                                                     {comment.user?.name || "Anonymous"}
                                                                 </Typography>
                                                                 <Typography variant="caption" color="text.disabled">
@@ -455,11 +506,7 @@ const Feed = () => {
                                                                 </Typography>
                                                             </Stack>
                                                             <Box
-                                                                sx={{
-                                                                    "& p": { m: 0 },
-                                                                    "& strong": { fontWeight: 700 },
-                                                                    "& em": { fontStyle: "italic" }
-                                                                }}
+                                                                sx={styles.commentText}
                                                                 dangerouslySetInnerHTML={{ __html: comment.text }}
                                                             />
                                                         </Box>
@@ -481,9 +528,9 @@ const Feed = () => {
                     fullWidth
                     maxWidth="sm"
                 >
-                    <DialogTitle sx={{ fontWeight: 800 }}>Write a response</DialogTitle>
+                    <DialogTitle sx={styles.dialogTitle}>Write a response</DialogTitle>
                     <DialogContent>
-                        <Box sx={{ mt: 1, "& .ql-container": { minHeight: "150px", fontSize: "1rem" } }}>
+                        <Box sx={styles.dialogQuillBox}>
                             <ReactQuill
                                 theme="snow"
                                 value={commentText}
@@ -498,13 +545,13 @@ const Feed = () => {
                             />
                         </Box>
                     </DialogContent>
-                    <DialogActions sx={{ p: 3 }}>
+                    <DialogActions sx={styles.dialogActions}>
                         <Button onClick={handleCloseCommentModal} color="inherit">Cancel</Button>
                         <Button
                             onClick={handleComment}
                             variant="contained"
                             disabled={!commentText.trim() || commentText === "<p><br></p>"}
-                            sx={{ borderRadius: "20px", fontWeight: 700 }}
+                            sx={styles.respondButton}
                         >
                             Respond
                         </Button>

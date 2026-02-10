@@ -37,30 +37,36 @@ const TokenCountdown: React.FC<TokenCountdownProps> = ({ expiryTime }) => {
 
     const isExpiringSoon = expiryTime - Date.now() < 60000;
 
+    const styles = {
+        container: {
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+            px: 1.5,
+            py: 0.5,
+            borderRadius: 2,
+            bgcolor: isExpiringSoon ? "error.light" : "action.hover",
+            color: isExpiringSoon ? "error.contrastText" : "text.secondary",
+            transition: "all 0.3s ease",
+        },
+        text: {
+            fontWeight: 700,
+            fontFamily: "monospace",
+            width: "45px",
+            textAlign: "center"
+        }
+    };
+
+
     return (
         <Tooltip title="Access Token Expiry Countdown">
             <Box
-                sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 1,
-                    px: 1.5,
-                    py: 0.5,
-                    borderRadius: 2,
-                    bgcolor: isExpiringSoon ? "error.light" : "action.hover",
-                    color: isExpiringSoon ? "error.contrastText" : "text.secondary",
-                    transition: "all 0.3s ease",
-                }}
+                sx={styles.container}
             >
                 <TimerIcon fontSize="small" />
                 <Typography
                     variant="body2"
-                    sx={{
-                        fontWeight: 700,
-                        fontFamily: "monospace",
-                        width: "45px",
-                        textAlign: "center"
-                    }}
+                    sx={styles.text}
                 >
                     {timeLeft}
                 </Typography>
@@ -70,3 +76,4 @@ const TokenCountdown: React.FC<TokenCountdownProps> = ({ expiryTime }) => {
 };
 
 export default TokenCountdown;
+
