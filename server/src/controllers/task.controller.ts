@@ -6,7 +6,7 @@ import Task from "../models/task.model";
 export const getTasks = async (req: Request, res: Response): Promise<void> => {
     try {
         const userId = req.user!._id;
-        const tasks = await Task.find({ userId: userId as any }).sort({ order: 1 });
+        const tasks = await Task.find({ userId: userId }).sort({ order: 1 });
         res.json(tasks);
     } catch (error: unknown) {
         if (error instanceof Error) {
@@ -25,11 +25,11 @@ export const createTask = async (req: Request, res: Response): Promise<void> => 
         const { title, description, status, priority } = req.body;
 
         // Get max order for the status to append to end
-        const lastTask = await Task.findOne({ userId: userId as any, status }).sort({ order: -1 });
+        const lastTask = await Task.findOne({ userId: userId, status }).sort({ order: -1 });
         const order = lastTask ? lastTask.order + 1 : 0;
 
         const task = await Task.create({
-            userId: userId as any,
+            userId: userId,
             title,
             description,
             status,
@@ -54,7 +54,7 @@ export const updateTask = async (req: Request, res: Response): Promise<void> => 
         const userId = req.user!._id;
         const updates = req.body;
 
-        const task = await Task.findOneAndUpdate({ _id: id, userId: userId as any }, updates, { new: true });
+        const task = await Task.findOneAndUpdate({ _id: id, userId: userId }, updates, { new: true });
 
         if (!task) {
             res.status(404).json({ message: "Task not found" });
@@ -77,7 +77,7 @@ export const deleteTask = async (req: Request, res: Response): Promise<void> => 
         const { id } = req.params;
         const userId = req.user!._id;
 
-        const task = await Task.findOneAndDelete({ _id: id, userId: userId as any });
+        const task = await Task.findOneAndDelete({ _id: id, userId: userId });
 
         if (!task) {
             res.status(404).json({ message: "Task not found" });
@@ -113,7 +113,7 @@ export const updateTaskOrder = async (req: Request, res: Response): Promise<void
 
         const bulkOps = tasks.map((task: TaskOrderUpdate) => ({
             updateOne: {
-                filter: { _id: task._id, userId: userId as any },
+                filter: { _id: task._id, userId: userId },
                 update: { status: task.status, order: task.order },
             },
         }));

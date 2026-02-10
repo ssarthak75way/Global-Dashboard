@@ -16,8 +16,6 @@ import {
     ListItemIcon,
     ListItemText,
     Avatar,
-    Menu,
-    MenuItem,
     Tooltip,
     useMediaQuery,
     useTheme as useMuiTheme
@@ -34,8 +32,99 @@ import {
     Brightness7 as LightModeIcon
 } from "@mui/icons-material";
 import TokenCountdown from "../components/TokenCountdown";
+import UserSearch from "../components/UserSearch";
+import UserMenu from "../components/UserMenu";
+
+import { Theme } from "@mui/material";
 
 const drawerWidth = 240;
+
+const privateLayoutStyles = {
+    root: { display: 'flex', minHeight: '100vh' },
+    drawerContentBox: { height: '100%', display: 'flex', flexDirection: 'column' },
+    drawerHeaderToolbar: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: [1] },
+    drawerHeaderTitle: { ml: 2, fontWeight: 700, color: 'primary.main' },
+    navList: { flexGrow: 1, px: 2, pt: 2 },
+    navListItem: { display: 'block', mb: 1 },
+    navListItemButton: (open: boolean, isActive: boolean, theme: Theme) => ({
+        minHeight: 48,
+        justifyContent: open ? 'initial' : 'center',
+        px: 2.5,
+        borderRadius: 3,
+        transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+        bgcolor: isActive ? (theme.palette.mode === 'light' ? 'rgba(99, 102, 241, 0.08)' : 'rgba(99, 102, 241, 0.15)') : 'transparent',
+        color: isActive ? 'primary.main' : 'text.primary',
+        '& .MuiListItemIcon-root': { color: isActive ? 'primary.main' : 'inherit' },
+        '&:hover': {
+            transform: 'translateX(4px)',
+            bgcolor: isActive ? 'primary.light' : 'action.hover',
+            color: isActive ? 'white' : 'text.primary',
+            '& .MuiListItemIcon-root': { color: isActive ? 'white' : 'inherit' }
+        }
+    }),
+    navListItemIcon: (open: boolean) => ({ minWidth: 0, mr: open ? 2 : 'auto', justifyContent: 'center' }),
+    navListItemText: (open: boolean) => ({ opacity: open ? 1 : 0 }),
+    navListItemTextPrimary: { fontWeight: 700, fontSize: '0.9rem' },
+    logoutButtonContainer: { p: 2 },
+    logoutButton: {
+        borderRadius: 3,
+        color: 'error.main',
+        transition: 'all 0.2s ease',
+        '&:hover': {
+            bgcolor: 'rgba(239, 68, 68, 0.1)',
+            transform: 'translateX(4px)'
+        }
+    },
+    appBar: (open: boolean, theme: Theme) => ({
+        zIndex: theme.zIndex.drawer + 1,
+        transition: theme.transitions.create(['width', 'margin'], {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.leavingScreen,
+        }),
+        ...(open && {
+            marginLeft: drawerWidth,
+            width: `calc(100% - ${drawerWidth}px)`,
+            transition: theme.transitions.create(['width', 'margin'], {
+                easing: theme.transitions.easing.sharp,
+                duration: theme.transitions.duration.enteringScreen,
+            }),
+        }),
+        bgcolor: 'background.paper',
+        borderBottom: '1px solid',
+        borderColor: 'divider',
+        color: 'text.primary'
+    }),
+    menuButton: (open: boolean) => ({ marginRight: 5, ...(open && { display: 'none' }) }),
+    title: { flexGrow: 1, fontWeight: 600 },
+    topBarActions: { display: 'flex', alignItems: 'center', gap: 2 },
+    avatarButton: { p: 0 },
+    avatar: { width: 35, height: 35, bgcolor: 'primary.main' },
+    drawer: (open: boolean, theme: Theme) => ({
+        width: drawerWidth,
+        flexShrink: 0,
+        whiteSpace: 'nowrap',
+        boxSizing: 'border-box',
+        [`& .MuiDrawer-paper`]: {
+            width: drawerWidth,
+            transition: theme.transitions.create('width', {
+                easing: theme.transitions.easing.sharp,
+                duration: theme.transitions.duration.enteringScreen,
+            }),
+            overflowX: 'hidden',
+            ...(!open && {
+                transition: theme.transitions.create('width', {
+                    easing: theme.transitions.easing.sharp,
+                    duration: theme.transitions.duration.leavingScreen,
+                }),
+                width: theme.spacing(7),
+                [theme.breakpoints.up('sm')]: {
+                    width: theme.spacing(9),
+                },
+            }),
+        },
+    }),
+    mainContent: { flexGrow: 1, p: 3, mt: 8, bgcolor: 'background.default' }
+};
 
 const PrivateLayout = () => {
     const { isAuthenticated, loading, logout, user } = useAuth();
@@ -62,9 +151,9 @@ const PrivateLayout = () => {
     ];
 
     const drawerContent = (
-        <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-            <Toolbar sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: [1] }}>
-                <Typography variant="h6" sx={{ ml: 2, fontWeight: 700, color: 'primary.main' }}>
+        <Box sx={privateLayoutStyles.drawerContentBox}>
+            <Toolbar sx={privateLayoutStyles.drawerHeaderToolbar}>
+                <Typography variant="h6" sx={privateLayoutStyles.drawerHeaderTitle}>
                     Global Dashboard
                 </Typography>
                 <IconButton onClick={toggleDrawer}>
@@ -72,86 +161,44 @@ const PrivateLayout = () => {
                 </IconButton>
             </Toolbar>
             <Divider />
-            <List component="nav" sx={{ flexGrow: 1, px: 2, pt: 2 }}>
+            <List component="nav" sx={privateLayoutStyles.navList}>
                 {menuItems.map((item) => (
-                    <ListItem key={item.text} disablePadding sx={{ display: 'block', mb: 1 }}>
+                    <ListItem key={item.text} disablePadding sx={privateLayoutStyles.navListItem}>
                         <ListItemButton
                             component={Link}
                             to={item.path}
                             selected={location.pathname === item.path}
-                            sx={{
-                                minHeight: 48,
-                                justifyContent: open ? 'initial' : 'center',
-                                px: 2.5,
-                                borderRadius: 3,
-                                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                                '&.Mui-selected': {
-                                    bgcolor: (theme) => theme.palette.mode === 'light' ? 'rgba(99, 102, 241, 0.08)' : 'rgba(99, 102, 241, 0.15)',
-                                    color: 'primary.main',
-                                    '& .MuiListItemIcon-root': { color: 'primary.main' },
-                                    '&:hover': { bgcolor: 'primary.light', color: 'white', '& .MuiListItemIcon-root': { color: 'white' } }
-                                },
-                                '&:hover': {
-                                    transform: 'translateX(4px)',
-                                    bgcolor: 'action.hover',
-                                }
-                            }}
+                            sx={(theme) => privateLayoutStyles.navListItemButton(open, location.pathname === item.path, theme)}
                         >
-                            <ListItemIcon sx={{ minWidth: 0, mr: open ? 2 : 'auto', justifyContent: 'center' }}>
+                            <ListItemIcon sx={privateLayoutStyles.navListItemIcon(open)}>
                                 {item.icon}
                             </ListItemIcon>
-                            <ListItemText primary={item.text} sx={{ opacity: open ? 1 : 0 }} primaryTypographyProps={{ fontWeight: 700, fontSize: '0.9rem' }} />
+                            <ListItemText primary={item.text} sx={privateLayoutStyles.navListItemText(open)} primaryTypographyProps={privateLayoutStyles.navListItemTextPrimary} />
                         </ListItemButton>
                     </ListItem>
                 ))}
             </List>
             <Divider sx={{ opacity: 0.5 }} />
-            <Box sx={{ p: 2 }}>
+            <Box sx={privateLayoutStyles.logoutButtonContainer}>
                 <ListItemButton
                     onClick={logout}
-                    sx={{
-                        borderRadius: 3,
-                        color: 'error.main',
-                        transition: 'all 0.2s ease',
-                        '&:hover': {
-                            bgcolor: 'rgba(239, 68, 68, 0.1)',
-                            transform: 'translateX(4px)'
-                        }
-                    }}
+                    sx={privateLayoutStyles.logoutButton}
                 >
                     <ListItemIcon sx={{ color: 'inherit', minWidth: 40 }}>
                         <LogoutIcon />
                     </ListItemIcon>
-                    {open && <ListItemText primary="Logout" primaryTypographyProps={{ fontWeight: 700, fontSize: '0.9rem' }} />}
+                    {open && <ListItemText primary="Logout" primaryTypographyProps={privateLayoutStyles.navListItemTextPrimary} />}
                 </ListItemButton>
             </Box>
         </Box>
     );
 
     return (
-        <Box sx={{ display: 'flex', minHeight: '100vh' }}>
+        <Box sx={privateLayoutStyles.root}>
             <AppBar
                 position="fixed"
                 elevation={0}
-                sx={{
-                    zIndex: muiTheme.zIndex.drawer + 1,
-                    transition: muiTheme.transitions.create(['width', 'margin'], {
-                        easing: muiTheme.transitions.easing.sharp,
-                        duration: muiTheme.transitions.duration.leavingScreen,
-                    }),
-                    ...(open && {
-                        marginLeft: drawerWidth,
-                        width: `calc(100% - ${drawerWidth}px)`,
-                        transition: muiTheme.transitions.create(['width', 'margin'], {
-                            easing: muiTheme.transitions.easing.sharp,
-                            duration: muiTheme.transitions.duration.enteringScreen,
-                        }),
-                    }),
-                    bgcolor: 'background.paper',
-                    borderBottom: '1px solid',
-                    borderColor: 'divider',
-                    color: 'text.primary'
-                }}
+                sx={(theme) => privateLayoutStyles.appBar(open, theme)}
             >
                 <Toolbar>
                     <IconButton
@@ -159,15 +206,17 @@ const PrivateLayout = () => {
                         aria-label="open drawer"
                         onClick={toggleDrawer}
                         edge="start"
-                        sx={{ marginRight: 5, ...(open && { display: 'none' }) }}
+                        sx={privateLayoutStyles.menuButton(open)}
                     >
                         <MenuIcon />
                     </IconButton>
-                    <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1, fontWeight: 600 }}>
+                    <Typography variant="h6" noWrap component="div" sx={privateLayoutStyles.title}>
                         {menuItems.find(i => i.path === location.pathname)?.text || 'Welcome'}
                     </Typography>
 
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <UserSearch />
+
+                    <Box sx={privateLayoutStyles.topBarActions}>
                         <TokenCountdown expiryTime={useAuth().expiryTime} />
 
                         <Tooltip title="Toggle Theme">
@@ -177,24 +226,24 @@ const PrivateLayout = () => {
                         </Tooltip>
 
                         <Tooltip title="Account settings">
-                            <IconButton onClick={handleMenu} sx={{ p: 0 }}>
-                                <Avatar alt={user?.email} src="/static/images/avatar/2.jpg" sx={{ width: 35, height: 35, bgcolor: 'primary.main' }}>
+                            <IconButton
+                                onClick={handleMenu}
+                                size="small"
+                                sx={privateLayoutStyles.avatarButton}
+                                aria-controls={open ? 'account-menu' : undefined}
+                                aria-haspopup="true"
+                                aria-expanded={open ? 'true' : undefined}
+                            >
+                                <Avatar alt={user?.email} src="/static/images/avatar/2.jpg" sx={privateLayoutStyles.avatar}>
                                     {user?.email?.[0].toUpperCase()}
                                 </Avatar>
                             </IconButton>
                         </Tooltip>
-                        <Menu
-                            id="menu-appbar"
+                        <UserMenu
                             anchorEl={anchorEl}
-                            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                            keepMounted
-                            transformOrigin={{ vertical: 'top', horizontal: 'right' }}
                             open={Boolean(anchorEl)}
                             onClose={handleClose}
-                        >
-                            <MenuItem onClick={handleClose} component={Link} to="/profile">Profile</MenuItem>
-                            <MenuItem onClick={() => { handleClose(); logout(); }}>Logout</MenuItem>
-                        </Menu>
+                        />
                     </Box>
                 </Toolbar>
             </AppBar>
@@ -203,35 +252,12 @@ const PrivateLayout = () => {
                 variant={isMobile ? "temporary" : "permanent"}
                 open={open}
                 onClose={toggleDrawer}
-                sx={{
-                    width: drawerWidth,
-                    flexShrink: 0,
-                    whiteSpace: 'nowrap',
-                    boxSizing: 'border-grow',
-                    [`& .MuiDrawer-paper`]: {
-                        width: drawerWidth,
-                        transition: muiTheme.transitions.create('width', {
-                            easing: muiTheme.transitions.easing.sharp,
-                            duration: muiTheme.transitions.duration.enteringScreen,
-                        }),
-                        overflowX: 'hidden',
-                        ...(!open && {
-                            transition: muiTheme.transitions.create('width', {
-                                easing: muiTheme.transitions.easing.sharp,
-                                duration: muiTheme.transitions.duration.leavingScreen,
-                            }),
-                            width: muiTheme.spacing(7),
-                            [muiTheme.breakpoints.up('sm')]: {
-                                width: muiTheme.spacing(9),
-                            },
-                        }),
-                    },
-                }}
+                sx={(theme) => privateLayoutStyles.drawer(open, theme)}
             >
                 {drawerContent}
             </Drawer>
 
-            <Box component="main" sx={{ flexGrow: 1, p: 3, mt: 8, bgcolor: 'background.default' }}>
+            <Box component="main" sx={privateLayoutStyles.mainContent}>
                 <Outlet />
             </Box>
         </Box>

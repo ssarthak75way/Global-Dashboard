@@ -53,6 +53,7 @@ const router = createBrowserRouter([
     children: [
       { path: "/dashboard", element: <Dashboard /> },
       { path: "/profile", element: <Profile /> },
+      { path: "/profile/:userId", element: <Profile /> },
       { path: "/board", element: <Board /> },
       { path: "/feed", element: <Feed /> }
     ]

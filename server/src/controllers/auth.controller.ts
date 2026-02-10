@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import User from "../models/user.model";
+import Post from "../models/post.model";
 import generateTokens from "../utils/generateToken";
 import sendEmail from "../utils/mailer";
 import bcrypt from "bcryptjs";
@@ -239,7 +240,7 @@ export const updateProfile = async (req: Request, res: Response): Promise<void> 
             return;
         }
 
-        const { name, age, socialHandles } = req.body;
+        const { name, age, socialHandles, bio, about, experience, skills, hobbies } = req.body;
 
         const user = await User.findById(userId);
         if (!user) {
@@ -255,6 +256,11 @@ export const updateProfile = async (req: Request, res: Response): Promise<void> 
                 ...socialHandles
             };
         }
+        if (bio !== undefined) user.bio = bio;
+        if (about !== undefined) user.about = about;
+        if (experience !== undefined) user.experience = experience;
+        if (skills !== undefined) user.skills = skills;
+        if (hobbies !== undefined) user.hobbies = hobbies;
 
         await user.save();
 
@@ -267,7 +273,12 @@ export const updateProfile = async (req: Request, res: Response): Promise<void> 
                 age: user.age,
                 socialHandles: user.socialHandles,
                 dashboardOrder: user.dashboardOrder,
-                isVerified: user.isVerified
+                isVerified: user.isVerified,
+                bio: user.bio,
+                about: user.about,
+                experience: user.experience,
+                skills: user.skills,
+                hobbies: user.hobbies
             }
         });
     } catch (error: unknown) {
@@ -446,3 +457,147 @@ async function getGoogleUser({ id_token, access_token }: { id_token: string; acc
         }
     }
 }
+
+// Get User Activity for Heatmap
+export const getUserActivity = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const userId = req.user?._id;
+
+        if (!userId) {
+            res.status(401).json({ message: "Unauthorized" });
+            return;
+        }
+
+        // Fetch all posts by the user with comments
+        const posts = await Post.find({ author: userId }).select('createdAt comments likes').lean();
+
+        // Group activity by date with detailed breakdown
+        const activityMap = new Map<string, { posts: number; comments: number; likes: number }>();
+
+        posts.forEach(post => {
+            const date = new Date(post.createdAt);
+            const dateStr = date.toISOString().split('T')[0]; // YYYY-MM-DD format
+
+            const existing = activityMap.get(dateStr) || { posts: 0, comments: 0, likes: 0 };
+            existing.posts += 1;
+            activityMap.set(dateStr, existing);
+        });
+
+        // Track comments made by the user
+        const allPosts = await Post.find({ 'comments.user': userId }).select('comments').lean();
+        allPosts.forEach(post => {
+            post.comments.forEach(comment => {
+                if (comment.user.toString() === userId.toString()) {
+                    const date = new Date(comment.createdAt);
+                    const dateStr = date.toISOString().split('T')[0];
+
+                    const existing = activityMap.get(dateStr) || { posts: 0, comments: 0, likes: 0 };
+                    existing.comments += 1;
+                    activityMap.set(dateStr, existing);
+                }
+            });
+        });
+
+        // Track likes given by the user
+        const likedPosts = await Post.find({ likes: userId }).select('createdAt').lean();
+        likedPosts.forEach(post => {
+            const date = new Date(post.createdAt);
+            const dateStr = date.toISOString().split('T')[0];
+
+            const existing = activityMap.get(dateStr) || { posts: 0, comments: 0, likes: 0 };
+            existing.likes += 1;
+            activityMap.set(dateStr, existing);
+        });
+
+        // Convert to array format for heatmap
+        const activity = Array.from(activityMap.entries()).map(([date, details]) => ({
+            date,
+            count: details.posts + details.comments + details.likes,
+            posts: details.posts,
+            comments: details.comments,
+            likes: details.likes
+        }));
+
+        // Calculate stats
+        const totalPosts = posts.length;
+        const activeDays = activityMap.size;
+
+        // Calculate current streak
+        let currentStreak = 0;
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        for (let i = 0; i < 365; i++) {
+            const checkDate = new Date(today);
+            checkDate.setDate(checkDate.getDate() - i);
+            const dateStr = checkDate.toISOString().split('T')[0];
+
+            if (activityMap.has(dateStr)) {
+                currentStreak++;
+            } else if (i > 0) {
+                // Allow one day gap for today if no posts yet
+                break;
+            }
+        }
+
+        // Calculate longest streak
+        let longestStreak = 0;
+        let tempStreak = 0;
+        const sortedDates = Array.from(activityMap.keys()).sort();
+
+        for (let i = 0; i < sortedDates.length; i++) {
+            if (i === 0) {
+                tempStreak = 1;
+            } else {
+                const prevDate = new Date(sortedDates[i - 1]);
+                const currDate = new Date(sortedDates[i]);
+                const diffDays = Math.floor((currDate.getTime() - prevDate.getTime()) / (1000 * 60 * 60 * 24));
+
+                if (diffDays === 1) {
+                    tempStreak++;
+                } else {
+                    longestStreak = Math.max(longestStreak, tempStreak);
+                    tempStreak = 1;
+                }
+            }
+        }
+        longestStreak = Math.max(longestStreak, tempStreak);
+
+        res.json({
+            activity,
+            stats: {
+                totalPosts,
+                currentStreak,
+                longestStreak,
+                activeDays
+            }
+        });
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            res.status(500).json({ message: error.message });
+        } else {
+            res.status(500).json({ message: "An unknown error occurred" });
+        }
+    }
+};
+
+// Get User by ID (Public Profile)
+export const getUserById = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const userId = req.params.id;
+        const user = await User.findById(userId).select("-password -refreshToken -otp -otpExpires");
+
+        if (!user) {
+            res.status(404).json({ message: "User not found" });
+            return;
+        }
+        res.status(200).json(user);
+        
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            res.status(500).json({ message: error.message });
+        } else {
+            res.status(500).json({ message: "An unknown error occurred" });
+        }
+    }
+};

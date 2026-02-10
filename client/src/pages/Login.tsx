@@ -5,6 +5,7 @@ import { useNavigate, Link } from "react-router-dom";
 import api from "../api/axios";
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import Loader from "../components/Loader";
 import {
     Box,
     Typography,
@@ -14,10 +15,10 @@ import {
     Link as MuiLink,
     Divider,
     Alert,
-    CircularProgress,
     Stack,
     Fade,
-    Grow
+    Grow,
+    Theme
 } from "@mui/material";
 import { Google as GoogleIcon, Login as LoginIcon } from "@mui/icons-material";
 import axios from "axios";
@@ -67,11 +68,11 @@ const Login = () => {
             borderRadius: 6,
             border: '1px solid',
             borderColor: 'divider',
-            background: (theme: any) => theme.palette.mode === 'light'
+            background: (theme: Theme) => theme.palette.mode === 'light'
                 ? 'rgba(255, 255, 255, 0.7)'
                 : 'rgba(15, 23, 42, 0.6)',
             backdropFilter: 'blur(20px)',
-            boxShadow: (theme: any) => theme.palette.mode === 'light'
+            boxShadow: (theme: Theme) => theme.palette.mode === 'light'
                 ? '0 25px 50px -12px rgba(0, 0, 0, 0.05)'
                 : '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
             position: 'relative',
@@ -85,7 +86,7 @@ const Login = () => {
             fontWeight: 800,
             mb: 1.5,
             letterSpacing: -1.5,
-            background: (theme: any) => `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
+            background: (theme: Theme) => `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             filter: 'drop-shadow(0 4px 8px rgba(99, 102, 241, 0.2))'
@@ -200,7 +201,7 @@ const Login = () => {
                             variant="contained"
                             size="large"
                             disabled={loading}
-                            startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <LoginIcon />}
+                            startIcon={loading ? <Loader size={20} color="inherit" /> : <LoginIcon />}
                             sx={styles.submitButton}
                         >
                             {loading ? "Authorizing..." : "Continue to Workspace"}

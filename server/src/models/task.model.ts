@@ -6,7 +6,7 @@ export interface ITask extends Document {
     status: string; // ToDo, In Progress, Done, etc.
     priority: "Low" | "Medium" | "High";
     order: number;
-    userId: mongoose.Schema.Types.ObjectId;
+    userId: mongoose.Types.ObjectId;
     createdAt: Date;
     updatedAt: Date;
 }

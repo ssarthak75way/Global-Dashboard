@@ -34,6 +34,7 @@ import {
     rectSortingStrategy,
     useSortable
 } from '@dnd-kit/sortable';
+import AddIcon from '@mui/icons-material/Add';
 import { CSS } from '@dnd-kit/utilities';
 import VerifiedIcon from "@mui/icons-material/CheckCircle";
 import UnverifiedIcon from "@mui/icons-material/Error";
@@ -63,113 +64,132 @@ interface DragProps {
     'aria-describedby'?: string;
 }
 
+const dashboardCardStyles = {
+    card: (isOverlay: boolean, theme: Theme) => ({
+        borderRadius: 1,
+        position: 'relative',
+        overflow: 'hidden',
+        background: theme.palette.mode === 'light'
+            ? 'rgba(255, 255, 255, 0.8)'
+            : 'rgba(30, 41, 59, 0.6)',
+        backdropFilter: 'blur(20px)',
+        border: '1px solid',
+        borderColor: isOverlay ? 'primary.main' : 'divider',
+        boxShadow: isOverlay
+            ? '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
+            : (theme.palette.mode === 'light' ? '0 10px 15px -3px rgba(0, 0, 0, 0.05)' : 'none'),
+        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        cursor: isOverlay ? 'grabbing' : 'default',
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        '&:hover': {
+            borderColor: !isOverlay ? 'primary.main' : 'inherit',
+            transform: !isOverlay ? 'translateY(-6px)' : 'none',
+            boxShadow: !isOverlay ? (theme.palette.mode === 'light'
+                ? '0 20px 25px -5px rgba(0, 0, 0, 0.1)'
+                : '0 20px 25px -5px rgba(0, 0, 0, 0.3)') : 'none',
+        }
+    }),
+    cardContent: { p: 3, flexGrow: 1, display: 'flex', flexDirection: 'column' },
+    headerBox: { display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 3 },
+    avatar: (color: string) => ({
+        bgcolor: `${color}15`,
+        color: color,
+        width: 52,
+        height: 52,
+        borderRadius: 3,
+        border: '1.5px solid',
+        borderColor: `${color}30`
+    }),
+    dragHandle: {
+        cursor: 'grab',
+        color: 'text.disabled',
+        '&:hover': { color: 'primary.main', bgcolor: 'action.hover' },
+        p: 0.5,
+        borderRadius: 1.5,
+        transition: 'all 0.2s'
+    },
+    platformText: { color: 'text.secondary', fontWeight: 800, letterSpacing: 1, textTransform: 'uppercase', mb: 0.5, display: 'block' },
+    labelText: { fontWeight: 800, lineHeight: 1.3, mb: 1, color: 'text.primary' },
+    valueText: (color: string) => ({
+        fontWeight: 950,
+        letterSpacing: -2,
+        fontSize: '2.5rem',
+        background: `linear-gradient(45deg, ${color}, ${color}AA)`,
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent'
+    }),
+    footerBox: (theme: Theme) => ({
+        display: 'flex',
+        alignItems: 'center',
+        gap: 1,
+        bgcolor: theme.palette.mode === 'light' ? 'rgba(0,0,0,0.03)' : 'rgba(255,255,255,0.04)',
+        px: 1.5,
+        py: 1,
+        borderRadius: 1,
+        border: '1px solid',
+        borderColor: 'divider'
+    }),
+    trendingIcon: { color: 'success.main', fontSize: '1rem' },
+    descriptionText: { color: 'text.secondary', fontWeight: 700, fontSize: '0.75rem' },
+    progressBar: (color: string) => ({
+        height: 4,
+        width: '100%',
+        background: `linear-gradient(90deg, transparent, ${color}, transparent)`,
+        opacity: 0.5
+    }),
+    dragIndicatorIcon: { fontSize: '1.25rem' },
+    platformIcon: { fontSize: '1.75rem' },
+    cardHeaderContentBox: { flexGrow: 1, mb: 2 },
+    overlayBox: (isMobile: boolean) => ({ width: isMobile ? '100%' : '100%' })
+};
+
 const DashboardCard = ({ card, loading, isOverlay = false, dragProps = {} }: { card: CardData; loading: boolean; isOverlay?: boolean; dragProps?: DragProps | Record<string, unknown> }) => {
     return (
         <Card
-            sx={{
-                borderRadius: 1,
-                position: 'relative',
-                overflow: 'hidden',
-                background: (theme: Theme) => theme.palette.mode === 'light'
-                    ? 'rgba(255, 255, 255, 0.8)'
-                    : 'rgba(30, 41, 59, 0.6)',
-                backdropFilter: 'blur(20px)',
-                border: '1px solid',
-                borderColor: () => isOverlay ? 'primary.main' : 'divider',
-                boxShadow: (theme: Theme) => isOverlay
-                    ? '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
-                    : (theme.palette.mode === 'light' ? '0 10px 15px -3px rgba(0, 0, 0, 0.05)' : 'none'),
-                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                cursor: isOverlay ? 'grabbing' : 'default',
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'column',
-                '&:hover': {
-                    borderColor: () => !isOverlay ? 'primary.main' : 'inherit',
-                    transform: !isOverlay ? 'translateY(-6px)' : 'none',
-                    boxShadow: (theme: Theme) => !isOverlay ? (theme.palette.mode === 'light'
-                        ? '0 20px 25px -5px rgba(0, 0, 0, 0.1)'
-                        : '0 20px 25px -5px rgba(0, 0, 0, 0.3)') : 'none',
-                }
-            }}
+            sx={(theme) => dashboardCardStyles.card(isOverlay, theme)}
         >
-            <CardContent sx={{ p: 3, flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-                <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 3 }}>
+            <CardContent sx={dashboardCardStyles.cardContent}>
+                <Box sx={dashboardCardStyles.headerBox}>
                     <Avatar
-                        sx={{
-                            bgcolor: `${card.color}15`,
-                            color: card.color,
-                            width: 52,
-                            height: 52,
-                            borderRadius: 3,
-                            border: '1.5px solid',
-                            borderColor: `${card.color}30`
-                        }}
+                        sx={dashboardCardStyles.avatar(card.color)}
                     >
                         {card.icon}
                     </Avatar>
                     {!isOverlay && (
-                        <Box {...dragProps} sx={{
-                            cursor: 'grab',
-                            color: 'text.disabled',
-                            '&:hover': { color: 'primary.main', bgcolor: 'action.hover' },
-                            p: 0.5,
-                            borderRadius: 1.5,
-                            transition: 'all 0.2s'
-                        }}>
-                            <DragIndicatorIcon sx={{ fontSize: '1.25rem' }} />
+                        <Box {...dragProps} sx={dashboardCardStyles.dragHandle}>
+                            <DragIndicatorIcon sx={dashboardCardStyles.dragIndicatorIcon} />
                         </Box>
                     )}
                 </Box>
 
-                <Box sx={{ flexGrow: 1, mb: 2 }}>
-                    <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 800, letterSpacing: 1, textTransform: 'uppercase', mb: 0.5, display: 'block' }}>
+                <Box sx={dashboardCardStyles.cardHeaderContentBox}>
+                    <Typography variant="caption" sx={dashboardCardStyles.platformText}>
                         {card.platform}
                     </Typography>
-                    <Typography variant="h6" sx={{ fontWeight: 800, lineHeight: 1.3, mb: 1, color: 'text.primary' }}>
+                    <Typography variant="h6" sx={dashboardCardStyles.labelText}>
                         {card.label}
                     </Typography>
 
                     {loading ? (
                         <Skeleton variant="text" width="60%" height={60} />
                     ) : (
-                        <Typography variant="h3" sx={{
-                            fontWeight: 950,
-                            letterSpacing: -2,
-                            fontSize: '2.5rem',
-                            background: `linear-gradient(45deg, ${card.color}, ${card.color}AA)`,
-                            WebkitBackgroundClip: 'text',
-                            WebkitTextFillColor: 'transparent'
-                        }}>
+                        <Typography variant="h3" sx={dashboardCardStyles.valueText(card.color)}>
                             {card.value}
                         </Typography>
                     )}
                 </Box>
 
-                <Box sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 1,
-                    bgcolor: (theme: Theme) => theme.palette.mode === 'light' ? 'rgba(0,0,0,0.03)' : 'rgba(255,255,255,0.04)',
-                    px: 1.5,
-                    py: 1,
-                    borderRadius: 1,
-                    border: '1px solid',
-                    borderColor: 'divider'
-                }}>
-                    <TrendingUpIcon sx={{ color: 'success.main', fontSize: '1rem' }} />
-                    <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 700, fontSize: '0.75rem' }}>
+                <Box sx={dashboardCardStyles.footerBox}>
+                    <TrendingUpIcon sx={dashboardCardStyles.trendingIcon} />
+                    <Typography variant="body2" sx={dashboardCardStyles.descriptionText}>
                         {card.description}
                     </Typography>
                 </Box>
             </CardContent>
 
-            <Box sx={{
-                height: 4,
-                width: '100%',
-                background: `linear-gradient(90deg, transparent, ${card.color}, transparent)`,
-                opacity: 0.5
-            }} />
+            <Box sx={dashboardCardStyles.progressBar(card.color)} />
         </Card>
     );
 };
@@ -290,11 +310,11 @@ const Dashboard = () => {
 
     useEffect(() => {
         const platforms = [
-            { id: 'github', label: 'Public Repositories', platform: 'GitHub', icon: <GitHubIcon sx={{ fontSize: '1.75rem' }} />, color: '#10b981', description: 'Real-time repository sync' },
-            { id: 'leetcode', label: 'Solved Problems', platform: 'LeetCode', icon: <TerminalIcon sx={{ fontSize: '1.75rem' }} />, color: '#f59e0b', description: 'Rank: Top 10%' },
-            { id: 'linkedin', label: 'Professional Index', platform: 'LinkedIn', icon: <LinkedInIcon sx={{ fontSize: '1.75rem' }} />, color: '#0a66c2', description: 'Weekly Profile Views' },
-            { id: 'codeforces', label: 'Global Rating', platform: 'Codeforces', icon: <EmojiEventsIcon sx={{ fontSize: '1.75rem' }} />, color: '#ef4444', description: 'Candidate Master' },
-            { id: 'tasks', label: 'Active Progress', platform: 'Internal Tasks', icon: <TaskIcon sx={{ fontSize: '1.75rem' }} />, color: '#6366f1', description: '3 Tasks Completed' }
+            { id: 'github', label: 'Public Repositories', platform: 'GitHub', icon: <GitHubIcon sx={dashboardCardStyles.platformIcon} />, color: '#10b981', description: 'Real-time repository sync' },
+            { id: 'leetcode', label: 'Solved Problems', platform: 'LeetCode', icon: <TerminalIcon sx={dashboardCardStyles.platformIcon} />, color: '#f59e0b', description: 'Rank: Top 10%' },
+            { id: 'linkedin', label: 'Professional Index', platform: 'LinkedIn', icon: <LinkedInIcon sx={dashboardCardStyles.platformIcon} />, color: '#0a66c2', description: 'Weekly Profile Views' },
+            { id: 'codeforces', label: 'Global Rating', platform: 'Codeforces', icon: <EmojiEventsIcon sx={dashboardCardStyles.platformIcon} />, color: '#ef4444', description: 'Candidate Master' },
+            { id: 'tasks', label: 'Active Progress', platform: 'Internal Tasks', icon: <TaskIcon sx={dashboardCardStyles.platformIcon} />, color: '#6366f1', description: '3 Tasks Completed' }
         ];
 
         let initialOrder = user?.dashboardOrder?.length ? user.dashboardOrder : platforms.map(p => p.id);
@@ -314,8 +334,8 @@ const Dashboard = () => {
             let value: string | number = '---';
             let description = p.description;
 
-            if (id === 'github' && stats.github) {
-                value = stats.github.profile.repos || 0;
+            if (id === 'github' && stats?.github) {
+                value = stats.github?.profile?.repos || 0;
                 description = `${stats.github.profile.followers} Followers`;
             } else if (id === 'tasks') {
                 value = 12;
@@ -362,70 +382,108 @@ const Dashboard = () => {
 
     const activeCard = activeId ? cards.find(c => c.id === activeId) : null;
 
+    const styles = {
+        container: { pb: 8, px: { xs: 2, md: 0 } },
+        header: {
+            mb: { xs: 5, md: 8 },
+            mt: { xs: 2, md: 4 },
+            display: 'flex',
+            flexDirection: { xs: 'column', md: 'row' },
+            justifyContent: 'space-between',
+            alignItems: { xs: 'flex-start', md: 'center' },
+            gap: 4
+        },
+        title: { fontWeight: 950, mb: 1, letterSpacing: -3, fontSize: { xs: '3rem', md: '4rem' }, lineHeight: 1 },
+        platformBadge: {
+            fontSize: '0.875rem',
+            verticalAlign: 'middle',
+            ml: 2,
+            bgcolor: 'primary.main',
+            color: 'white',
+            px: 2,
+            py: 0.75,
+            borderRadius: 2,
+            fontWeight: 900,
+            display: 'inline-flex',
+            alignItems: 'center',
+            boxShadow: '0 4px 15px rgba(99, 102, 241, 0.4)',
+            border: '1px solid rgba(255,255,255,0.2)'
+        },
+        profileBox: { display: 'flex', alignItems: 'center', gap: 2.5, mt: 2 },
+        avatar: { width: 48, height: 48, border: '2.5px solid', borderColor: 'primary.main', p: 0.3 },
+        username: { fontWeight: 900, lineHeight: 1, mb: 0.5 },
+        tagline: { fontWeight: 700, letterSpacing: 0.5 },
+        actionsBox: { display: 'flex', gap: 2, width: { xs: '100%', md: 'auto' } },
+        verifiedChip: {
+            fontWeight: 900,
+            borderRadius: 3,
+            height: 44,
+            px: 1,
+            fontSize: '0.875rem',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
+        },
+        addfeedChip: {
+            fontWeight: 900,
+            borderRadius: 3,
+            height: 44,
+            px: 1,
+            fontSize: '0.875rem',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease-in-out',
+            '&:hover': {
+                transform: 'scale(1.05)',
+                boxShadow: '0 6px 15px rgba(0,0,0,0.1)',
+            },
+        }
+    };
+
     return (
         <Fade in timeout={1200}>
-            <Box sx={{ pb: 8, px: { xs: 2, md: 0 } }}>
-                <Box sx={{
-                    mb: { xs: 5, md: 8 },
-                    mt: { xs: 2, md: 4 },
-                    display: 'flex',
-                    flexDirection: { xs: 'column', md: 'row' },
-                    justifyContent: 'space-between',
-                    alignItems: { xs: 'flex-start', md: 'center' },
-                    gap: 4
-                }}>
+            <Box sx={styles.container}>
+                <Box sx={styles.header}>
                     <Box>
-                        <Typography variant="h2" sx={{ fontWeight: 950, mb: 1, letterSpacing: -3, fontSize: { xs: '3rem', md: '4rem' }, lineHeight: 1 }}>
+                        <Typography variant="h2" sx={styles.title}>
                             Overview
-                            <Box component="span" sx={{
-                                fontSize: '0.875rem',
-                                verticalAlign: 'middle',
-                                ml: 2,
-                                bgcolor: 'primary.main',
-                                color: 'white',
-                                px: 2,
-                                py: 0.75,
-                                borderRadius: 2,
-                                fontWeight: 900,
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                boxShadow: '0 4px 15px rgba(99, 102, 241, 0.4)',
-                                border: '1px solid rgba(255,255,255,0.2)'
-                            }}>
+                            <Box component="span" sx={styles.platformBadge}>
                                 PLATFORMS
                             </Box>
                         </Typography>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.5, mt: 2 }}>
+
+                        <Box sx={styles.profileBox}>
                             <Avatar
                                 src={stats.github?.profile?.avatar || stats.codeforces?.avatar}
-                                sx={{ width: 48, height: 48, border: '2.5px solid', borderColor: 'primary.main', p: 0.3 }}
+                                sx={styles.avatar}
                             >
                                 {user?.email?.[0].toUpperCase()}
                             </Avatar>
                             <Box>
-                                <Typography variant="h6" sx={{ fontWeight: 900, lineHeight: 1, mb: 0.5 }}>
+                                <Typography variant="h6" sx={styles.username}>
                                     {stats.github?.profile?.username || stats.leetcode?.username || user?.email.split('@')[0]}
                                 </Typography>
-                                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700, letterSpacing: 0.5 }}>
+                                <Typography variant="caption" color="text.secondary" sx={styles.tagline}>
                                     Your unified digital presence console
                                 </Typography>
                             </Box>
                         </Box>
                     </Box>
 
-                    <Box sx={{ display: 'flex', gap: 2, width: { xs: '100%', md: 'auto' } }}>
+                    <Box sx={styles.actionsBox}>
+                        <Chip
+                            component="a"
+                            href="/feed"
+                            variant="outlined"
+                            icon={<AddIcon fontSize="large" />}
+                            label={"Add Feed"}
+                            color="primary"
+                            sx={styles.addfeedChip}
+                        />
+
                         <Chip
                             icon={user?.isVerified ? <VerifiedIcon /> : <UnverifiedIcon />}
                             label={user?.isVerified ? "Verified Status" : "Action Required"}
                             color={user?.isVerified ? "success" : "warning"}
-                            sx={{
-                                fontWeight: 900,
-                                borderRadius: 3,
-                                height: 44,
-                                px: 1,
-                                fontSize: '0.875rem',
-                                boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
-                            }}
+                            sx={styles.verifiedChip}
                         />
                     </Box>
                 </Box>
@@ -457,14 +515,14 @@ const Dashboard = () => {
                         }),
                     }}>
                         {activeCard ? (
-                            <Box sx={{ width: isMobile ? '100%' : '350px' }}>
+                            <Box sx={dashboardCardStyles.overlayBox(isMobile)}>
                                 <DashboardCard card={activeCard} loading={loadingStates[activeCard.id] || false} isOverlay />
                             </Box>
                         ) : null}
                     </DragOverlay>
                 </DndContext>
-            </Box>
-        </Fade>
+            </Box >
+        </Fade >
     );
 };
 

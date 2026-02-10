@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import api from "../api/axios";
 
-interface User {
+export interface User {
     _id: string;
     email: string;
     name?: string;
@@ -12,8 +12,22 @@ interface User {
         leetcode?: string;
         linkedin?: string;
     };
+    bio?: string;
+    about?: string;
+    experience?: Array<{
+        role: string;
+        company: string;
+        startDate: Date | string;
+        endDate?: Date | string;
+        description?: string;
+        current: boolean;
+    }>;
+    skills?: string[];
+    hobbies?: string[];
     isVerified: boolean;
     dashboardOrder?: string[];
+    followers: string[];
+    following: string[];
 }
 
 interface AuthContextType {
@@ -36,14 +50,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const storedUser = localStorage.getItem("user");
         return storedUser ? JSON.parse(storedUser) : null;
     });
-    const [accessToken, setAccessTokenState] = useState<string | null>((window as any).accessToken || null);
+    const [accessToken, setAccessTokenState] = useState<string | null>(window.accessToken || null);
     const [expiryTime, setExpiryTime] = useState<number | null>(null);
     const [loading, setLoading] = useState(true);
     const hasInitialCheck = React.useRef(false);
 
     const setAccessToken = (token: string | null) => {
         setAccessTokenState(token);
-        (window as any).accessToken = token;
+        window.accessToken = token;
     };
 
     const login = (userData: User, token: string, expiresAt?: number) => {
@@ -80,7 +94,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             setAccessToken(newAccessToken);
             if (data.expiresAt) setExpiryTime(data.expiresAt);
 
-       
+
             await fetchMe();
         } catch (error) {
             setUser(null);

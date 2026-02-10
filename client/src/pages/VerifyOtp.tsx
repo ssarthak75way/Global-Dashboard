@@ -13,7 +13,6 @@ import {
     Button,
     Paper,
     Alert,
-    CircularProgress,
     Stack,
     IconButton,
     Avatar,
@@ -27,6 +26,7 @@ import {
     CheckCircleOutline as VerifiedIcon,
     ArrowBack as BackIcon
 } from "@mui/icons-material";
+import Loader from "../components/Loader";
 
 const verifySchema = z.object({
     otp: z.string().length(6, "OTP must be 6 digits"),
@@ -161,7 +161,13 @@ const VerifyOtp = () => {
             cursor: 'pointer',
             textDecoration: 'none',
             color: 'primary.main',
-            '&:hover': { textDecoration: 'underline' }
+        },
+        otpInputProps: {
+            textAlign: 'center',
+            letterSpacing: '0.5em',
+            fontSize: '2rem',
+            fontWeight: 900,
+            height: '60px'
         }
     };
 
@@ -210,13 +216,7 @@ const VerifyOtp = () => {
                             autoFocus
                             inputProps={{
                                 maxLength: 6,
-                                style: {
-                                    textAlign: 'center',
-                                    letterSpacing: '0.5em',
-                                    fontSize: '2rem',
-                                    fontWeight: 900,
-                                    height: '60px'
-                                }
+                                style: styles.otpInputProps as React.CSSProperties
                             }}
                             {...register("otp")}
                             error={!!errors.otp}
@@ -231,7 +231,7 @@ const VerifyOtp = () => {
                             variant="contained"
                             size="large"
                             disabled={loading}
-                            startIcon={loading ? <CircularProgress size={24} color="inherit" /> : <VerifiedIcon />}
+                            startIcon={loading ? <Loader size={24} color="inherit" /> : <VerifiedIcon />}
                             sx={styles.verifyButton}
                         >
                             {loading ? "Verifying..." : "Verify & Unlock"}
