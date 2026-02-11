@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Paper, Avatar, Typography, Button, Chip, Stack } from '@mui/material';
 import { Email as EmailIcon, Badge as IdIcon, Edit as EditIcon } from '@mui/icons-material';
-import { User } from '../../context/AuthContext';
+import { useAuth, User } from '../../context/AuthContext';
 import FollowButton from '../FollowButton';
 
 interface ProfileHeaderProps {
@@ -12,6 +12,9 @@ interface ProfileHeaderProps {
 }
 
 const ProfileHeader: React.FC<ProfileHeaderProps> = ({ displayUser, isOwnProfile, onEditClick, styles }) => {
+    const { user: currentUser } = useAuth();
+    const isFollowing = currentUser?.following?.includes(displayUser?._id || '') || false;
+
     return (
         <Paper elevation={0} sx={styles.bentoCard}>
             <Box sx={styles.identityWrapper}>
@@ -77,6 +80,16 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ displayUser, isOwnProfile
                         )}
                     </Stack>
 
+                    {displayUser?.bio && (
+                        <Typography
+                            variant="subtitle1"
+                            color="text.secondary"
+                            sx={{ fontWeight: 700, mb: 2, opacity: 0.9, letterSpacing: 0.5 }}
+                        >
+                            {displayUser.bio}
+                        </Typography>
+                    )}
+
                     <Stack direction="row" spacing={1.5} alignItems="center" mb={2.5}>
                         <EmailIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
                         <Typography variant="body2" color="text.secondary" fontWeight={700}>
@@ -95,7 +108,13 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ displayUser, isOwnProfile
                                 Edit Profile
                             </Button>
                         ) : (
-                            <FollowButton targetUserId={displayUser?._id || ''} />
+                            <FollowButton
+                                userId={displayUser?._id || ''}
+                                initialIsFollowing={isFollowing}
+                                onToggle={(newStatus) => {
+                                    console.log('Follow status changed:', newStatus);
+                                }}
+                            />
                         )}
                     </Stack>
                 </Box>

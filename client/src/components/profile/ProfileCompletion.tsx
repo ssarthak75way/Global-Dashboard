@@ -1,14 +1,12 @@
 import React from 'react';
 import { Paper, Typography, Box, LinearProgress } from '@mui/material';
-import { User } from '../../context/AuthContext';
 
 interface ProfileCompletionProps {
-    displayUser: User | null;
     profileCompletion: number;
     styles: any;
 }
 
-const ProfileCompletion: React.FC<ProfileCompletionProps> = ({ displayUser, profileCompletion, styles }) => {
+const ProfileCompletion: React.FC<ProfileCompletionProps> = ({ profileCompletion, styles }) => {
     return (
         <Paper elevation={0} sx={styles.bentoCard}>
             <Typography sx={styles.sectionTitle}>Profile Completion</Typography>

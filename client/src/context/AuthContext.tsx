@@ -26,11 +26,13 @@ export interface User {
     }>;
     projects?: Array<{
         title: string;
+        organization?: string;
         startDate: Date | string;
         endDate?: Date | string;
         description?: string;
-        techStack: string[];
+        techStack?: string[];
         link?: string;
+        current?: boolean;
     }>;
     certifications?: Array<{
         title: string;

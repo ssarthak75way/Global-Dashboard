@@ -5,7 +5,7 @@ import { User } from '../../context/AuthContext';
 
 interface ProjectsSectionProps {
     displayUser: User | null;
-    calculateDuration: (startDate: string, endDate?: string, current?: boolean) => string;
+    calculateDuration: (startDate: string | Date, endDate?: string | Date, current?: boolean) => string;
     styles: any;
 }
 
@@ -72,9 +72,9 @@ const ProjectsSection: React.FC<ProjectsSectionProps> = ({ displayUser, calculat
                                     {project.description}
                                 </Typography>
                             )}
-                            {project.technologies && project.technologies.length > 0 && (
+                            {project.techStack && project.techStack.length > 0 && (
                                 <Stack direction="row" flexWrap="wrap" gap={0.8} mb={1.5}>
-                                    {project.technologies.map(tech => (
+                                    {project.techStack.map(tech => (
                                         <Chip
                                             key={tech}
                                             label={tech}

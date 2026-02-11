@@ -12,7 +12,7 @@ import { User } from '../../context/AuthContext';
 
 interface ExperienceSectionProps {
     displayUser: User | null;
-    calculateDuration: (startDate: string, endDate?: string, current?: boolean) => string;
+    calculateDuration: (startDate: string | Date, endDate?: string | Date, current?: boolean) => string;
     styles: any;
 }
 
@@ -61,7 +61,11 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ displayUser, calc
                                         {new Date(exp.startDate).toLocaleDateString(undefined, { month: 'short', year: 'numeric' })} - {exp.current ? 'Present' : exp.endDate ? new Date(exp.endDate).toLocaleDateString(undefined, { month: 'short', year: 'numeric' }) : 'N/A'}
                                         {' • '}
                                         <Typography component="span" variant="caption" fontWeight={900} color="primary.main">
-                                            {calculateDuration(exp.startDate, exp.endDate, exp.current)}
+                                            {calculateDuration(
+                                                exp.startDate,
+                                                exp.endDate,
+                                                exp.current
+                                            )}
                                         </Typography>
                                     </Typography>
                                     {exp.description && (

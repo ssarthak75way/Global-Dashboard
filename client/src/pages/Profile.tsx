@@ -21,6 +21,7 @@ import ActivitySection from "../components/profile/ActivitySection";
 import AboutSkillsSection from "../components/profile/AboutSkillsSection";
 import ExperienceSection from "../components/profile/ExperienceSection";
 import ProjectsSection from "../components/profile/ProjectsSection";
+import CertificationsSection from "../components/profile/CertificationsSection";
 import ProfileCompletion from "../components/profile/ProfileCompletion";
 
 const Profile = () => {
@@ -82,6 +83,9 @@ const Profile = () => {
                 try {
                     const { data } = await getUserById(userId);
                     setOtherUser(data);
+                    // Extract activity and stats from public profile response
+                    if (data.activity) setActivityData(data.activity);
+                    if (data.activityStats) setActivityStats(data.activityStats);
                 } catch (error) {
                     console.error("Failed to load user profile", error);
                 } finally {
@@ -100,7 +104,7 @@ const Profile = () => {
         setNetworkModalOpen(true);
     };
 
-    const calculateDuration = (startDate: string, endDate?: string, current?: boolean) => {
+    const calculateDuration = (startDate: string | Date, endDate?: string | Date, current?: boolean) => {
         const start = new Date(startDate);
         const end = current ? new Date() : endDate ? new Date(endDate) : new Date();
         const months = (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth());
@@ -249,24 +253,25 @@ const Profile = () => {
                     <Grid container spacing={3.5}>
                         {/* Profile Header */}
                         <Grid item xs={12} lg={8}>
-                            <ProfileHeader
-                                displayUser={displayUser}
-                                isOwnProfile={isOwnProfile}
-                                onEditClick={() => setEditDialogOpen(true)}
-                                styles={styles}
-                            />
+                            <Grid container spacing={3.5}>
+                                <Grid item xs={12}>
+                                    <ProfileHeader
+                                        displayUser={displayUser}
+                                        isOwnProfile={isOwnProfile}
+                                        onEditClick={() => setEditDialogOpen(true)}
+                                        styles={styles}
+                                    />
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <ProfileCompletion
+                                        profileCompletion={profileCompletion}
+                                        styles={styles}
+                                    />
+                                </Grid>
+                            </Grid>
                         </Grid>
 
-                        {/* Profile Completion */}
-                        <Grid item xs={12} lg={4}>
-                            <ProfileCompletion
-                                displayUser={displayUser}
-                                profileCompletion={profileCompletion}
-                                styles={styles}
-                            />
-                        </Grid>
-
-                        {/* Network Stats */}
+                        {/* Profile Info & Stats */}
                         <Grid item xs={12} lg={4}>
                             <NetworkStats
                                 networkStats={networkStats}
@@ -292,6 +297,14 @@ const Profile = () => {
                             <ExperienceSection
                                 displayUser={displayUser}
                                 calculateDuration={calculateDuration}
+                                styles={styles}
+                            />
+                        </Grid>
+
+                        {/* Certifications */}
+                        <Grid item xs={12}>
+                            <CertificationsSection
+                                displayUser={displayUser}
                                 styles={styles}
                             />
                         </Grid>

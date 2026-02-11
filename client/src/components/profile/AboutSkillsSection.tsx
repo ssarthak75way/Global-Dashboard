@@ -16,10 +16,25 @@ const AboutSkillsSection: React.FC<AboutSkillsSectionProps> = ({ displayUser, st
             </Typography>
 
             <Typography variant="subtitle2" sx={{ fontWeight: 900, letterSpacing: 1.5, mb: 2, opacity: 0.6 }}>SKILLS & TOOLS</Typography>
+            <Stack direction="row" flexWrap="wrap" gap={1.5} mb={4}>
+                {displayUser?.skills?.length ? (
+                    displayUser.skills.map(skill => (
+                        <Chip key={skill} label={skill} sx={{ fontWeight: 700, borderRadius: 1, bgcolor: 'primary.main', color: 'white' }} />
+                    ))
+                ) : (
+                    <Typography variant="body2" color="text.secondary" fontStyle="italic">No skills listed.</Typography>
+                )}
+            </Stack>
+
+            <Typography variant="subtitle2" sx={{ fontWeight: 900, letterSpacing: 1.5, mb: 2, opacity: 0.6 }}>HOBBIES & INTERESTS</Typography>
             <Stack direction="row" flexWrap="wrap" gap={1.5}>
-                {displayUser?.skills?.map(skill => (
-                    <Chip key={skill} label={skill} sx={{ fontWeight: 700, borderRadius: 1, bgcolor: 'primary.main', color: 'white' }} />
-                ))}
+                {displayUser?.hobbies?.length ? (
+                    displayUser.hobbies.map(hobby => (
+                        <Chip key={hobby} label={hobby} sx={{ fontWeight: 700, borderRadius: 1, bgcolor: 'secondary.main', color: 'white' }} />
+                    ))
+                ) : (
+                    <Typography variant="body2" color="text.secondary" fontStyle="italic">No hobbies listed.</Typography>
+                )}
             </Stack>
         </Paper>
     );
