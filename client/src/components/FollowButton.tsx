@@ -17,6 +17,10 @@ const FollowButton: React.FC<FollowButtonProps> = ({ userId, initialIsFollowing,
     const [loading, setLoading] = useState(false);
     const { user } = useAuth();
 
+    React.useEffect(() => {
+        setIsFollowing(initialIsFollowing);
+    }, [initialIsFollowing]);
+
     const handleClick = async () => {
         if (!user) return;
         setLoading(true);
@@ -47,7 +51,7 @@ const FollowButton: React.FC<FollowButtonProps> = ({ userId, initialIsFollowing,
             onClick={handleClick}
             disabled={loading}
             sx={{
-                borderRadius: '12px',
+                borderRadius: 1,
                 px: 3,
                 textTransform: 'none',
                 fontWeight: 700,
@@ -57,7 +61,7 @@ const FollowButton: React.FC<FollowButtonProps> = ({ userId, initialIsFollowing,
                 }
             }}
         >
-            {loading ? "Processing..." : (isFollowing ? "Unfollow" : "Follow")}
+            {loading ? "Processing..." : (isFollowing ? "Unfollow" : "Follow!")}
         </Button>
     );
 };

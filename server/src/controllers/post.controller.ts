@@ -55,7 +55,6 @@ export const likePost = async (req: Request, res: Response): Promise<void> => {
             return;
         }
 
-        // Check if userId is present before using it - although middleware ensures it, strict null checks might complain
         if (!userId) {
             res.status(401).json({ message: "User not authenticated" });
             return;

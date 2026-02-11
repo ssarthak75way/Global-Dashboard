@@ -81,7 +81,7 @@ const VerifyOtp = () => {
     const styles = {
         paper: {
             p: { xs: 4, md: 6 },
-            borderRadius: 6,
+            borderRadius: 1,
             border: '1px solid',
             borderColor: 'divider',
             background: (theme: Theme) => theme.palette.mode === 'light'
@@ -131,19 +131,19 @@ const VerifyOtp = () => {
         },
         alert: {
             mb: 4,
-            borderRadius: 3,
+            borderRadius: 1,
             borderStyle: 'dashed',
             fontWeight: 600
         },
         otpInput: {
             '& .MuiOutlinedInput-root': {
-                borderRadius: 4,
+                borderRadius: 1,
                 bgcolor: (theme: Theme) => theme.palette.mode === 'light' ? 'rgba(0,0,0,0.02)' : 'rgba(255,255,255,0.02)'
             }
         },
         verifyButton: {
             py: 2,
-            borderRadius: 4,
+            borderRadius: 1,
             fontSize: '1.1rem',
             fontWeight: 800,
             transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',

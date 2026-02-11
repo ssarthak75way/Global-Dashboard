@@ -51,6 +51,39 @@ export const updateProfileSchema = z.object({
             leetcode: z.string().optional().or(z.literal('')),
             linkedin: z.string().optional().or(z.literal('')),
         }).optional(),
+        bio: z.string().optional().or(z.literal('')),
+        about: z.string().optional().or(z.literal('')),
+        status: z.string().optional().or(z.literal('')),
+        avatar: z.string().optional().or(z.literal('')),
+        skills: z.array(z.string()).optional(),
+        hobbies: z.array(z.string()).optional(),
+        experience: z.array(z.object({
+            role: z.string(),
+            company: z.string(),
+            startDate: z.string(),
+            endDate: z.string().optional().or(z.literal('')),
+            description: z.string().optional().or(z.literal('')),
+            current: z.boolean().optional(),
+            jobType: z.enum(['Remote', 'Onsite', 'Hybrid']).optional(),
+            technologies: z.array(z.string()).optional()
+        })).optional(),
+        projects: z.array(z.object({
+            title: z.string(),
+            startDate: z.string(),
+            endDate: z.string().optional().or(z.literal('')),
+            description: z.string().optional().or(z.literal('')),
+            techStack: z.array(z.string()).optional(),
+            link: z.string().optional().or(z.literal(''))
+        })).optional(),
+        certifications: z.array(z.object({
+            title: z.string(),
+            issuer: z.string(),
+            issueDate: z.string(),
+            expiryDate: z.string().optional().or(z.literal('')),
+            description: z.string().optional().or(z.literal('')),
+            credentialId: z.string().optional().or(z.literal('')),
+            link: z.string().optional().or(z.literal(''))
+        })).optional(),
     }),
 });
 

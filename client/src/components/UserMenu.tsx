@@ -51,7 +51,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ anchorEl, open, onClose }) => {
                     overflow: 'visible',
                     filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
                     mt: 1.5,
-                    borderRadius: 3,
+                    borderRadius: 1,
                     minWidth: 220,
                     bgcolor: theme.palette.mode === 'dark' ? 'rgba(30,30,30,0.9)' : 'rgba(255,255,255,0.9)',
                     backdropFilter: 'blur(8px)',

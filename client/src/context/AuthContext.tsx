@@ -21,13 +21,35 @@ export interface User {
         endDate?: Date | string;
         description?: string;
         current: boolean;
+        jobType?: 'Remote' | 'Onsite' | 'Hybrid';
+        technologies?: string[];
+    }>;
+    projects?: Array<{
+        title: string;
+        startDate: Date | string;
+        endDate?: Date | string;
+        description?: string;
+        techStack: string[];
+        link?: string;
+    }>;
+    certifications?: Array<{
+        title: string;
+        issuer: string;
+        issueDate: Date | string;
+        expiryDate?: Date | string;
+        description?: string;
+        credentialId?: string;
+        link?: string;
     }>;
     skills?: string[];
     hobbies?: string[];
     isVerified: boolean;
+    avatar?: string;
     dashboardOrder?: string[];
     followers: string[];
     following: string[];
+    createdAt?: string;
+    status?: string;
 }
 
 interface AuthContextType {
@@ -54,7 +76,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [expiryTime, setExpiryTime] = useState<number | null>(null);
     const [loading, setLoading] = useState(true);
     const hasInitialCheck = React.useRef(false);
-
     const setAccessToken = (token: string | null) => {
         setAccessTokenState(token);
         window.accessToken = token;
@@ -76,7 +97,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(null);
         setAccessToken(null);
         setExpiryTime(null);
-        localStorage.removeItem("user");
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("expiryTime");
     };
 
     const updateUser = (userData: User) => {

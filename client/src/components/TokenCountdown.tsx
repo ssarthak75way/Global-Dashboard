@@ -4,9 +4,10 @@ import TimerIcon from "@mui/icons-material/Timer";
 
 interface TokenCountdownProps {
     expiryTime: number | null;
+    onExpire?: () => void;
 }
 
-const TokenCountdown: React.FC<TokenCountdownProps> = ({ expiryTime }) => {
+const TokenCountdown: React.FC<TokenCountdownProps> = ({ expiryTime, onExpire }) => {
     const [timeLeft, setTimeLeft] = useState<string>("00:00");
 
     useEffect(() => {
@@ -18,6 +19,7 @@ const TokenCountdown: React.FC<TokenCountdownProps> = ({ expiryTime }) => {
 
             if (difference <= 0) {
                 setTimeLeft("Expired");
+                if (onExpire) onExpire();
                 return;
             }
 
@@ -41,10 +43,10 @@ const TokenCountdown: React.FC<TokenCountdownProps> = ({ expiryTime }) => {
         container: {
             display: "flex",
             alignItems: "center",
-            gap: 1,
-            px: 1.5,
+            gap: { xs: 0.5, sm: 1 },
+            px: { xs: 1, sm: 1.5 },
             py: 0.5,
-            borderRadius: 2,
+            borderRadius: 1,
             bgcolor: isExpiringSoon ? "error.light" : "action.hover",
             color: isExpiringSoon ? "error.contrastText" : "text.secondary",
             transition: "all 0.3s ease",
@@ -52,8 +54,9 @@ const TokenCountdown: React.FC<TokenCountdownProps> = ({ expiryTime }) => {
         text: {
             fontWeight: 700,
             fontFamily: "monospace",
-            width: "45px",
-            textAlign: "center"
+            width: { xs: "35px", sm: "45px" },
+            textAlign: "center",
+            fontSize: { xs: "0.75rem", sm: "0.875rem" }
         }
     };
 
@@ -63,7 +66,7 @@ const TokenCountdown: React.FC<TokenCountdownProps> = ({ expiryTime }) => {
             <Box
                 sx={styles.container}
             >
-                <TimerIcon fontSize="small" />
+                <TimerIcon fontSize="small" sx={{ display: { xs: 'none', sm: 'block' } }} />
                 <Typography
                     variant="body2"
                     sx={styles.text}
