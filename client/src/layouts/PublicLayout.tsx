@@ -1,6 +1,7 @@
-import { Outlet, Navigate } from "react-router-dom";
+import { Outlet, Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { Box, Container, Typography, Theme } from "@mui/material";
+import PublicNavbar from "../components/PublicNavbar";
 
 const publicLayoutStyles = {
     root: (theme: Theme) => ({
@@ -63,37 +64,36 @@ const publicLayoutStyles = {
 
 const PublicLayout = () => {
     const { isAuthenticated, loading } = useAuth();
+    const location = useLocation();
+    const isLandingPage = location.pathname === '/';
 
     if (loading) return <div>Loading...</div>;
     if (isAuthenticated) return <Navigate to="/dashboard" replace />;
 
+    // Landing page has its own navbar and footer
+    if (isLandingPage) {
+        return <Outlet />;
+    }
+
+    // Auth pages (login, signup, verify-otp) use the styled layout
     return (
-        <Box
-            sx={(theme) => publicLayoutStyles.root(theme)}
-        >
-            <Box sx={publicLayoutStyles.blob} />
-            <Container maxWidth="sm" sx={publicLayoutStyles.container}>
-                <Box sx={publicLayoutStyles.headerBox}>
-                    <Typography
-                        variant="h3"
-                        sx={publicLayoutStyles.title}
-                    >
-                        Global Dashboard
-                    </Typography>
-                    <Typography variant="body1" color="text.secondary" sx={publicLayoutStyles.subtitle}>
-                        The Industry Standard Engineering Management Tool
-                    </Typography>
-                </Box>
+        <>
+            <PublicNavbar />
+            <Box
+                sx={(theme) => publicLayoutStyles.root(theme)}
+            >
+                <Box sx={publicLayoutStyles.blob} />
+                <Container maxWidth="sm" sx={{ ...publicLayoutStyles.container, py: { xs: 4, sm: 8 } }}>
+                    <Outlet />
 
-                <Outlet />
-
-                <Box sx={publicLayoutStyles.footerBox}>
-                    <Typography variant="caption" color="text.secondary">
-                        © {new Date().getFullYear()} Global Dashboard Inc. All rights reserved. Professional Edition.
-                    </Typography>
-                </Box>
-            </Container>
-        </Box>
+                    <Box sx={publicLayoutStyles.footerBox}>
+                        <Typography variant="caption" color="text.secondary">
+                            © {new Date().getFullYear()} DevConnect. All rights reserved.
+                        </Typography>
+                    </Box>
+                </Container>
+            </Box>
+        </>
     );
 };
 

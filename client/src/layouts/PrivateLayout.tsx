@@ -1,7 +1,7 @@
 import { Outlet, Navigate, Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
     Box,
     Drawer,
@@ -29,7 +29,9 @@ import {
     Forum as FeedIcon,
     Logout as LogoutIcon,
     Brightness4 as DarkModeIcon,
-    Brightness7 as LightModeIcon
+    Brightness7 as LightModeIcon,
+    Search as SearchIcon,
+    Close as CloseIcon
 } from "@mui/icons-material";
 import TokenCountdown from "../components/TokenCountdown";
 import UserSearch from "../components/UserSearch";
@@ -50,7 +52,7 @@ const privateLayoutStyles = {
         minHeight: 48,
         justifyContent: open ? 'initial' : 'center',
         px: 2.5,
-        borderRadius: 3,
+        borderRadius: 1,
         transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
         bgcolor: isActive ? (theme.palette.mode === 'light' ? 'rgba(99, 102, 241, 0.08)' : 'rgba(99, 102, 241, 0.15)') : 'transparent',
         color: isActive ? 'primary.main' : 'text.primary',
@@ -67,7 +69,7 @@ const privateLayoutStyles = {
     navListItemTextPrimary: { fontWeight: 700, fontSize: '0.9rem' },
     logoutButtonContainer: { p: 2 },
     logoutButton: {
-        borderRadius: 3,
+        borderRadius: 1,
         color: 'error.main',
         transition: 'all 0.2s ease',
         '&:hover': {
@@ -75,13 +77,13 @@ const privateLayoutStyles = {
             transform: 'translateX(4px)'
         }
     },
-    appBar: (open: boolean, theme: Theme) => ({
+    appBar: (open: boolean, isMobile: boolean, theme: Theme) => ({
         zIndex: theme.zIndex.drawer + 1,
         transition: theme.transitions.create(['width', 'margin'], {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen,
         }),
-        ...(open && {
+        ...(open && !isMobile && {
             marginLeft: drawerWidth,
             width: `calc(100% - ${drawerWidth}px)`,
             transition: theme.transitions.create(['width', 'margin'], {
@@ -104,7 +106,23 @@ const privateLayoutStyles = {
         flexShrink: 0,
         whiteSpace: 'nowrap',
         boxSizing: 'border-box',
+        transition: theme.transitions.create('width', {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.enteringScreen,
+        }),
+        ...(!open && {
+            transition: theme.transitions.create('width', {
+                easing: theme.transitions.easing.sharp,
+                duration: theme.transitions.duration.leavingScreen,
+            }),
+            overflowX: 'hidden',
+            width: theme.spacing(7),
+            [theme.breakpoints.up('sm')]: {
+                width: theme.spacing(9),
+            },
+        }),
         [`& .MuiDrawer-paper`]: {
+            position: 'fixed', // Explicitly ensure fixed if not already
             width: drawerWidth,
             transition: theme.transitions.create('width', {
                 easing: theme.transitions.easing.sharp,
@@ -123,21 +141,39 @@ const privateLayoutStyles = {
             }),
         },
     }),
-    mainContent: { flexGrow: 1, p: 3, mt: 8, bgcolor: 'background.default' }
+    mainContent: {
+        flexGrow: 1,
+        p: 3,
+        display: 'flex',
+        flexDirection: 'column',
+        minHeight: '100vh',
+        mt: { xs: 7, md: 8 },
+        bgcolor: 'background.default',
+        width: '100%',
+        overflowX: 'hidden'
+    }
 };
 
 const PrivateLayout = () => {
-    const { isAuthenticated, loading, logout, user } = useAuth();
+    const { isAuthenticated, loading, logout, user, checkAuth, expiryTime } = useAuth();
     const { theme, toggleTheme } = useTheme();
-    const [open, setOpen] = useState(true);
-    const location = useLocation();
     const muiTheme = useMuiTheme();
     const isMobile = useMediaQuery(muiTheme.breakpoints.down('md'));
 
+    // Default open to true on desktop, false on mobile
+    const [open, setOpen] = useState(!isMobile);
+    const location = useLocation();
+
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const [searchOpen, setSearchOpen] = useState(false);
+
+    // Synchronize open state with isMobile changes
+    useEffect(() => {
+        setOpen(!isMobile);
+    }, [isMobile]);
 
     if (loading) return <div>Loading...</div>;
-    if (!isAuthenticated) return <Navigate to="/login" replace />;
+    if (!isAuthenticated) return <Navigate to="/" replace />;
 
     const toggleDrawer = () => setOpen(!open);
     const handleMenu = (event: React.MouseEvent<HTMLElement>) => setAnchorEl(event.currentTarget);
@@ -154,7 +190,7 @@ const PrivateLayout = () => {
         <Box sx={privateLayoutStyles.drawerContentBox}>
             <Toolbar sx={privateLayoutStyles.drawerHeaderToolbar}>
                 <Typography variant="h6" sx={privateLayoutStyles.drawerHeaderTitle}>
-                    Global Dashboard
+                    DevConnect
                 </Typography>
                 <IconButton onClick={toggleDrawer}>
                     <ChevronLeftIcon />
@@ -198,7 +234,7 @@ const PrivateLayout = () => {
             <AppBar
                 position="fixed"
                 elevation={0}
-                sx={(theme) => privateLayoutStyles.appBar(open, theme)}
+                sx={(theme) => privateLayoutStyles.appBar(open, isMobile, theme)}
             >
                 <Toolbar>
                     <IconButton
@@ -206,7 +242,7 @@ const PrivateLayout = () => {
                         aria-label="open drawer"
                         onClick={toggleDrawer}
                         edge="start"
-                        sx={privateLayoutStyles.menuButton(open)}
+                        sx={{ mr: { xs: 1, md: 2 } }}
                     >
                         <MenuIcon />
                     </IconButton>
@@ -214,10 +250,39 @@ const PrivateLayout = () => {
                         {menuItems.find(i => i.path === location.pathname)?.text || 'Welcome'}
                     </Typography>
 
-                    <UserSearch />
+                    {isMobile ? (
+                        searchOpen ? (
+                            <Box sx={{
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                width: '100%',
+                                height: '100%',
+                                bgcolor: 'background.paper',
+                                zIndex: 1200,
+                                display: 'flex',
+                                alignItems: 'center',
+                                px: 2,
+                                gap: 1
+                            }}>
+                                <Box sx={{ flexGrow: 1 }}>
+                                    <UserSearch />
+                                </Box>
+                                <IconButton onClick={() => setSearchOpen(false)}>
+                                    <CloseIcon />
+                                </IconButton>
+                            </Box>
+                        ) : (
+                            <IconButton color="inherit" onClick={() => setSearchOpen(true)} sx={{ ml: 'auto' }}>
+                                <SearchIcon />
+                            </IconButton>
+                        )
+                    ) : (
+                        <UserSearch />
+                    )}
 
                     <Box sx={privateLayoutStyles.topBarActions}>
-                        <TokenCountdown expiryTime={useAuth().expiryTime} />
+                        <TokenCountdown expiryTime={expiryTime} onExpire={checkAuth} />
 
                         <Tooltip title="Toggle Theme">
                             <IconButton onClick={toggleTheme} color="inherit">
@@ -234,8 +299,8 @@ const PrivateLayout = () => {
                                 aria-haspopup="true"
                                 aria-expanded={open ? 'true' : undefined}
                             >
-                                <Avatar alt={user?.email} src="/static/images/avatar/2.jpg" sx={privateLayoutStyles.avatar}>
-                                    {user?.email?.[0].toUpperCase()}
+                                <Avatar alt={user?.name} src={user?.avatar} sx={privateLayoutStyles.avatar}>
+                                    {user?.name?.[0].toUpperCase()}
                                 </Avatar>
                             </IconButton>
                         </Tooltip>
@@ -251,7 +316,7 @@ const PrivateLayout = () => {
             <Drawer
                 variant={isMobile ? "temporary" : "permanent"}
                 open={open}
-                onClose={toggleDrawer}
+                onClose={isMobile ? toggleDrawer : undefined}
                 sx={(theme) => privateLayoutStyles.drawer(open, theme)}
             >
                 {drawerContent}
@@ -259,6 +324,70 @@ const PrivateLayout = () => {
 
             <Box component="main" sx={privateLayoutStyles.mainContent}>
                 <Outlet />
+
+                {/* Footer */}
+                <Box
+                    sx={{
+                        mt: 'auto',
+                        py: 3,
+                        px: 3,
+                        borderTop: '1px solid',
+                        borderColor: 'divider',
+                        bgcolor: 'background.paper'
+                    }}
+                >
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            flexDirection: { xs: 'column', sm: 'row' },
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            gap: 2
+                        }}
+                    >
+                        <Typography variant="body2" color="text.secondary">
+                            © {new Date().getFullYear()} DevConnect. All rights reserved.
+                        </Typography>
+                        <Box sx={{ display: 'flex', gap: 2 }}>
+                            <Typography
+                                component={Link}
+                                to="#"
+                                variant="body2"
+                                sx={{
+                                    color: 'text.secondary',
+                                    textDecoration: 'none',
+                                    '&:hover': { color: 'primary.main' }
+                                }}
+                            >
+                                Privacy
+                            </Typography>
+                            <Typography
+                                component={Link}
+                                to="#"
+                                variant="body2"
+                                sx={{
+                                    color: 'text.secondary',
+                                    textDecoration: 'none',
+                                    '&:hover': { color: 'primary.main' }
+                                }}
+                            >
+                                Terms
+                            </Typography>
+                            <Typography
+                                component={Link}
+                                to="#"
+                                variant="body2"
+                                sx={{
+                                    color: 'text.secondary',
+                                    textDecoration: 'none',
+                                    '&:hover': { color: 'primary.main' }
+                                }}
+                            >
+                                Support
+                            </Typography>
+                        </Box>
+                    </Box>
+                </Box>
             </Box>
         </Box>
     );

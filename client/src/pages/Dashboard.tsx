@@ -253,16 +253,19 @@ const Dashboard = () => {
         github: GithubStats | null;
         leetcode: LeetcodeStats | null;
         codeforces: CodeforcesStats | null;
+        tasks: any[] | null;
     }>({
         github: null,
         leetcode: null,
-        codeforces: null
+        codeforces: null,
+        tasks: null
     });
 
     const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>({
         github: false,
         leetcode: false,
-        codeforces: false
+        codeforces: false,
+        tasks: false
     });
 
     const [cards, setCards] = useState<CardData[]>([]);
@@ -276,12 +279,12 @@ const Dashboard = () => {
     useEffect(() => {
         const fetchAllStats = async () => {
             const handles = user?.socialHandles;
-            if (!handles) return;
 
             const platforms = [
-                { key: 'github', handle: handles.github, url: '/social/github' },
-                { key: 'leetcode', handle: handles.leetcode, url: '/social/leetcode' },
-                { key: 'codeforces', handle: handles.codeforces, url: '/social/codeforces' }
+                { key: 'github', handle: handles?.github, url: '/social/github' },
+                { key: 'leetcode', handle: handles?.leetcode, url: '/social/leetcode' },
+                { key: 'codeforces', handle: handles?.codeforces, url: '/social/codeforces' },
+                { key: 'tasks', handle: true, url: '/tasks' }
             ];
 
             platforms.forEach(p => {
@@ -305,16 +308,16 @@ const Dashboard = () => {
             );
         };
 
-        fetchAllStats();
+        if (user) fetchAllStats();
     }, [user]);
 
     useEffect(() => {
         const platforms = [
             { id: 'github', label: 'Public Repositories', platform: 'GitHub', icon: <GitHubIcon sx={dashboardCardStyles.platformIcon} />, color: '#10b981', description: 'Real-time repository sync' },
-            { id: 'leetcode', label: 'Solved Problems', platform: 'LeetCode', icon: <TerminalIcon sx={dashboardCardStyles.platformIcon} />, color: '#f59e0b', description: 'Rank: Top 10%' },
+            { id: 'leetcode', label: 'Solved Problems', platform: 'LeetCode', icon: <TerminalIcon sx={dashboardCardStyles.platformIcon} />, color: '#f59e0b', description: 'Real-time sync' },
             { id: 'linkedin', label: 'Professional Index', platform: 'LinkedIn', icon: <LinkedInIcon sx={dashboardCardStyles.platformIcon} />, color: '#0a66c2', description: 'Weekly Profile Views' },
-            { id: 'codeforces', label: 'Global Rating', platform: 'Codeforces', icon: <EmojiEventsIcon sx={dashboardCardStyles.platformIcon} />, color: '#ef4444', description: 'Candidate Master' },
-            { id: 'tasks', label: 'Active Progress', platform: 'Internal Tasks', icon: <TaskIcon sx={dashboardCardStyles.platformIcon} />, color: '#6366f1', description: '3 Tasks Completed' }
+            { id: 'codeforces', label: 'Global Rating', platform: 'Codeforces', icon: <EmojiEventsIcon sx={dashboardCardStyles.platformIcon} />, color: '#ef4444', description: 'Competitive Rank' },
+            { id: 'tasks', label: 'Active Progress', platform: 'Internal Tasks', icon: <TaskIcon sx={dashboardCardStyles.platformIcon} />, color: '#6366f1', description: 'Total tasks' }
         ];
 
         let initialOrder = user?.dashboardOrder?.length ? user.dashboardOrder : platforms.map(p => p.id);
@@ -325,10 +328,6 @@ const Dashboard = () => {
             if (!initialOrder.includes(p.id)) initialOrder.push(p.id);
         });
 
-        if (!user?.dashboardOrder?.length) {
-            initialOrder = [...initialOrder].sort(() => Math.random() - 0.5);
-        }
-
         const orderedCards = initialOrder.map(id => {
             const p = platforms.find(x => x.id === id)!;
             let value: string | number = '---';
@@ -337,8 +336,9 @@ const Dashboard = () => {
             if (id === 'github' && stats?.github) {
                 value = stats.github?.profile?.repos || 0;
                 description = `${stats.github.profile.followers} Followers`;
-            } else if (id === 'tasks') {
-                value = 12;
+            } else if (id === 'tasks' && stats.tasks) {
+                value = stats.tasks.length;
+                description = `${stats.tasks.filter((t: any) => t.status === 'Completed').length} completed`;
             } else if (id === 'leetcode' && stats.leetcode) {
                 value = stats.leetcode.totalSolved || '---';
                 description = `Rank: ${stats.leetcode.ranking || 'N/A'}`;
@@ -452,7 +452,7 @@ const Dashboard = () => {
 
                         <Box sx={styles.profileBox}>
                             <Avatar
-                                src={stats.github?.profile?.avatar || stats.codeforces?.avatar}
+                                src={stats.github?.profile?.avatar || stats.codeforces?.avatar || undefined}
                                 sx={styles.avatar}
                             >
                                 {user?.email?.[0].toUpperCase()}

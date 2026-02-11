@@ -61,8 +61,8 @@ const Signup = () => {
 
     const styles = {
         paper: {
-            p: { xs: 4, md: 6 },
-            borderRadius: 6,
+            p: { xs: 3, sm: 4, md: 6 },
+            borderRadius: 1,
             border: '1px solid',
             borderColor: 'divider',
             background: (theme: Theme) => theme.palette.mode === 'light'
@@ -93,16 +93,16 @@ const Signup = () => {
         },
         alert: {
             mb: 4,
-            borderRadius: 3,
+            borderRadius: 1,
             borderStyle: 'dashed',
             fontWeight: 600
         },
         input: {
-            borderRadius: 3
+            borderRadius: 1
         },
         submitButton: {
             py: 2,
-            borderRadius: 3,
+            borderRadius: 1,
             fontSize: '1rem',
             fontWeight: 800,
             textTransform: 'none',
@@ -124,7 +124,7 @@ const Signup = () => {
         },
         googleButton: {
             py: 1.5,
-            borderRadius: 3,
+            borderRadius: 1,
             borderColor: 'divider',
             color: 'text.primary',
             fontWeight: 700,
@@ -154,7 +154,7 @@ const Signup = () => {
         <Fade in timeout={800}>
             <Paper elevation={0} sx={styles.paper}>
                 <Box sx={styles.headerBox}>
-                    <Typography variant="h3" sx={styles.title}>
+                    <Typography variant="h3" sx={{ ...styles.title, fontSize: { xs: '2.5rem', md: '3rem' } }}>
                         Join Us
                     </Typography>
                     <Typography variant="body1" color="text.secondary" sx={styles.subtitle}>
@@ -175,7 +175,7 @@ const Signup = () => {
                         <TextField
                             fullWidth
                             label="Email Address"
-                            placeholder="engineering@Global Dashboard.com"
+                            placeholder="you@example.com"
                             {...register("email")}
                             error={!!errors.email}
                             helperText={errors.email?.message}

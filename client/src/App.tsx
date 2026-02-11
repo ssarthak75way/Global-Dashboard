@@ -13,6 +13,7 @@ import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import Board from "./pages/Board";
 import Feed from "./pages/Feed";
+import LandingPage from "./pages/LandingPage";
 import { ErrorBoundary, FallbackProps } from "react-error-boundary";
 
 const ErrorFallback = ({ error, resetErrorBoundary }: FallbackProps) => {
@@ -42,10 +43,10 @@ const router = createBrowserRouter([
   {
     element: <PublicLayout />,
     children: [
+      { path: "/", element: <LandingPage /> },
       { path: "/signup", element: <Signup /> },
       { path: "/verify-otp", element: <VerifyOtp /> },
-      { path: "/login", element: <Login /> },
-      { path: "/", element: <Navigate to="/login" replace /> }
+      { path: "/login", element: <Login /> }
     ]
   },
   {

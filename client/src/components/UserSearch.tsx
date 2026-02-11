@@ -67,7 +67,7 @@ const UserSearch = () => {
 
     return (
         <ClickAwayListener onClickAway={() => setOpen(false)}>
-            <Box sx={{ position: 'relative', width: { xs: '100%', sm: 300, md: 400 }, mr: 2 }}>
+            <Box sx={{ position: 'relative', width: { xs: '100%', sm: 300, md: 400 }, mr: { xs: 0, sm: 2 } }}>
                 <TextField
                     fullWidth
                     variant="outlined"
@@ -87,7 +87,7 @@ const UserSearch = () => {
                             </InputAdornment>
                         ),
                         sx: {
-                            borderRadius: 3,
+                            borderRadius: 1,
                             bgcolor: 'background.paper',
                             '& fieldset': { border: 'none' },
                             boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
@@ -110,7 +110,7 @@ const UserSearch = () => {
                             zIndex: 1300,
                             maxHeight: 400,
                             overflow: 'auto',
-                            borderRadius: 2,
+                            borderRadius: 1,
                             boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
                         }}
                     >

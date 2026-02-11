@@ -80,7 +80,7 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
             justifyContent: 'center',
             mb: 2,
             p: 2,
-            borderRadius: 3,
+            borderRadius: 1,
             bgcolor: config.bgColor,
             width: 'fit-content',
             mx: 'auto',
@@ -105,14 +105,14 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
             gap: 2,
         },
         cancelButton: {
-            borderRadius: 2,
+            borderRadius: 1,
             px: 3,
             py: 1,
             fontWeight: 600,
             textTransform: 'none',
         },
         confirmButton: {
-            borderRadius: 2,
+            borderRadius: 1,
             px: 3,
             py: 1,
             fontWeight: 600,
@@ -125,7 +125,7 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
         },
         dialog: {
             '& .MuiDialog-paper': {
-                borderRadius: 3,
+                borderRadius: 1,
                 minWidth: { xs: '90%', sm: 400 },
                 maxWidth: 500,
             },

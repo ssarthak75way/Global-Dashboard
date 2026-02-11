@@ -32,14 +32,14 @@ export const getTheme = (mode: 'light' | 'dark'): ThemeOptions => ({
         button: { textTransform: 'none', fontWeight: 600, letterSpacing: '0.01em' },
     },
     shape: {
-        borderRadius: 16,
+        borderRadius: 4,
     },
     components: {
         MuiButton: {
             styleOverrides: {
                 root: {
                     padding: '10px 24px',
-                    borderRadius: '12px',
+                    borderRadius: 4, // equivalent to borderRadius: 1 in sx
                     transition: 'all 0.2s ease-in-out',
                     '&:hover': {
                         transform: 'translateY(-2px)',
@@ -62,6 +62,7 @@ export const getTheme = (mode: 'light' | 'dark'): ThemeOptions => ({
                 root: {
                     backgroundImage: 'none',
                     backdropFilter: 'blur(12px)',
+                    borderRadius: 4,
                     border: mode === 'light' ? '1px solid rgba(226, 232, 240, 0.8)' : '1px solid rgba(51, 65, 85, 0.5)',
                     boxShadow: mode === 'light'
                         ? '0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05)'
@@ -75,7 +76,7 @@ export const getTheme = (mode: 'light' | 'dark'): ThemeOptions => ({
         MuiCard: {
             styleOverrides: {
                 root: {
-                    borderRadius: 20,
+                    borderRadius: 4,
                     overflow: 'hidden',
                     transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
                     '&:hover': {
