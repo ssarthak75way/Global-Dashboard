@@ -10,7 +10,8 @@ import {
 import { Download as DownloadIcon } from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
 import { format } from 'date-fns';
-import html2pdf from 'html2pdf.js';
+// @ts-ignore
+import html2pdf from 'html2pdf.js/src/index.js';
 
 const Resume = () => {
     const { user } = useAuth();
@@ -25,7 +26,7 @@ const Resume = () => {
             filename: `${user?.name ? user.name.replace(/\s+/g, '_') : 'My'}_RESUME.pdf`,
             image: { type: 'jpeg' as const, quality: 1 },
             html2canvas: {
-                scale: 3, 
+                scale: 3,
                 useCORS: true,
                 logging: false
             },
@@ -54,23 +55,23 @@ const Resume = () => {
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-       
+
         },
         paper: {
-            p: '12mm',  
-            boxSizing: 'border-box',  
+            p: '12mm',
+            boxSizing: 'border-box',
             borderRadius: 0,
             boxShadow: '0 10px 40px rgba(0,0,0,0.08)',
-            width: '210mm',     
-            height: '297mm',     
-            overflow: 'hidden',  
+            width: '210mm',
+            height: '297mm',
+            overflow: 'hidden',
             mx: 'auto',
             backgroundColor: 'white',
             color: '#000000',
             fontFamily: "'Inter', 'Helvetica', 'Arial', sans-serif",
             display: 'flex',
             flexDirection: 'column',
-            gap: 2  
+            gap: 2
         },
         header: {
             textAlign: 'center',
@@ -79,7 +80,7 @@ const Resume = () => {
         },
         name: {
             fontWeight: 800,
-            fontSize: '24pt', 
+            fontSize: '24pt',
             color: '#000000',
             mb: 0.5,
             lineHeight: 1
@@ -106,7 +107,7 @@ const Resume = () => {
         },
         sectionTitle: {
             fontWeight: 800,
-            fontSize: '11pt',  
+            fontSize: '11pt',
             color: '#000000',
             textTransform: 'uppercase',
             letterSpacing: 0.5,
@@ -137,7 +138,7 @@ const Resume = () => {
             fontWeight: 700
         },
         content: {
-            fontSize: '9pt',  
+            fontSize: '9pt',
             lineHeight: 1.4,
             color: '#1a1a1a',
             whiteSpace: 'pre-wrap'
@@ -201,7 +202,7 @@ const Resume = () => {
                                     GitHub : {user.socialHandles?.github.replace(/^https?:\/\/(www\.)?github\.com\//, '')}
                                 </Typography>
                             )}
-                             {user.socialHandles?.leetcode && (
+                            {user.socialHandles?.leetcode && (
                                 <Typography sx={styles.contactItem}>
                                     Leetcode : {user.socialHandles?.leetcode.replace(/^https?:\/\/(www\.)?github\.com\//, '')}
                                 </Typography>

@@ -8,57 +8,84 @@ export default defineConfig({
       output: {
         manualChunks(id) {
           if (id.includes('node_modules')) {
-            // Core UI Framework
-            if (id.includes('@mui/material')) {
+            // Specific core packages to avoid circular dependencies and over-bundling
+            if (id.includes('/node_modules/react/') ||
+              id.includes('/node_modules/react-dom/') ||
+              id.includes('/node_modules/react-router-dom/')) {
+              return 'vendor-react-core';
+            }
+            if (id.includes('/node_modules/@mui/material/')) {
+              // Further split MUI if it's still large
+              if (id.includes('/node_modules/@mui/material/styles/') ||
+                id.includes('/node_modules/@mui/material/transitions/') ||
+                id.includes('/node_modules/@mui/material/colors/')) {
+                return 'vendor-mui-core-internal';
+              }
+              if (id.includes('/node_modules/@mui/material/Box/') ||
+                id.includes('/node_modules/@mui/material/Stack/') ||
+                id.includes('/node_modules/@mui/material/Typography/')) {
+                return 'vendor-mui-layout-components';
+              }
               return 'vendor-mui-material';
             }
-            if (id.includes('@mui/icons-material')) {
+            if (id.includes('/node_modules/@mui/system/') || id.includes('/node_modules/@mui/styled-engine/')) {
+              return 'vendor-mui-system';
+            }
+            if (id.includes('/node_modules/@mui/icons-material/')) {
               return 'vendor-mui-icons';
             }
-
-            // Heavy Editors and Renderers
-            if (id.includes('react-quill-new')) {
-              return 'vendor-quill';
-            }
-            if (id.includes('react-markdown') || id.includes('remark-gfm')) {
-              return 'vendor-markdown';
+            if (id.includes('/node_modules/@mui/')) {
+              return 'vendor-mui-other';
             }
 
-            // PDF Generation (Split internal heavy dependencies)
-            if (id.includes('jspdf')) {
+            // Large PDF Generation Dependencies
+            if (id.includes('/node_modules/jspdf/')) {
               return 'vendor-jspdf';
             }
-            if (id.includes('html2canvas')) {
+            if (id.includes('/node_modules/html2canvas/')) {
               return 'vendor-html2canvas';
             }
-            if (id.includes('html2pdf.js')) {
+            if (id.includes('/node_modules/html2pdf.js/')) {
               return 'vendor-html2pdf-wrapper';
             }
 
-            // Framework Core
-            if (id.includes('react') || id.includes('react-dom') || id.includes('react-router-dom')) {
-              return 'vendor-react-core';
+            // Heavy Dependencies
+            if (id.includes('/node_modules/react-quill-new/')) {
+              return 'vendor-quill';
             }
-
-            // Common Utilities
-            if (id.includes('zod') || id.includes('date-fns') || id.includes('axios')) {
-              return 'vendor-utils';
+            if (id.includes('/node_modules/react-markdown/') || id.includes('/node_modules/remark-gfm/')) {
+              return 'vendor-markdown';
             }
-            if (id.includes('@dnd-kit')) {
+            if (id.includes('/node_modules/@dnd-kit/')) {
               return 'vendor-dnd';
             }
-
-            // Other UI libs
-            if (id.includes('react-select') || id.includes('react-icons') || id.includes('react-calendar-heatmap')) {
+            if (id.includes('/node_modules/@emotion/')) {
+              return 'vendor-emotion';
+            }
+            if (id.includes('/node_modules/react-hook-form/') || id.includes('/node_modules/@hookform/')) {
+              return 'vendor-hook-form';
+            }
+            // Catch other UI extras and group them
+            if (id.includes('/node_modules/react-select/') ||
+              id.includes('/node_modules/react-icons/') ||
+              id.includes('/node_modules/react-calendar-heatmap/') ||
+              id.includes('/node_modules/react-error-boundary/')) {
               return 'vendor-ui-extra';
             }
 
-            // Everything else
+            // Utilities
+            if (id.includes('/node_modules/zod/') ||
+              id.includes('/node_modules/date-fns/') ||
+              id.includes('/node_modules/axios/')) {
+              return 'vendor-utils';
+            }
+
+            // Everything else in node_modules
             return 'vendor-common';
           }
         }
       }
     },
-    chunkSizeWarningLimit: 600
+    chunkSizeWarningLimit: 500
   }
 })
