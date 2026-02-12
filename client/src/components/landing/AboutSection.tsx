@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Container, Typography, Grid, Stack, Divider, useTheme } from '@mui/material';
+import { Box, Container, Typography, Grid, Stack, Paper, useTheme } from '@mui/material';
 import { CheckCircle as CheckIcon } from '@mui/icons-material';
 
 const AboutSection: React.FC = () => {
@@ -23,49 +23,91 @@ const AboutSection: React.FC = () => {
                 <Grid container spacing={6} alignItems="center">
                     <Grid item xs={12} md={6}>
                         <Typography variant="h2" sx={{ ...styles.sectionTitle, textAlign: 'left' }}>
-                            About DevConnect
+                            What is DevConnect?
                         </Typography>
                         <Typography sx={{ fontSize: '1.1rem', color: 'text.secondary', mb: 3 }}>
-                            DevConnect is more than just a platform—it's a community where developers come together to learn, share, and grow. We believe in the power of collaboration and continuous improvement.
+                            DevConnect is your complete professional platform designed specifically for developers. Whether you're a student, freelancer, or experienced professional, DevConnect helps you establish a strong online presence and manage your career growth.
+                        </Typography>
+                        <Typography sx={{ fontSize: '1.1rem', color: 'text.secondary', mb: 3 }}>
+                            <strong>What you get:</strong> A professional profile that showcases your skills and experience, an ATS-optimized resume builder for job applications, a task management system to stay organized, social features to network with developers, and analytics to track your growth.
                         </Typography>
                         <Stack spacing={2}>
                             {[
-                                'Built by developers, for developers',
-                                'Focus on continuous learning and growth',
-                                'Transparent progress tracking',
-                                'Supportive global community'
+                                'All-in-one platform for developers',
+                                'Build strong professional presence online',
+                                'Create job-ready resumes in minutes',
+                                'Track your coding journey & progress',
+                                'Connect with global developer community',
+                                'Completely free to use'
                             ].map((item, index) => (
                                 <Stack key={index} direction="row" spacing={2} alignItems="center">
                                     <CheckIcon color="primary" />
-                                    <Typography variant="body1">{item}</Typography>
+                                    <Typography variant="body1" sx={{ fontWeight: 500 }}>{item}</Typography>
                                 </Stack>
                             ))}
                         </Stack>
                     </Grid>
                     <Grid item xs={12} md={6}>
-                        <Box
+                        <Paper
+                            elevation={3}
                             sx={{
-                                p: 6,
+                                p: 4,
                                 borderRadius: 4,
                                 background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
-                                color: 'white',
-                                textAlign: 'center'
+                                color: 'white'
                             }}
                         >
-                            <Typography variant="h3" sx={{ fontWeight: 900, mb: 2 }}>
-                                10,000+
+                            <Typography variant="h4" sx={{ fontWeight: 900, mb: 3, textAlign: 'center' }}>
+                                How to Use DevConnect
                             </Typography>
-                            <Typography variant="h6" sx={{ mb: 4 }}>
-                                Active Developers
-                            </Typography>
-                            <Divider sx={{ bgcolor: 'white', opacity: 0.3, mb: 4 }} />
-                            <Typography variant="h3" sx={{ fontWeight: 900, mb: 2 }}>
-                                50,000+
-                            </Typography>
-                            <Typography variant="h6">
-                                Projects Showcased
-                            </Typography>
-                        </Box>
+
+                            <Stack spacing={3}>
+                                <Box>
+                                    <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
+                                        1. Create Your Profile
+                                    </Typography>
+                                    <Typography variant="body2">
+                                        Sign up and fill in your work experience, education, projects, skills, and certifications. This becomes your professional portfolio.
+                                    </Typography>
+                                </Box>
+
+                                <Box>
+                                    <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
+                                        2. Build Your Resume
+                                    </Typography>
+                                    <Typography variant="body2">
+                                        Use the Resume Builder to create an ATS-optimized resume. Your profile data auto-fills the resume. Export as PDF for job applications.
+                                    </Typography>
+                                </Box>
+
+                                <Box>
+                                    <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
+                                        3. Track Your Activity
+                                    </Typography>
+                                    <Typography variant="body2">
+                                        Post updates about your projects and learning. Your activity appears on the heatmap, helping you maintain consistency and build streaks.
+                                    </Typography>
+                                </Box>
+
+                                <Box>
+                                    <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
+                                        4. Manage Tasks
+                                    </Typography>
+                                    <Typography variant="body2">
+                                        Use the Kanban board to organize your tasks. Create, drag, and track your work across To Do, In Progress, and Done columns.
+                                    </Typography>
+                                </Box>
+
+                                <Box>
+                                    <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
+                                        5. Network & Grow
+                                    </Typography>
+                                    <Typography variant="body2">
+                                        Follow other developers, engage with their posts, share your achievements, and build your professional network.
+                                    </Typography>
+                                </Box>
+                            </Stack>
+                        </Paper>
                     </Grid>
                 </Grid>
             </Container>

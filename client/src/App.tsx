@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { ThemeProvider as MuiThemeProvider, createTheme, CssBaseline } from "@mui/material";
 import { getTheme } from "./theme";
-import { createBrowserRouter, RouterProvider, Navigate } from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { ThemeProvider, useTheme } from "./context/ThemeContext";
 import PublicLayout from "./layouts/PublicLayout";
@@ -16,6 +16,7 @@ import Feed from "./pages/Feed";
 import Resume from "./pages/Resume";
 import LandingPage from "./pages/LandingPage";
 import NotFound from "./pages/NotFound";
+import Documentation from "./pages/Documentation";
 import { ErrorBoundary, FallbackProps } from "react-error-boundary";
 
 const ErrorFallback = ({ error, resetErrorBoundary }: FallbackProps) => {
@@ -43,9 +44,12 @@ const ErrorFallback = ({ error, resetErrorBoundary }: FallbackProps) => {
 
 const router = createBrowserRouter([
   {
+    path: "/",
+    element: <LandingPage />
+  },
+  {
     element: <PublicLayout />,
     children: [
-      { path: "/", element: <LandingPage /> },
       { path: "/signup", element: <Signup /> },
       { path: "/verify-otp", element: <VerifyOtp /> },
       { path: "/login", element: <Login /> }
@@ -59,7 +63,8 @@ const router = createBrowserRouter([
       { path: "/profile/:userId", element: <Profile /> },
       { path: "/board", element: <Board /> },
       { path: "/feed", element: <Feed /> },
-      { path: "/resume", element: <Resume /> }
+      { path: "/resume", element: <Resume /> },
+      { path: "/documentation", element: <Documentation /> }
     ]
   },
   {
@@ -75,7 +80,6 @@ const AppContent = () => {
     createTheme(getTheme(theme)),
     [theme]);
 
-  // Pass theme to router context if needed, but here wrapping RouterProvider is sufficient
   return (
     <MuiThemeProvider theme={muiTheme}>
       <CssBaseline />

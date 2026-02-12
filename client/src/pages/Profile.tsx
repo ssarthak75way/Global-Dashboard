@@ -138,7 +138,7 @@ const Profile = () => {
         container: {
             maxWidth: 1400,
             mx: 'auto',
-            px: { xs: 1, sm: 2, md: 3 }
+            px: { xs: 1, sm: 2, md: 3 }, minHeight: "100vh"
         },
         headerTitle: {
             fontWeight: 900,

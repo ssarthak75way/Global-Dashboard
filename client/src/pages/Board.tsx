@@ -225,7 +225,7 @@ const Board = () => {
 
     const boardStyles = {
         loadingContainer: { display: 'flex', justifyContent: 'center', py: 8 },
-        container: { p: { xs: 1.5, sm: 2, md: 4 } },
+        container: { p: { xs: 1.5, sm: 2, md: 4 } , minHeight:"100vh"},
         header: { mb: { xs: 3, md: 4 }, display: 'flex', justifyContent: 'space-between', alignItems: { xs: 'flex-start', sm: 'flex-end' }, flexDirection: { xs: 'column', sm: 'row' }, gap: 2 },
         headerTitle: { fontWeight: 800, mb: 1, fontSize: { xs: '1.75rem', sm: '2.125rem' } },
         addTaskPaper: {

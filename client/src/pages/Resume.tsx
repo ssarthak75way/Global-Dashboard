@@ -54,6 +54,7 @@ const Resume = () => {
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
+       
         },
         paper: {
             p: '12mm',  

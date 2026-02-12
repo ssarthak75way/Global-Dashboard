@@ -1,12 +1,15 @@
 import React from 'react';
 import { Box, Container, Typography, Grid, Card, CardContent, useTheme } from '@mui/material';
 import {
-    Code as CodeIcon,
-    People as PeopleIcon,
-    TrendingUp as TrendingUpIcon,
-    Security as SecurityIcon,
-    Speed as SpeedIcon,
-    Public as PublicIcon
+    Description as ResumeIcon,
+    Person as ProfileIcon,
+    CalendarMonth as HeatmapIcon,
+    Dashboard as BoardIcon,
+    Forum as FeedIcon,
+    Work as ProjectIcon,
+    School as SkillIcon,
+    CardMembership as CertIcon,
+    TrendingUp as ActivityIcon
 } from '@mui/icons-material';
 
 const FeaturesSection: React.FC = () => {
@@ -14,34 +17,49 @@ const FeaturesSection: React.FC = () => {
 
     const features = [
         {
-            icon: <CodeIcon sx={{ fontSize: 40 }} />,
+            icon: <ResumeIcon sx={{ fontSize: 40 }} />,
+            title: 'ATS-Optimized Resume Builder',
+            description: 'Create professional, ATS-friendly resumes with our easy-to-use builder. Fill in your details once and export to PDF instantly. Perfect for job applications.'
+        },
+        {
+            icon: <ProfileIcon sx={{ fontSize: 40 }} />,
+            title: 'Comprehensive Profile',
+            description: 'Build your complete professional profile with work experience, education, projects, skills, and certifications. Make your online presence strong and discoverable.'
+        },
+        {
+            icon: <HeatmapIcon sx={{ fontSize: 40 }} />,
             title: 'Activity Tracking',
-            description: 'GitHub-style heatmap to visualize your coding journey and maintain streaks.'
+            description: 'Track your coding journey with a GitHub-style activity heatmap. Visualize your consistency, maintain streaks, and see your progress over time.'
         },
         {
-            icon: <PeopleIcon sx={{ fontSize: 40 }} />,
-            title: 'Professional Networking',
-            description: 'Connect with developers, share experiences, and grow your professional network.'
+            icon: <BoardIcon sx={{ fontSize: 40 }} />,
+            title: 'Task Management Board',
+            description: 'Organize your work with a powerful Kanban board. Create tasks, drag-and-drop between columns (To Do, In Progress, Done), and stay productive.'
         },
         {
-            icon: <TrendingUpIcon sx={{ fontSize: 40 }} />,
-            title: 'Profile Showcase',
-            description: 'Build a comprehensive portfolio with projects, skills, and certifications.'
+            icon: <FeedIcon sx={{ fontSize: 40 }} />,
+            title: 'Social Feed & Networking',
+            description: 'Share your thoughts, projects, and achievements. Like, comment, and engage with posts from developers worldwide. Build your professional network.'
         },
         {
-            icon: <SecurityIcon sx={{ fontSize: 40 }} />,
-            title: 'Secure & Private',
-            description: 'Your data is protected with industry-standard security measures.'
+            icon: <ProjectIcon sx={{ fontSize: 40 }} />,
+            title: 'Project Showcase',
+            description: 'Display your projects with descriptions, tech stacks, live links, and GitHub repositories. Let recruiters and peers see what you\'ve built.'
         },
         {
-            icon: <SpeedIcon sx={{ fontSize: 40 }} />,
-            title: 'Real-time Updates',
-            description: 'Stay connected with instant notifications and live activity feeds.'
+            icon: <SkillIcon sx={{ fontSize: 40 }} />,
+            title: 'Skills & Expertise',
+            description: 'List all your technical skills, programming languages, frameworks, and tools. Organize them by proficiency to highlight your strengths.'
         },
         {
-            icon: <PublicIcon sx={{ fontSize: 40 }} />,
-            title: 'Global Community',
-            description: 'Join developers from around the world in a vibrant tech community.'
+            icon: <CertIcon sx={{ fontSize: 40 }} />,
+            title: 'Certifications & Achievements',
+            description: 'Showcase your certifications, courses, and professional achievements. Add credential IDs and links to verify your accomplishments.'
+        },
+        {
+            icon: <ActivityIcon sx={{ fontSize: 40 }} />,
+            title: 'Analytics Dashboard',
+            description: 'Get insights into your activity with detailed analytics. Track posts, followers, following, projects, and overall engagement metrics.'
         }
     ];
 
@@ -60,7 +78,7 @@ const FeaturesSection: React.FC = () => {
             color: 'text.secondary',
             textAlign: 'center',
             mb: { xs: 4, md: 6 },
-            maxWidth: 700,
+            maxWidth: 800,
             mx: 'auto'
         },
         featureCard: {
@@ -82,10 +100,10 @@ const FeaturesSection: React.FC = () => {
         <Box id="features" sx={{ ...styles.section, bgcolor: 'background.paper' }}>
             <Container maxWidth="lg">
                 <Typography variant="h2" sx={styles.sectionTitle}>
-                    Powerful Features
+                    Everything You Need in One Platform
                 </Typography>
                 <Typography sx={styles.sectionSubtitle}>
-                    Everything you need to build your developer brand and grow your career
+                    DevConnect provides all the tools you need to build your professional brand, manage your work, and connect with the global developer community
                 </Typography>
                 <Grid container spacing={4}>
                     {features.map((feature, index) => (

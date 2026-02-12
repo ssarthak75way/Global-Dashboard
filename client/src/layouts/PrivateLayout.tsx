@@ -32,7 +32,9 @@ import {
     Brightness7 as LightModeIcon,
     Search as SearchIcon,
     Close as CloseIcon,
-    Description as ResumeIcon
+    Description as ResumeIcon,
+    Home as HomeIcon,
+    MenuBook as DocumentationIcon
 } from "@mui/icons-material";
 import TokenCountdown from "../components/TokenCountdown";
 import UserSearch from "../components/UserSearch";
@@ -181,11 +183,13 @@ const PrivateLayout = () => {
     const handleClose = () => setAnchorEl(null);
 
     const menuItems = [
+        { text: 'Home', icon: <HomeIcon />, path: '/' },
         { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
         { text: 'Task Board', icon: <BoardIcon />, path: '/board' },
         { text: 'Social Feed', icon: <FeedIcon />, path: '/feed' },
         { text: 'Profile', icon: <ProfileIcon />, path: '/profile' },
         { text: 'Resume', icon: <ResumeIcon />, path: '/resume' },
+        { text: 'Documentation', icon: <DocumentationIcon />, path: '/documentation' },
     ];
 
     const drawerContent = (
@@ -326,9 +330,10 @@ const PrivateLayout = () => {
 
             <Box component="main" sx={privateLayoutStyles.mainContent}>
                 <Outlet />
+                <LandingFooter />
 
-                <LandingFooter/>
             </Box>
+            
         </Box>
     );
 };

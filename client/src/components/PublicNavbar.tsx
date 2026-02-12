@@ -13,32 +13,35 @@ import {
     ListItemText,
     useTheme,
     useMediaQuery,
-    Container
+    Container,
+    Avatar,
+    Tooltip
 } from '@mui/material';
+
+    import {MenuBook as DocumentationIcon} from "@mui/icons-material";
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
+import DashboardIcon from '@mui/icons-material/Dashboard';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import UserMenu from './UserMenu';
 
 const PublicNavbar: React.FC = () => {
-    const {isAuthenticated} = useAuth();
+    const { isAuthenticated, user } = useAuth();
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [mobileOpen, setMobileOpen] = useState(false);
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
     const navigate = useNavigate();
     const location = useLocation();
 
-    const navItems = [
-        { label: 'Home', href: '#home' },
-        { label: 'Features', href: '#features' },
-        { label: 'About', href: '#about' },
-        { label: 'How It Works', href: '#how-it-works' },
-        { label: 'Support', href: '#support' }
-    ];
 
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
     };
+
+    const handleMenu = (event: React.MouseEvent<HTMLElement>) => setAnchorEl(event.currentTarget);
+    const handleClose = () => setAnchorEl(null);
 
     const scrollToSection = (href: string) => {
         // If not on landing page, navigate there first
@@ -143,34 +146,38 @@ const PublicNavbar: React.FC = () => {
                 </IconButton>
             </Box>
             <List>
-                {navItems.map((item) => (
-                    <ListItem key={item.label} disablePadding>
-                        <ListItemButton onClick={() => scrollToSection(item.href)}>
+               
+                {isAuthenticated ? (
+                    <ListItem disablePadding>
+                        <ListItemButton onClick={() => { navigate('/dashboard'); setMobileOpen(false); }}>
                             <ListItemText
-                                primary={item.label}
-                                primaryTypographyProps={{ fontWeight: 600 }}
+                                primary="Go to Dashboard"
+                                primaryTypographyProps={{ fontWeight: 600, color: 'primary.main' }}
                             />
                         </ListItemButton>
                     </ListItem>
-                ))}
-                <ListItem disablePadding>
-                    <ListItemButton onClick={() => { navigate('/login'); setMobileOpen(false); }}>
-                        <ListItemText
-                            primary="Login"
-                            primaryTypographyProps={{ fontWeight: 600, color: 'primary.main' }}
-                        />
-                    </ListItemButton>
-                </ListItem>
-                <ListItem sx={{ px: 2, pt: 1 }}>
-                    <Button
-                        fullWidth
-                        variant="contained"
-                        onClick={() => { navigate('/signup'); setMobileOpen(false); }}
-                        sx={{ ...styles.ctaButton, ml: 0 }}
-                    >
-                        Get Started
-                    </Button>
-                </ListItem>
+                ) : (
+                    <>
+                        <ListItem disablePadding>
+                            <ListItemButton onClick={() => { navigate('/login'); setMobileOpen(false); }}>
+                                <ListItemText
+                                    primary="Login"
+                                    primaryTypographyProps={{ fontWeight: 600, color: 'primary.main' }}
+                                />
+                            </ListItemButton>
+                        </ListItem>
+                        <ListItem sx={{ px: 2, pt: 1 }}>
+                            <Button
+                                fullWidth
+                                variant="contained"
+                                onClick={() => { navigate('/signup'); setMobileOpen(false); }}
+                                sx={{ ...styles.ctaButton, ml: 0 }}
+                            >
+                                Get Started
+                            </Button>
+                        </ListItem>
+                    </>
+                )}
             </List>
         </Box>
     );
@@ -200,29 +207,61 @@ const PublicNavbar: React.FC = () => {
                             </IconButton>
                         ) : (
                             <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                {navItems.map((item) => (
-                                    <Button
-                                        key={item.label}
-                                        onClick={() => scrollToSection(item.href)}
-                                        sx={styles.navButton}
-                                    >
-                                        {item.label}
-                                    </Button>
-                                ))}
-                               {!isAuthenticated && <>
-                                <Button
-                                    onClick={() => navigate('/login')}
-                                    sx={{ ...styles.navButton, ml: 2 }}
-                                >
-                                    Login
-                                </Button>
-                                <Button
-                                    variant="contained"
-                                    onClick={() => navigate('/signup')}
-                                    sx={styles.ctaButton}
-                                >
-                                    Get Started
-                                </Button></>}
+                                
+                                {isAuthenticated ? (
+                                    <>
+                                     <Button
+                                            startIcon={<DocumentationIcon />}
+                                            onClick={() => navigate('/documentation')}
+                                            sx={{ ...styles.navButton, ml: 2 }}
+                                        >
+                                            Docs
+                                        </Button>
+                                        <Button
+                                            startIcon={<DashboardIcon />}
+                                            onClick={() => navigate('/dashboard')}
+                                            sx={{ ...styles.navButton, ml: 2 }}
+                                        >
+                                            Dashboard
+                                        </Button>
+                                        <Tooltip title="Account settings">
+                                            <IconButton
+                                                onClick={handleMenu}
+                                                size="small"
+                                                sx={{ ml: 1 }}
+                                            >
+                                                <Avatar
+                                                    alt={user?.name}
+                                                    src={user?.avatar}
+                                                    sx={{ width: 35, height: 35, bgcolor: 'primary.main' }}
+                                                >
+                                                    {user?.name?.[0]?.toUpperCase()||user?.email?.[0]?.toUpperCase() || '?'}
+                                                </Avatar>
+                                            </IconButton>
+                                        </Tooltip>
+                                        <UserMenu
+                                            anchorEl={anchorEl}
+                                            open={Boolean(anchorEl)}
+                                            onClose={handleClose}
+                                        />
+                                    </>
+                                ) : (
+                                    <>
+                                        <Button
+                                            onClick={() => navigate('/login')}
+                                            sx={{ ...styles.navButton, ml: 2 }}
+                                        >
+                                            Login
+                                        </Button>
+                                        <Button
+                                            variant="contained"
+                                            onClick={() => navigate('/signup')}
+                                            sx={styles.ctaButton}
+                                        >
+                                            Get Started
+                                        </Button>
+                                    </>
+                                )}
                             </Box>
                         )}
                     </Toolbar>

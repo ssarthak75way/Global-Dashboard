@@ -1,7 +1,8 @@
-import { Outlet, Navigate, useLocation } from "react-router-dom";
+import { Outlet, Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { Box, Container, Typography, Theme } from "@mui/material";
+import { Box, Container, Theme } from "@mui/material";
 import PublicNavbar from "../components/PublicNavbar";
+import LandingFooter from "../components/landing/LandingFooter";
 
 const publicLayoutStyles = {
     root: (theme: Theme) => ({
@@ -64,35 +65,24 @@ const publicLayoutStyles = {
 
 const PublicLayout = () => {
     const { isAuthenticated, loading } = useAuth();
-    const location = useLocation();
-    const isLandingPage = location.pathname === '/';
 
     if (loading) return <div>Loading...</div>;
-    if (isAuthenticated) return <Navigate to="/dashboard" replace />;
 
-    // Landing page has its own navbar and footer
-    if (isLandingPage) {
-        return <Outlet />;
+    // Redirect authenticated users from auth pages to dashboard
+    if (isAuthenticated) {
+        return <Navigate to="/dashboard" replace />;
     }
 
-    // Auth pages (login, signup, verify-otp) use the styled layout
     return (
         <>
             <PublicNavbar />
-            <Box
-                sx={(theme) => publicLayoutStyles.root(theme)}
-            >
+            <Box sx={(theme) => publicLayoutStyles.root(theme)}>
                 <Box sx={publicLayoutStyles.blob} />
                 <Container maxWidth="sm" sx={{ ...publicLayoutStyles.container, py: { xs: 4, sm: 8 } }}>
                     <Outlet />
-
-                    <Box sx={publicLayoutStyles.footerBox}>
-                        <Typography variant="caption" color="text.secondary">
-                            © {new Date().getFullYear()} DevConnect. All rights reserved.
-                        </Typography>
-                    </Box>
                 </Container>
             </Box>
+            <LandingFooter />
         </>
     );
 };

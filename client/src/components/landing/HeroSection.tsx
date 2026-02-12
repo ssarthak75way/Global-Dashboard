@@ -1,8 +1,11 @@
 import React from 'react';
 import { Box, Container, Typography, Button, Grid, Stack, Paper, useTheme } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
+import DashboardIcon from '@mui/icons-material/Dashboard';
 
 const HeroSection: React.FC = () => {
+    const { isAuthenticated } = useAuth();
     const theme = useTheme();
     const navigate = useNavigate();
 
@@ -51,28 +54,42 @@ const HeroSection: React.FC = () => {
                 <Grid container spacing={6} alignItems="center">
                     <Grid item xs={12} md={7}>
                         <Typography variant="h1" sx={styles.heroTitle}>
-                            Connect, Code, Collaborate
+                            Your Complete Developer Platform
                         </Typography>
                         <Typography sx={styles.heroSubtitle}>
-                            Join the ultimate platform for developers to showcase their work, track their progress, and connect with a global community of tech enthusiasts.
+                            DevConnect is your all-in-one platform to build a strong professional presence, showcase your projects, create an ATS-optimized resume, track your coding activity, connect with developers worldwide, and manage your tasks—all in one place.
                         </Typography>
                         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-                            <Button
-                                variant="contained"
-                                size="large"
-                                onClick={() => navigate('/signup')}
-                                sx={styles.ctaButton}
-                            >
-                                Get Started Free
-                            </Button>
-                            <Button
-                                variant="outlined"
-                                size="large"
-                                onClick={() => navigate('/login')}
-                                sx={{ ...styles.ctaButton, boxShadow: 'none' }}
-                            >
-                                Sign In
-                            </Button>
+                            {isAuthenticated ? (
+                                <Button
+                                    variant="contained"
+                                    size="large"
+                                    startIcon={<DashboardIcon />}
+                                    onClick={() => navigate('/dashboard')}
+                                    sx={styles.ctaButton}
+                                >
+                                    Go to Dashboard
+                                </Button>
+                            ) : (
+                                <>
+                                    <Button
+                                        variant="contained"
+                                        size="large"
+                                        onClick={() => navigate('/signup')}
+                                        sx={styles.ctaButton}
+                                    >
+                                        Get Started Free
+                                    </Button>
+                                    <Button
+                                        variant="outlined"
+                                        size="large"
+                                        onClick={() => navigate('/login')}
+                                        sx={{ ...styles.ctaButton, boxShadow: 'none' }}
+                                    >
+                                        Sign In
+                                    </Button>
+                                </>
+                            )}
                         </Stack>
                     </Grid>
                     <Grid item xs={12} md={5}>
@@ -88,11 +105,12 @@ const HeroSection: React.FC = () => {
                         >
                             <Stack spacing={2}>
                                 {[
-                                    '✓ Track your coding activity',
-                                    '✓ Build your professional profile',
-                                    '✓ Connect with developers',
-                                    '✓ Showcase your projects',
-                                    '✓ Join a global community'
+                                    '✓ Create ATS-optimized resume with PDF export',
+                                    '✓ Build comprehensive professional profile',
+                                    '✓ Track coding activity with GitHub-style heatmap',
+                                    '✓ Manage tasks with Kanban board',
+                                    '✓ Share posts & connect with developers',
+                                    '✓ Showcase projects, skills & certifications'
                                 ].map((item, index) => (
                                     <Typography key={index} variant="h6" sx={{ fontWeight: 600 }}>
                                         {item}

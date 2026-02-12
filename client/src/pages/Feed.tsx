@@ -180,7 +180,7 @@ const Feed = () => {
 
     const styles = {
         loadingContainer: { display: "flex", justifyContent: "center", mt: 8 },
-        mainContainer: { maxWidth: 800, mx: "auto", px: { xs: 2, sm: 3 }, pb: 8 }
+        mainContainer: { maxWidth: 800, mx: "auto", px: { xs: 2, sm: 3 }, pb: 8, minHeight:"100vh" }
     };
 
     if (loading) return (

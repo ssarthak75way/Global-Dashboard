@@ -1,9 +1,11 @@
 import React from 'react';
 import { Box, Container, Typography, Grid, Stack, Link, Divider, IconButton, useTheme } from '@mui/material';
+import { Link as RouterLink } from 'react-router-dom';
 import {
     LinkedIn as LinkedInIcon,
     GitHub as GitHubIcon,
-    Twitter as TwitterIcon
+    Twitter as TwitterIcon,
+    Email as EmailIcon
 } from '@mui/icons-material';
 
 const LandingFooter: React.FC = () => {
@@ -16,6 +18,13 @@ const LandingFooter: React.FC = () => {
             borderColor: 'divider',
             py: 6,
             mt: 8
+        },
+        link: {
+            cursor: 'pointer',
+            transition: 'color 0.2s',
+            '&:hover': {
+                color: 'primary.main'
+            }
         }
     };
 
@@ -48,35 +57,79 @@ const LandingFooter: React.FC = () => {
                             Empowering developers to build, connect, and grow together.
                         </Typography>
                         <Stack direction="row" spacing={1}>
-                            <IconButton size="small" sx={{ bgcolor: 'action.hover' }}>
+                            <IconButton
+                                size="small"
+                                sx={{ bgcolor: 'action.hover' }}
+                                component="a"
+                                href="https://github.com"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
                                 <GitHubIcon />
                             </IconButton>
-                            <IconButton size="small" sx={{ bgcolor: 'action.hover' }}>
+                            <IconButton
+                                size="small"
+                                sx={{ bgcolor: 'action.hover' }}
+                                component="a"
+                                href="https://linkedin.com"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
                                 <LinkedInIcon />
                             </IconButton>
-                            <IconButton size="small" sx={{ bgcolor: 'action.hover' }}>
+                            <IconButton
+                                size="small"
+                                sx={{ bgcolor: 'action.hover' }}
+                                component="a"
+                                href="https://twitter.com"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
                                 <TwitterIcon />
+                            </IconButton>
+                            <IconButton
+                                size="small"
+                                sx={{ bgcolor: 'action.hover' }}
+                                component="a"
+                                href="mailto:contact@devconnect.com"
+                            >
+                                <EmailIcon />
                             </IconButton>
                         </Stack>
                     </Grid>
                     <Grid item xs={12} sm={4} md={2}>
                         <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
-                            Product
+                            Platform
                         </Typography>
                         <Stack spacing={1}>
-                            <Link href="#features" color="text.secondary" underline="hover">Features</Link>
-                            <Link href="#" color="text.secondary" underline="hover">Pricing</Link>
-                            <Link href="#" color="text.secondary" underline="hover">Updates</Link>
+                            <Link component={RouterLink} to="/dashboard" color="text.secondary" underline="hover" sx={styles.link}>
+                                Dashboard
+                            </Link>
+                            <Link component={RouterLink} to="/feed" color="text.secondary" underline="hover" sx={styles.link}>
+                                Social Feed
+                            </Link>
+                            <Link component={RouterLink} to="/board" color="text.secondary" underline="hover" sx={styles.link}>
+                                Task Board
+                            </Link>
+                            <Link component={RouterLink} to="/profile" color="text.secondary" underline="hover" sx={styles.link}>
+                                Profile
+                            </Link>
                         </Stack>
                     </Grid>
                     <Grid item xs={12} sm={4} md={2}>
                         <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
-                            Company
+                            Features
                         </Typography>
                         <Stack spacing={1}>
-                            <Link href="#about" color="text.secondary" underline="hover">About</Link>
-                            <Link href="#" color="text.secondary" underline="hover">Blog</Link>
-                            <Link href="#" color="text.secondary" underline="hover">Careers</Link>
+                            <Link component={RouterLink} to="/resume" color="text.secondary" underline="hover" sx={styles.link}>
+                                Resume Builder
+                            </Link>
+                            <Link href="#features" color="text.secondary" underline="hover" sx={styles.link}>
+                                All Features
+                            </Link>
+                            <Link href="#how-it-works" color="text.secondary" underline="hover" sx={styles.link}>
+                                How It Works
+                            </Link>
                         </Stack>
                     </Grid>
                     <Grid item xs={12} sm={4} md={2}>
@@ -84,26 +137,48 @@ const LandingFooter: React.FC = () => {
                             Resources
                         </Typography>
                         <Stack spacing={1}>
-                            <Link href="#support" color="text.secondary" underline="hover">Support</Link>
-                            <Link href="#" color="text.secondary" underline="hover">Documentation</Link>
-                            <Link href="#" color="text.secondary" underline="hover">Community</Link>
+                            <Link component={RouterLink} to="/documentation" color="text.secondary" underline="hover" sx={styles.link}>
+                                Documentation
+                            </Link>
+                            <Link href="#about" color="text.secondary" underline="hover" sx={styles.link}>
+                                About Us
+                            </Link>
+                            <Link href="#support" color="text.secondary" underline="hover" sx={styles.link}>
+                                Support
+                            </Link>
                         </Stack>
                     </Grid>
                     <Grid item xs={12} sm={4} md={2}>
                         <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
-                            Legal
+                            Account
                         </Typography>
                         <Stack spacing={1}>
-                            <Link href="#" color="text.secondary" underline="hover">Privacy</Link>
-                            <Link href="#" color="text.secondary" underline="hover">Terms</Link>
-                            <Link href="#" color="text.secondary" underline="hover">Security</Link>
+                            <Link component={RouterLink} to="/login" color="text.secondary" underline="hover" sx={styles.link}>
+                                Login
+                            </Link>
+                            <Link component={RouterLink} to="/signup" color="text.secondary" underline="hover" sx={styles.link}>
+                                Sign Up
+                            </Link>
+                            <Link component="a" href="mailto:support@devconnect.com" color="text.secondary" underline="hover" sx={styles.link}>
+                                Contact
+                            </Link>
                         </Stack>
                     </Grid>
                 </Grid>
                 <Divider sx={{ my: 4 }} />
-                <Typography variant="body2" color="text.secondary" textAlign="center">
-                    © {new Date().getFullYear()} DevConnect. All rights reserved.
-                </Typography>
+                <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" alignItems="center" spacing={2}>
+                    <Typography variant="body2" color="text.secondary">
+                        © {new Date().getFullYear()} DevConnect. All rights reserved.
+                    </Typography>
+                    <Stack direction="row" spacing={2}>
+                        <Link href="#" color="text.secondary" underline="hover" sx={{ ...styles.link, fontSize: '0.875rem' }}>
+                            Privacy Policy
+                        </Link>
+                        <Link href="#" color="text.secondary" underline="hover" sx={{ ...styles.link, fontSize: '0.875rem' }}>
+                            Terms of Service
+                        </Link>
+                    </Stack>
+                </Stack>
             </Container>
         </Box>
     );
