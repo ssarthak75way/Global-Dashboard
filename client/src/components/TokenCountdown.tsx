@@ -54,9 +54,9 @@ const TokenCountdown: React.FC<TokenCountdownProps> = ({ expiryTime, onExpire })
         text: {
             fontWeight: 700,
             fontFamily: "monospace",
-            width: { xs: "35px", sm: "45px" },
+            width: { xs: "28px", sm: "45px" },
             textAlign: "center",
-            fontSize: { xs: "0.75rem", sm: "0.875rem" }
+            fontSize: { xs: "0.7rem", sm: "0.875rem" }
         }
     };
 

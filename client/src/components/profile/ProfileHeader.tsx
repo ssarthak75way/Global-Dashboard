@@ -1,8 +1,10 @@
 import React from 'react';
-import { Box, Paper, Avatar, Typography, Button, Chip, Stack } from '@mui/material';
-import { Email as EmailIcon, Badge as IdIcon, Edit as EditIcon } from '@mui/icons-material';
+import { Box, Paper, Avatar, Typography, Button, Chip, Stack, Tooltip } from '@mui/material';
+import { Email as EmailIcon } from '@mui/icons-material';
 import { useAuth, User } from '../../context/AuthContext';
 import FollowButton from '../FollowButton';
+import { GoVerified } from "react-icons/go";
+import { AiOutlineEdit } from "react-icons/ai";
 
 interface ProfileHeaderProps {
     displayUser: User | null;
@@ -26,7 +28,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ displayUser, isOwnProfile
                             background: displayUser?.avatar ? 'transparent' : styles.avatar.background
                         }}
                     >
-                        {!displayUser?.avatar && (displayUser?.name?.[0].toUpperCase() || displayUser?.email?.[0].toUpperCase())}
+                        {!displayUser?.avatar && (displayUser?.name?.[0]?.toUpperCase() || displayUser?.email?.[0]?.toUpperCase() || '?')}
                     </Avatar>
                     {displayUser?.status ? (
                         <Chip
@@ -71,12 +73,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ displayUser, isOwnProfile
                             {displayUser?.name || displayUser?.email.split('@')[0]}
                         </Typography>
                         {displayUser?.isVerified && (
-                            <Chip
-                                icon={<IdIcon />}
-                                label="Verified"
-                                color="primary"
-                                sx={{ fontWeight: 900, borderRadius: 1, px: 1, height: 32 }}
-                            />
+                            <GoVerified size={32} />
                         )}
                     </Stack>
 
@@ -98,16 +95,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ displayUser, isOwnProfile
                     </Stack>
 
                     <Stack direction="row" spacing={2} flexWrap="wrap">
-                        {isOwnProfile ? (
-                            <Button
-                                variant="contained"
-                                startIcon={<EditIcon />}
-                                onClick={onEditClick}
-                                sx={{ borderRadius: 1.5, fontWeight: 900, textTransform: 'none', px: 3 }}
-                            >
-                                Edit Profile
-                            </Button>
-                        ) : (
+                        {!isOwnProfile &&
                             <FollowButton
                                 userId={displayUser?._id || ''}
                                 initialIsFollowing={isFollowing}
@@ -115,8 +103,15 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ displayUser, isOwnProfile
                                     console.log('Follow status changed:', newStatus);
                                 }}
                             />
-                        )}
+                        }
                     </Stack>
+                </Box>
+                <Box>
+                   {isOwnProfile && 
+                   <Tooltip title="Edit Profile" onClick={onEditClick} style={styles.editbutton} >
+                        <AiOutlineEdit size={32} />
+                   </Tooltip>
+                }
                 </Box>
             </Box>
         </Paper>

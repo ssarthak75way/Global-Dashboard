@@ -164,8 +164,8 @@ const VerifyOtp = () => {
         },
         otpInputProps: {
             textAlign: 'center',
-            letterSpacing: '0.5em',
-            fontSize: '2rem',
+            letterSpacing: { xs: '0.2em', sm: '0.5em' },
+            fontSize: { xs: '1.5rem', sm: '2rem' },
             fontWeight: 900,
             height: '60px'
         }
@@ -216,13 +216,15 @@ const VerifyOtp = () => {
                             autoFocus
                             inputProps={{
                                 maxLength: 6,
-                                style: styles.otpInputProps as React.CSSProperties
                             }}
                             {...register("otp")}
                             error={!!errors.otp}
                             helperText={errors.otp?.message}
                             variant="outlined"
-                            sx={styles.otpInput}
+                            sx={{
+                                ...styles.otpInput,
+                                '& .MuiInputBase-input': styles.otpInputProps
+                            }}
                         />
 
                         <Button

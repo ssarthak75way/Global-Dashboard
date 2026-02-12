@@ -25,10 +25,37 @@ export const getTheme = (mode: 'light' | 'dark'): ThemeOptions => ({
     },
     typography: {
         fontFamily: '"Outfit", "Inter", "system-ui", sans-serif',
-        h1: { fontWeight: 800, letterSpacing: '-0.02em' },
-        h2: { fontWeight: 800, letterSpacing: '-0.02em' },
-        h3: { fontWeight: 700, letterSpacing: '-0.01em' },
-        h4: { fontWeight: 700, letterSpacing: '-0.01em' },
+        h1: {
+            fontWeight: 900,
+            letterSpacing: '-0.03em',
+            fontSize: 'clamp(2.5rem, 8vw, 4.5rem)',
+            lineHeight: 1.1
+        },
+        h2: {
+            fontWeight: 900,
+            letterSpacing: '-0.02em',
+            fontSize: 'clamp(2rem, 6vw, 3.5rem)',
+            lineHeight: 1.2
+        },
+        h3: {
+            fontWeight: 800,
+            letterSpacing: '-0.02em',
+            fontSize: 'clamp(1.5rem, 4vw, 2.5rem)',
+            lineHeight: 1.2
+        },
+        h4: {
+            fontWeight: 800,
+            letterSpacing: '-0.01em',
+            fontSize: 'clamp(1.25rem, 3vw, 2rem)'
+        },
+        subtitle1: {
+            fontSize: 'clamp(1rem, 2vw, 1.1rem)',
+            fontWeight: 500
+        },
+        body1: {
+            fontSize: 'clamp(0.875rem, 1.5vw, 1rem)',
+            lineHeight: 1.6
+        },
         button: { textTransform: 'none', fontWeight: 600, letterSpacing: '0.01em' },
     },
     shape: {

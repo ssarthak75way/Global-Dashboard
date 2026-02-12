@@ -22,7 +22,7 @@ const NetworkStats: React.FC<NetworkStatsProps> = ({
         { label: 'POSTS', value: activityStats.totalPosts, color: 'info.main' },
         { label: 'CERTIFICATIONS', value: certificationsCount, color: 'warning.main' },
         { label: 'STREAK', value: activityStats.currentStreak, color: 'success.main' },
-        { label: 'LONGEST STREAK', value: activityStats.longestStreak, color: 'success.main' }
+        { label: 'MAX STREAK', value: activityStats.longestStreak, color: 'success.main' }
     ];
 
     return (

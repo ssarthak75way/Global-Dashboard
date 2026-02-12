@@ -1,20 +1,39 @@
-import { useMemo } from "react";
-import { ThemeProvider as MuiThemeProvider, createTheme, CssBaseline } from "@mui/material";
+import { useMemo, lazy, Suspense } from "react";
+import { ThemeProvider as MuiThemeProvider, createTheme, CssBaseline, Box, CircularProgress } from "@mui/material";
 import { getTheme } from "./theme";
-import { createBrowserRouter, RouterProvider, Navigate } from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { ThemeProvider, useTheme } from "./context/ThemeContext";
 import PublicLayout from "./layouts/PublicLayout";
 import PrivateLayout from "./layouts/PrivateLayout";
-import Signup from "./pages/Signup";
-import VerifyOtp from "./pages/VerifyOtp";
-import Login from "./pages/Login";
-import Dashboard from "./pages/Dashboard";
-import Profile from "./pages/Profile";
-import Board from "./pages/Board";
-import Feed from "./pages/Feed";
-import LandingPage from "./pages/LandingPage";
 import { ErrorBoundary, FallbackProps } from "react-error-boundary";
+
+const LandingPage = lazy(() => import("./pages/LandingPage"));
+const Signup = lazy(() => import("./pages/Signup"));
+const VerifyOtp = lazy(() => import("./pages/VerifyOtp"));
+const Login = lazy(() => import("./pages/Login"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Profile = lazy(() => import("./pages/Profile"));
+const Board = lazy(() => import("./pages/Board"));
+const Feed = lazy(() => import("./pages/Feed"));
+const Resume = lazy(() => import("./pages/Resume"));
+const Documentation = lazy(() => import("./pages/Documentation"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+
+const LoadingFallback = () => (
+  <Box
+    sx={{
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      height: '100vh',
+      width: '100vw',
+      bgcolor: 'background.default'
+    }}
+  >
+    <CircularProgress size={60} thickness={4} />
+  </Box>
+);
 
 const ErrorFallback = ({ error, resetErrorBoundary }: FallbackProps) => {
   const styles = {
@@ -41,27 +60,110 @@ const ErrorFallback = ({ error, resetErrorBoundary }: FallbackProps) => {
 
 const router = createBrowserRouter([
   {
+    path: "/",
+    element: (
+      <Suspense fallback={<LoadingFallback />}>
+        <LandingPage />
+      </Suspense>
+    )
+  },
+  {
     element: <PublicLayout />,
     children: [
-      { path: "/", element: <LandingPage /> },
-      { path: "/signup", element: <Signup /> },
-      { path: "/verify-otp", element: <VerifyOtp /> },
-      { path: "/login", element: <Login /> }
+      {
+        path: "/signup",
+        element: (
+          <Suspense fallback={<LoadingFallback />}>
+            <Signup />
+          </Suspense>
+        )
+      },
+      {
+        path: "/verify-otp",
+        element: (
+          <Suspense fallback={<LoadingFallback />}>
+            <VerifyOtp />
+          </Suspense>
+        )
+      },
+      {
+        path: "/login",
+        element: (
+          <Suspense fallback={<LoadingFallback />}>
+            <Login />
+          </Suspense>
+        )
+      }
     ]
   },
   {
     element: <PrivateLayout />,
     children: [
-      { path: "/dashboard", element: <Dashboard /> },
-      { path: "/profile", element: <Profile /> },
-      { path: "/profile/:userId", element: <Profile /> },
-      { path: "/board", element: <Board /> },
-      { path: "/feed", element: <Feed /> }
+      {
+        path: "/dashboard",
+        element: (
+          <Suspense fallback={<LoadingFallback />}>
+            <Dashboard />
+          </Suspense>
+        )
+      },
+      {
+        path: "/profile",
+        element: (
+          <Suspense fallback={<LoadingFallback />}>
+            <Profile />
+          </Suspense>
+        )
+      },
+      {
+        path: "/profile/:userId",
+        element: (
+          <Suspense fallback={<LoadingFallback />}>
+            <Profile />
+          </Suspense>
+        )
+      },
+      {
+        path: "/board",
+        element: (
+          <Suspense fallback={<LoadingFallback />}>
+            <Board />
+          </Suspense>
+        )
+      },
+      {
+        path: "/feed",
+        element: (
+          <Suspense fallback={<LoadingFallback />}>
+            <Feed />
+          </Suspense>
+        )
+      },
+      {
+        path: "/resume",
+        element: (
+          <Suspense fallback={<LoadingFallback />}>
+            <Resume />
+          </Suspense>
+        )
+      },
+      {
+        path: "/documentation",
+        element: (
+          <Suspense fallback={<LoadingFallback />}>
+            <Documentation />
+          </Suspense>
+        )
+      }
     ]
   },
   {
     path: "*",
-    element: <Navigate to="/login" replace />
+    element: (
+      <Suspense fallback={<LoadingFallback />}>
+        <NotFound />
+      </Suspense>
+    )
   }
 ]);
 
@@ -72,7 +174,6 @@ const AppContent = () => {
     createTheme(getTheme(theme)),
     [theme]);
 
-  // Pass theme to router context if needed, but here wrapping RouterProvider is sufficient
   return (
     <MuiThemeProvider theme={muiTheme}>
       <CssBaseline />

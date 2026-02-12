@@ -47,12 +47,13 @@ const FollowButton: React.FC<FollowButtonProps> = ({ userId, initialIsFollowing,
         <Button
             variant={isFollowing ? "outlined" : "contained"}
             color={isFollowing ? "secondary" : "primary"}
-            startIcon={loading ? <Loader size={20} color="inherit" /> : (isFollowing ? <PersonRemoveIcon /> : <PersonAddIcon />)}
+            startIcon={loading ? <Loader size={18} color="inherit" /> : (isFollowing ? <PersonRemoveIcon /> : <PersonAddIcon />)}
             onClick={handleClick}
             disabled={loading}
             sx={{
                 borderRadius: 1,
                 px: 3,
+                minWidth: '140px',
                 textTransform: 'none',
                 fontWeight: 700,
                 boxShadow: isFollowing ? 'none' : '0 4px 12px rgba(99, 102, 241, 0.3)',

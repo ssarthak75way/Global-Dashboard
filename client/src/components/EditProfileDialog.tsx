@@ -261,7 +261,7 @@ const EditProfileDialog: React.FC<EditProfileDialogProps> = ({ open, onClose, us
             fullWidth
             PaperProps={{
                 sx: {
-                    borderRadius: fullScreen ? 0 : 1,
+                    borderRadius: fullScreen ? 0 : 2,
                     bgcolor: (theme) => theme.palette.mode === 'light' ? 'rgba(255,255,255,0.95)' : 'rgba(15,23,42,0.95)',
                     backdropFilter: 'blur(20px)',
                     boxShadow: '0 24px 48px rgba(0,0,0,0.2)',
@@ -319,7 +319,7 @@ const EditProfileDialog: React.FC<EditProfileDialogProps> = ({ open, onClose, us
                 </Box>
 
                 {/* Content Area */}
-                <Box sx={{ flex: 1, p: 4, overflowY: 'auto' }}>
+                <Box sx={{ flex: 1, p: { xs: 2, sm: 4 }, overflowY: 'auto' }}>
                     <form id="edit-profile-form" onSubmit={handleSubmit(handleFormSubmit)}>
                         {/* Tab 0: Personal Info */}
                         <div role="tabpanel" hidden={activeTab !== 0}>
@@ -383,7 +383,7 @@ const EditProfileDialog: React.FC<EditProfileDialogProps> = ({ open, onClose, us
                                         </label>
                                     </Box>
 
-                                    <Grid container spacing={3}>
+                                    <Grid container spacing={{ xs: 2, sm: 3 }}>
                                         <Grid item xs={12}>
                                             <TextField
                                                 label="Display Name"
@@ -448,11 +448,13 @@ const EditProfileDialog: React.FC<EditProfileDialogProps> = ({ open, onClose, us
                                 <Stack spacing={4}>
                                     <Box>
                                         <Typography variant="h6" fontWeight="700" color="text.secondary" gutterBottom>Professional Identity</Typography>
-                                        <Grid container spacing={3}>
+                                        <Grid container spacing={{ xs: 2, sm: 3 }}>
                                             <Grid item xs={12}>
                                                 <TextField
                                                     label="Professional Bio"
                                                     fullWidth
+                                                    minRows={2}
+                                                    maxRows={2}
                                                     variant="outlined"
                                                     multiline
                                                     rows={2}
@@ -909,7 +911,7 @@ const EditProfileDialog: React.FC<EditProfileDialogProps> = ({ open, onClose, us
                                     {(['github', 'linkedin', 'leetcode', 'codeforces'] as const).map((platform) => (
                                         <TextField
                                             key={platform}
-                                            label={platform.charAt(0).toUpperCase() + platform.slice(1)}
+                                            label={platform.charAt(0)?.toUpperCase() + platform.slice(1)}
                                             fullWidth
                                             {...register(`socialHandles.${platform}`)}
                                             InputProps={{

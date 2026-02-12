@@ -1,3 +1,7 @@
+/* *{
+  font-family:Verdana, Geneva, Tahoma, sans-serif !important;
+
+} */
 :root {
   --bg-color: #f8f9fa;
   --text-color: #212529;
@@ -71,6 +75,41 @@ body {
 .layout-container {
   display: flex;
   min-height: 100vh;
+}
+
+/* HTML: <div class="loader"></div> */
+.search-loader {
+  width: 10px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #ffffff;
+  display: grid;
+  animation: l22-0 2s infinite linear;
+}
+.search-loader:before,
+.search-loader:after {
+  content: "";
+  grid-area: 1/1;
+  margin: 15%;
+  border-radius: 50%;
+  background: inherit;
+  transform: rotate(0deg) translate(150%);
+  animation: l22 1s infinite;
+}
+.search-loader:after {
+  animation-delay: -.5s
+}
+@keyframes l22-0 {
+  100% {transform: rotate(1turn)}
+}
+@keyframes l22 {
+  100% {transform: rotate(1turn) translate(150%)}
+}
+@keyframes l20 {
+    0%       {transform:scale(var(--_s,1)) translate(0)    rotate(0)}
+    25%      {transform:scale(var(--_s,1)) translate(-25%) rotate(0)}
+    50%      {transform:scale(var(--_s,1)) translate(-25%) rotate(1turn)}
+    75%,100% {transform:scale(var(--_s,1)) translate(0)    rotate(1turn)}
 }
 
 .sidebar {

@@ -259,7 +259,7 @@ export const searchUsers = async (req: Request, res: Response): Promise<void> =>
                 { email: { $regex: query, $options: "i" } }
             ]
         })
-            .select("name email isVerified _id socialHandles")
+            .select("name email avatar isVerified _id socialHandles")
             .limit(10);
 
         res.status(200).json(users);

@@ -1,8 +1,11 @@
 import React from 'react';
 import { Box, Container, Typography, Button, useTheme } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
+import DashboardIcon from '@mui/icons-material/Dashboard';
 
 const CTASection: React.FC = () => {
+    const { isAuthenticated } = useAuth();
     const theme = useTheme();
     const navigate = useNavigate();
 
@@ -30,21 +33,40 @@ const CTASection: React.FC = () => {
                 <Typography variant="h6" sx={{ mb: 4, opacity: 0.9 }}>
                     Join thousands of developers already using DevConnect
                 </Typography>
-                <Button
-                    variant="contained"
-                    size="large"
-                    onClick={() => navigate('/signup')}
-                    sx={{
-                        ...styles.ctaButton,
-                        bgcolor: 'primary.main',
-                        color: 'white',
-                        '&:hover': {
-                            bgcolor: 'primary.dark'
-                        }
-                    }}
-                >
-                    Create Free Account
-                </Button>
+                {isAuthenticated ? (
+                    <Button
+                        variant="contained"
+                        size="large"
+                        startIcon={<DashboardIcon />}
+                        onClick={() => navigate('/dashboard')}
+                        sx={{
+                            ...styles.ctaButton,
+                            bgcolor: 'white',
+                            color: 'primary.main',
+                            '&:hover': {
+                                bgcolor: 'grey.100'
+                            }
+                        }}
+                    >
+                        Go to Dashboard
+                    </Button>
+                ) : (
+                    <Button
+                        variant="contained"
+                        size="large"
+                        onClick={() => navigate('/signup')}
+                        sx={{
+                            ...styles.ctaButton,
+                            bgcolor: 'white',
+                            color: 'primary.main',
+                            '&:hover': {
+                                bgcolor: 'grey.100'
+                            }
+                        }}
+                    >
+                        Create Free Account
+                    </Button>
+                )}
             </Container>
         </Box>
     );

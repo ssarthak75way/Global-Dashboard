@@ -138,18 +138,19 @@ const Profile = () => {
         container: {
             maxWidth: 1400,
             mx: 'auto',
-            px: { xs: 2, md: 3 }
+            px: { xs: 1, sm: 2, md: 3 }, minHeight: "100vh"
         },
         headerTitle: {
             fontWeight: 900,
-            fontSize: { xs: '1.8rem', md: '2.5rem' },
-            mb: 4,
+            fontSize: 'clamp(1.3rem, 10vw, 2.5rem)',
+            mb: { xs: 3, md: 4 },
             background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent'
         },
         bentoCard: {
-            p: { xs: 3, md: 4 },
+            p: { xs: 2.5, sm: 4, md: 4 },
+            my: 1.3,
             borderRadius: 3,
             border: '1px solid',
             borderColor: 'divider',
@@ -178,11 +179,11 @@ const Profile = () => {
         },
         name: {
             fontWeight: 900,
-            fontSize: { xs: '1.8rem', md: '2.2rem' }
+            fontSize: { xs: '1.5rem', md: '2rem', sm: '2rem' }
         },
         sectionTitle: {
             fontWeight: 900,
-            fontSize: { xs: '1.3rem', md: '1.6rem' },
+            fontSize: { xs: '1.3rem', md: '1.3rem' },
             mb: 3,
             display: 'flex',
             alignItems: 'center',
@@ -197,13 +198,18 @@ const Profile = () => {
         },
         statBox: {
             textAlign: 'center',
-            p: 2.5,
+            p: { xs: 1, sm: 2.5, md: 1 },
+            my: 1,
             borderRadius: 2,
             bgcolor: theme.palette.mode === 'light' ? 'rgba(0,0,0,0.02)' : 'rgba(255,255,255,0.02)',
             border: '1px solid',
             borderColor: 'divider',
             transition: 'all 0.2s',
             cursor: 'pointer',
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
             '&:hover': {
                 bgcolor: 'action.hover',
                 transform: 'translateY(-4px)',
@@ -212,12 +218,12 @@ const Profile = () => {
         },
         statValue: {
             fontWeight: 900,
-            fontSize: { xs: '1.8rem', md: '2.2rem' },
+            fontSize: 'clamp(1.2rem, 4vw, 2.2rem)',
             mb: 0.5
         },
         statLabel: {
-            fontSize: '0.7rem',
-            fontWeight: 900,
+            fontSize: { xs: '0.55rem', sm: '0.55em' },
+            fontWeight: 500,
             letterSpacing: 1,
             opacity: 0.6,
             textTransform: 'uppercase'
@@ -235,6 +241,23 @@ const Profile = () => {
                 background: `linear-gradient(90deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
                 transition: 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)'
             }
+        },
+        editbutton: {
+            position: 'absolute',
+            top: 20,
+            right: 20,
+            zIndex: 10,
+            cursor: 'pointer',
+            borderRadius: 1.5,
+            fontWeight: 900,
+            textTransform: 'none',
+            color: theme.palette.primary.main,
+            px: 3,
+            '&:hover': {
+                bgcolor: 'action.hover',
+                transform: 'translateY(-4px)',
+                boxShadow: `0 8px 16px ${theme.palette.mode === 'light' ? 'rgba(0, 0, 0, 0.53)' : 'rgba(0,0,0,0.3)'}`
+            }
         }
     };
 
@@ -247,7 +270,7 @@ const Profile = () => {
 
                 {profileLoading ? (
                     <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
-                        <Loader size={60} />
+                        <Loader size={60} fullPage />
                     </Box>
                 ) : (
                     <Grid container spacing={3.5}>

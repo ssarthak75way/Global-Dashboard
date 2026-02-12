@@ -49,7 +49,7 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ displayUser, calc
                                         </Box>
                                         {exp.jobType && (
                                             <Chip
-                                                label={exp.jobType.toUpperCase()}
+                                                label={exp.jobType?.toUpperCase()}
                                                 size="small"
                                                 variant="outlined"
                                                 color={exp.jobType === 'Remote' ? 'success' : exp.jobType === 'Hybrid' ? 'warning' : 'info'}

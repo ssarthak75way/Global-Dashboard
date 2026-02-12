@@ -472,25 +472,20 @@ async function getGoogleUser({ id_token, access_token }: { id_token: string; acc
     }
 }
 
-// Get User Activity for Heatmap
-// Helper function to calculate user activity
 const calculateUserActivity = async (userId: string) => {
-    // Fetch all posts by the user with comments
-    const posts = await Post.find({ author: userId }).select('createdAt comments likes').lean();
+    const posts = await Post.find({ author: userId }).select('createdAt comments').lean();
 
-    // Group activity by date with detailed breakdown
-    const activityMap = new Map<string, { posts: number; comments: number; likes: number }>();
+    const activityMap = new Map<string, { posts: number; comments: number }>();
 
     posts.forEach(post => {
         const date = new Date(post.createdAt);
-        const dateStr = date.toISOString().split('T')[0]; // YYYY-MM-DD format
+        const dateStr = date.toISOString().split('T')[0];
 
-        const existing = activityMap.get(dateStr) || { posts: 0, comments: 0, likes: 0 };
+        const existing = activityMap.get(dateStr) || { posts: 0, comments: 0 };
         existing.posts += 1;
         activityMap.set(dateStr, existing);
     });
 
-    // Track comments made by the user
     const allPosts = await Post.find({ 'comments.user': userId }).select('comments').lean();
     allPosts.forEach(post => {
         post.comments.forEach(comment => {
@@ -498,38 +493,25 @@ const calculateUserActivity = async (userId: string) => {
                 const date = new Date(comment.createdAt);
                 const dateStr = date.toISOString().split('T')[0];
 
-                const existing = activityMap.get(dateStr) || { posts: 0, comments: 0, likes: 0 };
+                const existing = activityMap.get(dateStr) || { posts: 0, comments: 0 };
                 existing.comments += 1;
                 activityMap.set(dateStr, existing);
             }
         });
     });
 
-    // Track likes given by the user
-    const likedPosts = await Post.find({ likes: userId }).select('createdAt').lean();
-    likedPosts.forEach(post => {
-        const date = new Date(post.createdAt);
-        const dateStr = date.toISOString().split('T')[0];
+    const totalLikes = await Post.countDocuments({ likes: userId });
 
-        const existing = activityMap.get(dateStr) || { posts: 0, comments: 0, likes: 0 };
-        existing.likes += 1;
-        activityMap.set(dateStr, existing);
-    });
-
-    // Convert to array format for heatmap
     const activity = Array.from(activityMap.entries()).map(([date, details]) => ({
         date,
-        count: details.posts + details.comments + details.likes,
+        count: details.posts + details.comments,
         posts: details.posts,
-        comments: details.comments,
-        likes: details.likes
+        comments: details.comments
     }));
 
-    // Calculate stats
     const totalPosts = posts.length;
     const activeDays = activityMap.size;
 
-    // Calculate current streak
     let currentStreak = 0;
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -542,12 +524,9 @@ const calculateUserActivity = async (userId: string) => {
         if (activityMap.has(dateStr)) {
             currentStreak++;
         } else if (i > 0) {
-            // Allow one day gap for today if no posts yet
             break;
         }
     }
-
-    // Calculate longest streak
     let longestStreak = 0;
     let tempStreak = 0;
     const sortedDates = Array.from(activityMap.keys()).sort();
@@ -574,6 +553,7 @@ const calculateUserActivity = async (userId: string) => {
         activity,
         stats: {
             totalPosts,
+            totalLikes,
             currentStreak,
             longestStreak,
             activeDays
