@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Paper, Avatar, Typography, Button, Chip, Stack, Tooltip } from '@mui/material';
-import { Email as EmailIcon, Badge as IdIcon, Edit as EditIcon } from '@mui/icons-material';
+import { Email as EmailIcon } from '@mui/icons-material';
 import { useAuth, User } from '../../context/AuthContext';
 import FollowButton from '../FollowButton';
 import { GoVerified } from "react-icons/go";

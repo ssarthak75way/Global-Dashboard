@@ -1,21 +1,64 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
   build: {
     rollupOptions: {
       output: {
-        manualChunks: {
-          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
-          'vendor-mui': ['@mui/material', '@mui/icons-material', '@emotion/react', '@emotion/styled'],
-          'vendor-dnd': ['@dnd-kit/core', '@dnd-kit/sortable', '@dnd-kit/utilities'],
-          'vendor-utils': ['axios', 'date-fns', 'zod', 'react-hook-form', 'react-error-boundary'],
-          'vendor-ui': ['react-icons', 'react-markdown', 'react-quill-new', 'react-select', 'remark-gfm']
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            // Core UI Framework
+            if (id.includes('@mui/material')) {
+              return 'vendor-mui-material';
+            }
+            if (id.includes('@mui/icons-material')) {
+              return 'vendor-mui-icons';
+            }
+
+            // Heavy Editors and Renderers
+            if (id.includes('react-quill-new')) {
+              return 'vendor-quill';
+            }
+            if (id.includes('react-markdown') || id.includes('remark-gfm')) {
+              return 'vendor-markdown';
+            }
+
+            // PDF Generation (Split internal heavy dependencies)
+            if (id.includes('jspdf')) {
+              return 'vendor-jspdf';
+            }
+            if (id.includes('html2canvas')) {
+              return 'vendor-html2canvas';
+            }
+            if (id.includes('html2pdf.js')) {
+              return 'vendor-html2pdf-wrapper';
+            }
+
+            // Framework Core
+            if (id.includes('react') || id.includes('react-dom') || id.includes('react-router-dom')) {
+              return 'vendor-react-core';
+            }
+
+            // Common Utilities
+            if (id.includes('zod') || id.includes('date-fns') || id.includes('axios')) {
+              return 'vendor-utils';
+            }
+            if (id.includes('@dnd-kit')) {
+              return 'vendor-dnd';
+            }
+
+            // Other UI libs
+            if (id.includes('react-select') || id.includes('react-icons') || id.includes('react-calendar-heatmap')) {
+              return 'vendor-ui-extra';
+            }
+
+            // Everything else
+            return 'vendor-common';
+          }
         }
       }
     },
-    chunkSizeWarningLimit: 1000 // Optional: increase warning limit if chunks are still slightly over 500kb but much better than before
+    chunkSizeWarningLimit: 600
   }
 })

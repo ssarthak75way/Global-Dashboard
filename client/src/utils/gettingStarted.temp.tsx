@@ -1,14 +1,3 @@
-import React from 'react';
-import {
-    Description as DescriptionIcon,
-    Person as PersonIcon,
-    CheckCircle as CheckCircleIcon,
-    Dashboard as DashboardIcon,
-    Assignment as AssignmentIcon,
-    Forum as ForumIcon
-} from '@mui/icons-material';
-
-// Getting Started Guide
 export interface GettingStartedStep {
     title: string;
     description: string;

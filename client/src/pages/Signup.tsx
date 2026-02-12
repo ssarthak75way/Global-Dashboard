@@ -20,7 +20,6 @@ import {
     Theme,
     InputAdornment,
     IconButton,
-    LinearProgress
 } from "@mui/material";
 import {
     Google as GoogleIcon,

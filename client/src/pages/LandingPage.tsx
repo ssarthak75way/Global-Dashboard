@@ -7,6 +7,7 @@ import FeaturesSection from '../components/landing/FeaturesSection';
 import AboutSection from '../components/landing/AboutSection';
 import HowItWorksSection from '../components/landing/HowItWorksSection';
 import TerminalShowcaseSection from '../components/landing/TerminalShowcaseSection';
+import ResumeShowcaseSection from '../components/landing/ResumeShowcaseSection';
 import SupportSection from '../components/landing/SupportSection';
 import CTASection from '../components/landing/CTASection';
 import LandingFooter from '../components/landing/LandingFooter';
@@ -19,6 +20,7 @@ const LandingPage: React.FC = () => {
             <HeroSection />
             <TerminalShowcaseSection />
             <FeaturesSection />
+            <ResumeShowcaseSection />
             <AboutSection />
             <HowItWorksSection />
             <SupportSection />

@@ -13,11 +13,10 @@ import {
     Cancel as CancelIcon,
     Add as AddIcon,
     PhotoCamera,
-    Image as ImageIcon
 } from "@mui/icons-material";
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
-import Loader from "../Loader"; // Adjust path
+import Loader from "../Loader"; 
 
 interface CreatePostProps {
     user: any;

@@ -330,10 +330,9 @@ const PrivateLayout = () => {
 
             <Box component="main" sx={privateLayoutStyles.mainContent}>
                 <Outlet />
-                <LandingFooter />
 
+                <LandingFooter />
             </Box>
-            
         </Box>
     );
 };
