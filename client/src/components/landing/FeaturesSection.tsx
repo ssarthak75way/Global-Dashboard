@@ -47,19 +47,19 @@ const FeaturesSection: React.FC = () => {
 
     const styles = {
         section: {
-            py: { xs: 8, md: 12 }
+            py: { xs: 6, md: 12 }
         },
         sectionTitle: {
             fontWeight: 900,
-            fontSize: { xs: '2rem', md: '3rem' },
+            fontSize: { xs: '1.75rem', sm: '2.5rem', md: '3rem' },
             mb: 2,
             textAlign: 'center'
         },
         sectionSubtitle: {
-            fontSize: '1.1rem',
+            fontSize: { xs: '0.9rem', sm: '1.1rem' },
             color: 'text.secondary',
             textAlign: 'center',
-            mb: 6,
+            mb: { xs: 4, md: 6 },
             maxWidth: 700,
             mx: 'auto'
         },

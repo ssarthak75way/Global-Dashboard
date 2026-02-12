@@ -31,13 +31,15 @@ import {
     Brightness4 as DarkModeIcon,
     Brightness7 as LightModeIcon,
     Search as SearchIcon,
-    Close as CloseIcon
+    Close as CloseIcon,
+    Description as ResumeIcon
 } from "@mui/icons-material";
 import TokenCountdown from "../components/TokenCountdown";
 import UserSearch from "../components/UserSearch";
 import UserMenu from "../components/UserMenu";
 
 import { Theme } from "@mui/material";
+import LandingFooter from "../components/landing/LandingFooter";
 
 const drawerWidth = 240;
 
@@ -143,10 +145,9 @@ const privateLayoutStyles = {
     }),
     mainContent: {
         flexGrow: 1,
-        p: 3,
+        p: { xs: 1, sm: 2, md: 3 },
         display: 'flex',
         flexDirection: 'column',
-        minHeight: '100vh',
         mt: { xs: 7, md: 8 },
         bgcolor: 'background.default',
         width: '100%',
@@ -184,6 +185,7 @@ const PrivateLayout = () => {
         { text: 'Task Board', icon: <BoardIcon />, path: '/board' },
         { text: 'Social Feed', icon: <FeedIcon />, path: '/feed' },
         { text: 'Profile', icon: <ProfileIcon />, path: '/profile' },
+        { text: 'Resume', icon: <ResumeIcon />, path: '/resume' },
     ];
 
     const drawerContent = (
@@ -281,11 +283,11 @@ const PrivateLayout = () => {
                         <UserSearch />
                     )}
 
-                    <Box sx={privateLayoutStyles.topBarActions}>
+                    <Box sx={{ ...privateLayoutStyles.topBarActions, gap: { xs: 0.5, sm: 2 } }}>
                         <TokenCountdown expiryTime={expiryTime} onExpire={checkAuth} />
 
                         <Tooltip title="Toggle Theme">
-                            <IconButton onClick={toggleTheme} color="inherit">
+                            <IconButton onClick={toggleTheme} color="inherit" sx={{ display: { xs: 'none', sm: 'inline-flex' } }}>
                                 {theme === 'light' ? <DarkModeIcon /> : <LightModeIcon />}
                             </IconButton>
                         </Tooltip>
@@ -300,7 +302,7 @@ const PrivateLayout = () => {
                                 aria-expanded={open ? 'true' : undefined}
                             >
                                 <Avatar alt={user?.name} src={user?.avatar} sx={privateLayoutStyles.avatar}>
-                                    {user?.name?.[0].toUpperCase()}
+                                    {user?.name?.[0]?.toUpperCase() || '?'}
                                 </Avatar>
                             </IconButton>
                         </Tooltip>
@@ -325,69 +327,7 @@ const PrivateLayout = () => {
             <Box component="main" sx={privateLayoutStyles.mainContent}>
                 <Outlet />
 
-                {/* Footer */}
-                <Box
-                    sx={{
-                        mt: 'auto',
-                        py: 3,
-                        px: 3,
-                        borderTop: '1px solid',
-                        borderColor: 'divider',
-                        bgcolor: 'background.paper'
-                    }}
-                >
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            flexDirection: { xs: 'column', sm: 'row' },
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            gap: 2
-                        }}
-                    >
-                        <Typography variant="body2" color="text.secondary">
-                            © {new Date().getFullYear()} DevConnect. All rights reserved.
-                        </Typography>
-                        <Box sx={{ display: 'flex', gap: 2 }}>
-                            <Typography
-                                component={Link}
-                                to="#"
-                                variant="body2"
-                                sx={{
-                                    color: 'text.secondary',
-                                    textDecoration: 'none',
-                                    '&:hover': { color: 'primary.main' }
-                                }}
-                            >
-                                Privacy
-                            </Typography>
-                            <Typography
-                                component={Link}
-                                to="#"
-                                variant="body2"
-                                sx={{
-                                    color: 'text.secondary',
-                                    textDecoration: 'none',
-                                    '&:hover': { color: 'primary.main' }
-                                }}
-                            >
-                                Terms
-                            </Typography>
-                            <Typography
-                                component={Link}
-                                to="#"
-                                variant="body2"
-                                sx={{
-                                    color: 'text.secondary',
-                                    textDecoration: 'none',
-                                    '&:hover': { color: 'primary.main' }
-                                }}
-                            >
-                                Support
-                            </Typography>
-                        </Box>
-                    </Box>
-                </Box>
+                <LandingFooter/>
             </Box>
         </Box>
     );

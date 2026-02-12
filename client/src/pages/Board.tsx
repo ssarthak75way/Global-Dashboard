@@ -225,9 +225,9 @@ const Board = () => {
 
     const boardStyles = {
         loadingContainer: { display: 'flex', justifyContent: 'center', py: 8 },
-        container: { p: { xs: 2, md: 4 } },
-        header: { mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 2 },
-        headerTitle: { fontWeight: 800, mb: 1 },
+        container: { p: { xs: 1.5, sm: 2, md: 4 } },
+        header: { mb: { xs: 3, md: 4 }, display: 'flex', justifyContent: 'space-between', alignItems: { xs: 'flex-start', sm: 'flex-end' }, flexDirection: { xs: 'column', sm: 'row' }, gap: 2 },
+        headerTitle: { fontWeight: 800, mb: 1, fontSize: { xs: '1.75rem', sm: '2.125rem' } },
         addTaskPaper: {
             p: 1,
             display: 'flex',
@@ -237,12 +237,12 @@ const Board = () => {
             border: '1px solid',
             borderColor: 'divider'
         },
-        addTaskInput: { '& .MuiOutlinedInput-notchedOutline': { border: 'none' } },
+        addTaskInput: { '& .MuiOutlinedInput-notchedOutline': { border: 'none' }, '& .MuiInputBase-input': { fontSize: { xs: '0.875rem', sm: '1rem' } } },
         divider: { height: 28, mx: 1 },
-        addButton: { px: 2 },
+        addButton: { px: 2, fontSize: { xs: '0.75rem', sm: '0.875rem' } },
         boardContainer: { maxWidth: 800, mx: 'auto' },
-        emptyStatePaper: { p: 4, textAlign: 'center', bgcolor: 'transparent', border: '2px dashed', borderColor: 'divider' },
-        emptyStateIcon: { fontSize: 48, color: 'text.disabled', mb: 2 },
+        emptyStatePaper: { p: { xs: 2, sm: 4 }, textAlign: 'center', bgcolor: 'transparent', border: '2px dashed', borderColor: 'divider' },
+        emptyStateIcon: { fontSize: { xs: 32, sm: 48 }, color: 'text.disabled', mb: 2 },
         dragOverlayCard: { boxShadow: 6, border: '1px solid', borderColor: 'primary.main' },
         dragOverlayContent: { p: '16px !important', display: 'flex', alignItems: 'flex-start', gap: 2 },
         dragOverlayIconBox: { mt: 0.5, color: 'primary.main' },
@@ -252,7 +252,7 @@ const Board = () => {
 
     if (loading) return (
         <Box sx={boardStyles.loadingContainer}>
-            <Loader />
+            <Loader fullPage />
         </Box>
     );
 

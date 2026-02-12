@@ -14,7 +14,6 @@ import {
     Fade,
     ListItemButton
 } from '@mui/material';
-import Loader from './Loader';
 import { Search as SearchIcon } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { searchUsers } from '../services/socialService';
@@ -44,6 +43,8 @@ const UserSearch = () => {
             try {
                 const response = await searchUsers(query);
                 setResults(response.data);
+                console.log(response.data);
+                
                 setOpen(true);
             } catch (error) {
                 console.error("Search failed", error);
@@ -83,7 +84,7 @@ const UserSearch = () => {
                         ),
                         endAdornment: loading && (
                             <InputAdornment position="end">
-                                <Loader size={20} />
+                                <div className="search-loader"></div>
                             </InputAdornment>
                         ),
                         sx: {
@@ -132,8 +133,10 @@ const UserSearch = () => {
                                             }}
                                         >
                                             <ListItemAvatar>
-                                                <Avatar sx={{ bgcolor: 'secondary.main' }}>
-                                                    {user.name?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase()}
+                                                <Avatar src={user?.avatar}
+
+                                                >
+                                                    {!user?.avatar && (user?.name?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || '?')}
                                                 </Avatar>
                                             </ListItemAvatar>
                                             <ListItemText

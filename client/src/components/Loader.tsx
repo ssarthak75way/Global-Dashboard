@@ -4,23 +4,24 @@ import { Box, SxProps, Theme } from '@mui/material';
 
 interface LoaderProps {
     size?: number;
-    color?: string; // Allow overriding the main border color if needed
+    color?: string;
     sx?: SxProps<Theme>;
+    fullPage?: boolean;
 }
 
-const Loader: React.FC<LoaderProps> = ({ size = 48, color, sx }) => {
-    // Calculate scale if size is different from default 48px
+const Loader: React.FC<LoaderProps> = ({ size = 48, color, sx, fullPage = false }) => {
     const scale = size / 48;
 
     return (
         <Box
             sx={{
-                width: size,
-                height: size,
+                width: fullPage ? '100%' : size,
+                height: fullPage ? '100%' : size,
+                minHeight: fullPage ? '80vh' : 'auto',
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                overflow: 'hidden', // Ensure no layout overflow
+                overflow: 'hidden',
                 ...sx
             }}
         >

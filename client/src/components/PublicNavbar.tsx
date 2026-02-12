@@ -18,8 +18,10 @@ import {
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const PublicNavbar: React.FC = () => {
+    const {isAuthenticated} = useAuth();
     const [mobileOpen, setMobileOpen] = useState(false);
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -86,36 +88,37 @@ const PublicNavbar: React.FC = () => {
         },
         logoText: {
             fontWeight: 900,
-            fontSize: { xs: '1.3rem', md: '1.5rem' },
+            fontSize: { xs: '1.1rem', sm: '1.3rem', md: '1.5rem' },
             background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             letterSpacing: -0.5
         },
         navButton: {
-            mx: 0.5,
-            px: 2,
+            mx: 0.25,
+            px: { md: 1.5, lg: 2 },
             fontWeight: 600,
             color: 'text.primary',
             textTransform: 'none',
-            fontSize: '0.95rem',
+            fontSize: '0.9rem',
             '&:hover': {
                 bgcolor: 'action.hover',
                 color: 'primary.main'
             }
         },
         ctaButton: {
-            ml: 2,
-            px: 3,
+            ml: { xs: 1, md: 2 },
+            px: { xs: 2, md: 3 },
             py: 1,
             fontWeight: 700,
             textTransform: 'none',
             borderRadius: 2,
+            fontSize: { xs: '0.85rem', md: '0.95rem' },
             boxShadow: `0 4px 14px ${theme.palette.primary.main}40`
         },
         drawer: {
             '& .MuiDrawer-paper': {
-                width: 280,
+                width: { xs: '100%', sm: 280 },
                 bgcolor: 'background.default'
             }
         },
@@ -206,6 +209,7 @@ const PublicNavbar: React.FC = () => {
                                         {item.label}
                                     </Button>
                                 ))}
+                               {!isAuthenticated && <>
                                 <Button
                                     onClick={() => navigate('/login')}
                                     sx={{ ...styles.navButton, ml: 2 }}
@@ -218,7 +222,7 @@ const PublicNavbar: React.FC = () => {
                                     sx={styles.ctaButton}
                                 >
                                     Get Started
-                                </Button>
+                                </Button></>}
                             </Box>
                         )}
                     </Toolbar>

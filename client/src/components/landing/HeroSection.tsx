@@ -21,23 +21,23 @@ const HeroSection: React.FC = () => {
         },
         heroTitle: {
             fontWeight: 900,
-            fontSize: { xs: '2.5rem', md: '4rem' },
-            lineHeight: 1.2,
-            mb: 3,
+            fontSize: { xs: '2rem', sm: '2.5rem', md: '4rem' },
+            lineHeight: 1.1,
+            mb: { xs: 2, md: 3 },
             background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent'
         },
         heroSubtitle: {
-            fontSize: { xs: '1.1rem', md: '1.4rem' },
+            fontSize: { xs: '0.95rem', sm: '1.1rem', md: '1.4rem' },
             color: 'text.secondary',
-            mb: 4,
+            mb: { xs: 3, md: 4 },
             maxWidth: 600
         },
         ctaButton: {
-            px: 4,
+            px: { xs: 3, md: 4 },
             py: 1.5,
-            fontSize: '1.1rem',
+            fontSize: { xs: '0.95rem', md: '1.1rem' },
             fontWeight: 700,
             borderRadius: 2,
             textTransform: 'none',

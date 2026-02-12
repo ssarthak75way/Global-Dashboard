@@ -13,7 +13,9 @@ import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import Board from "./pages/Board";
 import Feed from "./pages/Feed";
+import Resume from "./pages/Resume";
 import LandingPage from "./pages/LandingPage";
+import NotFound from "./pages/NotFound";
 import { ErrorBoundary, FallbackProps } from "react-error-boundary";
 
 const ErrorFallback = ({ error, resetErrorBoundary }: FallbackProps) => {
@@ -56,12 +58,13 @@ const router = createBrowserRouter([
       { path: "/profile", element: <Profile /> },
       { path: "/profile/:userId", element: <Profile /> },
       { path: "/board", element: <Board /> },
-      { path: "/feed", element: <Feed /> }
+      { path: "/feed", element: <Feed /> },
+      { path: "/resume", element: <Resume /> }
     ]
   },
   {
     path: "*",
-    element: <Navigate to="/login" replace />
+    element: <NotFound />
   }
 ]);
 

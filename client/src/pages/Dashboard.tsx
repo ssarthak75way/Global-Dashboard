@@ -383,24 +383,24 @@ const Dashboard = () => {
     const activeCard = activeId ? cards.find(c => c.id === activeId) : null;
 
     const styles = {
-        container: { pb: 8, px: { xs: 2, md: 0 } },
+        container: { pb: 8, px: { xs: 1, sm: 2, md: 0 } },
         header: {
-            mb: { xs: 5, md: 8 },
+            mb: { xs: 4, md: 8 },
             mt: { xs: 2, md: 4 },
             display: 'flex',
             flexDirection: { xs: 'column', md: 'row' },
             justifyContent: 'space-between',
             alignItems: { xs: 'flex-start', md: 'center' },
-            gap: 4
+            gap: { xs: 2, md: 4 }
         },
-        title: { fontWeight: 950, mb: 1, letterSpacing: -3, fontSize: { xs: '3rem', md: '4rem' }, lineHeight: 1 },
+        title: { fontWeight: 950, mb: 1, letterSpacing: -1, fontSize: { xs: 'clamp(1.8rem, 10vw, 2.5rem)', sm: '3.5rem', md: '4rem' }, lineHeight: 1 },
         platformBadge: {
-            fontSize: '0.875rem',
+            fontSize: { xs: '0.7rem', sm: '0.875rem' },
             verticalAlign: 'middle',
-            ml: 2,
+            ml: { xs: 1, sm: 2 },
             bgcolor: 'primary.main',
             color: 'white',
-            px: 2,
+            px: { xs: 1, sm: 2 },
             py: 0.75,
             borderRadius: 2,
             fontWeight: 900,
@@ -409,25 +409,27 @@ const Dashboard = () => {
             boxShadow: '0 4px 15px rgba(99, 102, 241, 0.4)',
             border: '1px solid rgba(255,255,255,0.2)'
         },
-        profileBox: { display: 'flex', alignItems: 'center', gap: 2.5, mt: 2 },
-        avatar: { width: 48, height: 48, border: '2.5px solid', borderColor: 'primary.main', p: 0.3 },
-        username: { fontWeight: 900, lineHeight: 1, mb: 0.5 },
-        tagline: { fontWeight: 700, letterSpacing: 0.5 },
-        actionsBox: { display: 'flex', gap: 2, width: { xs: '100%', md: 'auto' } },
+        profileBox: { display: 'flex', alignItems: 'center', gap: { xs: 1.5, sm: 2.5 }, mt: 2 },
+        avatar: { width: { xs: 40, sm: 48 }, height: { xs: 40, sm: 48 }, border: '2.5px solid', borderColor: 'primary.main', p: 0.3 },
+        username: { fontWeight: 900, lineHeight: 1, mb: 0.5, fontSize: { xs: '1rem', sm: '1.25rem' } },
+        tagline: { fontWeight: 700, letterSpacing: 0.5, fontSize: { xs: '0.65rem', sm: '0.75rem' } },
+        actionsBox: { display: 'flex', gap: 2, width: { xs: '100%', md: 'auto' }, mt: { xs: 2, md: 0 } },
         verifiedChip: {
             fontWeight: 900,
             borderRadius: 3,
+            flex: { xs: 1, md: 'none' },
             height: 44,
             px: 1,
-            fontSize: '0.875rem',
+            fontSize: { xs: '0.75rem', sm: '0.875rem' },
             boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
         },
         addfeedChip: {
             fontWeight: 900,
             borderRadius: 3,
+            flex: { xs: 1, md: 'none' },
             height: 44,
             px: 1,
-            fontSize: '0.875rem',
+            fontSize: { xs: '0.75rem', sm: '0.875rem' },
             boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
             cursor: 'pointer',
             transition: 'all 0.2s ease-in-out',
@@ -455,7 +457,7 @@ const Dashboard = () => {
                                 src={stats.github?.profile?.avatar || stats.codeforces?.avatar || undefined}
                                 sx={styles.avatar}
                             >
-                                {user?.email?.[0].toUpperCase()}
+                                {user?.email?.[0]?.toUpperCase() || '?'}
                             </Avatar>
                             <Box>
                                 <Typography variant="h6" sx={styles.username}>

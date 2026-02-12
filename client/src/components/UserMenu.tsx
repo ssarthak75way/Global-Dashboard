@@ -89,7 +89,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ anchorEl, open, onClose }) => {
                     src="/static/images/avatar/2.jpg"
                     sx={{ width: '40px !important', height: '40px !important' }}
                 >
-                    {user?.name?.[0]?.toUpperCase()}
+                    {user?.name?.[0]?.toUpperCase() || '?'}
                 </Avatar>
                 <Box sx={{ minWidth: 0 }}>
                     <Typography variant="subtitle2" noWrap sx={{ fontWeight: 600 }}>

@@ -30,8 +30,8 @@ export const createPost = async (req: Request, res: Response): Promise<void> => 
 export const getPosts = async (req: Request, res: Response): Promise<void> => {
     try {
         const posts = await Post.find()
-            .populate("author", "email name")
-            .populate("comments.user", "name")
+            .populate("author", "email avatar name")
+            .populate("comments.user", "name avatar")
             .sort({ createdAt: -1 });
         res.status(200).json(posts);
     } catch (error: unknown) {

@@ -7,11 +7,11 @@ const AboutSection: React.FC = () => {
 
     const styles = {
         section: {
-            py: { xs: 8, md: 12 }
+            py: { xs: 6, md: 12 }
         },
         sectionTitle: {
             fontWeight: 900,
-            fontSize: { xs: '2rem', md: '3rem' },
+            fontSize: { xs: '1.75rem', sm: '2.5rem', md: '3rem' },
             mb: 2,
             textAlign: 'center'
         }
