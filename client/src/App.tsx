@@ -17,7 +17,9 @@ const Profile = lazy(() => import("./pages/Profile"));
 const Board = lazy(() => import("./pages/Board"));
 const Feed = lazy(() => import("./pages/Feed"));
 const Resume = lazy(() => import("./pages/Resume"));
+const Messages = lazy(() => import("./pages/Messages"));
 const Documentation = lazy(() => import("./pages/Documentation"));
+import { SocketProvider } from "./context/SocketContext";
 const PublicDocumentation = lazy(() => import("./pages/PublicDocumentation"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
@@ -69,13 +71,13 @@ const router = createBrowserRouter([
     )
   },
   {
-      path: "/guide",
-        element: (
-          <Suspense fallback={<LoadingFallback />}>
-            <PublicDocumentation />
-          </Suspense>
-        )
-      },
+    path: "/guide",
+    element: (
+      <Suspense fallback={<LoadingFallback />}>
+        <PublicDocumentation />
+      </Suspense>
+    )
+  },
   {
     element: <PublicLayout />,
     children: [
@@ -95,7 +97,7 @@ const router = createBrowserRouter([
           </Suspense>
         )
       },
-      
+
       {
         path: "/login",
         element: (
@@ -158,6 +160,14 @@ const router = createBrowserRouter([
         )
       },
       {
+        path: "/messages",
+        element: (
+          <Suspense fallback={<LoadingFallback />}>
+            <Messages />
+          </Suspense>
+        )
+      },
+      {
         path: "/documentation",
         element: (
           <Suspense fallback={<LoadingFallback />}>
@@ -197,7 +207,9 @@ function App() {
     <ErrorBoundary FallbackComponent={ErrorFallback}>
       <ThemeProvider>
         <AuthProvider>
-          <AppContent />
+          <SocketProvider>
+            <AppContent />
+          </SocketProvider>
         </AuthProvider>
       </ThemeProvider>
     </ErrorBoundary>

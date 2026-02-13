@@ -50,6 +50,7 @@ export interface User {
     dashboardOrder?: string[];
     followers: string[];
     following: string[];
+    blockedUsers: string[];
     createdAt?: string;
     status?: string;
 }

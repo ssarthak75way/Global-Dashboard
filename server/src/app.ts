@@ -5,6 +5,7 @@ import authRoutes from "./routes/auth.routes";
 import taskRoutes from "./routes/task.routes";
 import socialRoutes from "./routes/social.routes";
 import postRoutes from "./routes/post.routes";
+import chatRoutes from "./routes/chat.routes";
 
 const app: Express = express();
 
@@ -23,6 +24,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/tasks", taskRoutes);
 app.use("/api/social", socialRoutes);
 app.use("/api/posts", postRoutes);
+app.use("/api/chat", chatRoutes);
 
 // Basic Route
 app.get("/", (req: Request, res: Response) => {

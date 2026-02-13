@@ -6,6 +6,8 @@ import FollowButton from '../FollowButton';
 import { GoVerified } from "react-icons/go";
 import { AiOutlineEdit } from "react-icons/ai";
 
+import { useNavigate } from 'react-router-dom';
+
 interface ProfileHeaderProps {
     displayUser: User | null;
     isOwnProfile: boolean;
@@ -15,7 +17,14 @@ interface ProfileHeaderProps {
 
 const ProfileHeader: React.FC<ProfileHeaderProps> = ({ displayUser, isOwnProfile, onEditClick, styles }) => {
     const { user: currentUser } = useAuth();
+    const navigate = useNavigate();
     const isFollowing = currentUser?.following?.includes(displayUser?._id || '') || false;
+
+    const handleMessageClick = () => {
+        if (displayUser) {
+            navigate('/messages', { state: { selectedUser: displayUser } });
+        }
+    };
 
     return (
         <Paper elevation={0} sx={styles.bentoCard}>
@@ -96,22 +105,27 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ displayUser, isOwnProfile
 
                     <Stack direction="row" spacing={2} flexWrap="wrap">
                         {!isOwnProfile &&
-                            <FollowButton
-                                userId={displayUser?._id || ''}
-                                initialIsFollowing={isFollowing}
-                                onToggle={(newStatus) => {
-                                    console.log('Follow status changed:', newStatus);
-                                }}
-                            />
+                            <>
+                                <FollowButton
+                                    userId={displayUser?._id || ''}
+                                    initialIsFollowing={isFollowing}
+                                    onToggle={(newStatus) => {
+                                        console.log('Follow status changed:', newStatus);
+                                    }}
+                                />
+                                <Button onClick={handleMessageClick} variant="contained" sx={{ fontWeight: 700 }}>
+                                    Message
+                                </Button>
+                            </>
                         }
                     </Stack>
                 </Box>
                 <Box>
-                   {isOwnProfile && 
-                   <Tooltip title="Edit Profile" onClick={onEditClick} style={styles.editbutton} >
-                        <AiOutlineEdit size={32} />
-                   </Tooltip>
-                }
+                    {isOwnProfile &&
+                        <Tooltip title="Edit Profile" onClick={onEditClick} style={styles.editbutton} >
+                            <AiOutlineEdit size={32} />
+                        </Tooltip>
+                    }
                 </Box>
             </Box>
         </Paper>

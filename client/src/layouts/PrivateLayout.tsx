@@ -34,7 +34,8 @@ import {
     Close as CloseIcon,
     Description as ResumeIcon,
     Home as HomeIcon,
-    MenuBook as DocumentationIcon
+    MenuBook as DocumentationIcon,
+    Chat as ChatIcon
 } from "@mui/icons-material";
 import TokenCountdown from "../components/TokenCountdown";
 import UserSearch from "../components/UserSearch";
@@ -187,6 +188,7 @@ const PrivateLayout = () => {
         { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
         { text: 'Task Board', icon: <BoardIcon />, path: '/board' },
         { text: 'Social Feed', icon: <FeedIcon />, path: '/feed' },
+        { text: 'Messages', icon: <ChatIcon />, path: '/messages' },
         { text: 'Profile', icon: <ProfileIcon />, path: '/profile' },
         { text: 'Resume', icon: <ResumeIcon />, path: '/resume' },
         { text: 'Documentation', icon: <DocumentationIcon />, path: '/documentation' },
@@ -331,7 +333,7 @@ const PrivateLayout = () => {
             <Box component="main" sx={privateLayoutStyles.mainContent}>
                 <Outlet />
 
-                <LandingFooter />
+                {location.pathname !== '/messages' && <LandingFooter />}
             </Box>
         </Box>
     );
