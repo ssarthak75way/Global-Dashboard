@@ -1,11 +1,12 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import {
     Box,
     Typography,
     Paper,
     Button,
-    Stack,
-    Tooltip
+    Tooltip,
+    Tabs,
+    Tab
 } from '@mui/material';
 import { Download as DownloadIcon } from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
@@ -13,9 +14,33 @@ import { format } from 'date-fns';
 // @ts-ignore
 import html2pdf from 'html2pdf.js/src/index.js';
 
+// Templates
+import ModernTemplate from '../components/resume/templates/ModernTemplate';
+import ClassicTemplate from '../components/resume/templates/ClassicTemplate';
+import MinimalistTemplate from '../components/resume/templates/MinimalistTemplate';
+import CreativeTemplate from '../components/resume/templates/CreativeTemplate';
+import ATSFriendlyTemplate from '../components/resume/templates/ATSFriendlyTemplate';
+
+import {
+    Description as DescriptionIcon,
+    Article as ArticleIcon,
+    HistoryEdu as HistoryEduIcon,
+    Brush as BrushIcon,
+    Spellcheck as SpellcheckIcon
+} from '@mui/icons-material';
+
+const TEMPLATES = [
+    { id: 'modern', name: 'Modern', component: ModernTemplate, icon: <ArticleIcon /> },
+    { id: 'classic', name: 'Classic', component: ClassicTemplate, icon: <HistoryEduIcon /> },
+    { id: 'minimalist', name: 'Minimalist', component: MinimalistTemplate, icon: <DescriptionIcon /> },
+    { id: 'creative', name: 'Creative', component: CreativeTemplate, icon: <BrushIcon /> },
+    { id: 'ats', name: 'ATS Friendly', component: ATSFriendlyTemplate, icon: <SpellcheckIcon /> },
+];
+
 const Resume = () => {
     const { user } = useAuth();
     const resumeRef = useRef<HTMLDivElement>(null);
+    const [selectedTemplate, setSelectedTemplate] = useState(0);
 
     const handleDownload = () => {
         const element = resumeRef.current;
@@ -26,9 +51,10 @@ const Resume = () => {
             filename: `${user?.name ? user.name.replace(/\s+/g, '_') : 'My'}_RESUME.pdf`,
             image: { type: 'jpeg' as const, quality: 1 },
             html2canvas: {
-                scale: 3,
+                scale: 4, // Higher scale for better quality
                 useCORS: true,
-                logging: false
+                logging: false,
+                letterRendering: true
             },
             jsPDF: { unit: 'mm' as const, format: 'a4' as const, orientation: 'portrait' as const }
         };
@@ -154,7 +180,71 @@ const Resume = () => {
             bottom: 40,
             right: 40,
             zIndex: 1000,
+        },
+        tech: {
+            fontSize: '7pt',
+            color: '#1a1a1a',
+            mx: -0.8
+        },
+        templatePicker: {
+            mb: 4,
+            width: '100%',
+            maxWidth: '1000px',
+            px: 2,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center'
+        },
+        tabs: {
+            bgcolor: 'background.paper',
+            p: 0.5,
+            borderRadius: 3,
+            boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
+            mb: 2,
+            '& .MuiTabs-indicator': {
+                height: '100%',
+                borderRadius: 2,
+                opacity: 0.1,
+                bgcolor: 'primary.main'
+            }
+        },
+        tab: {
+            minHeight: 48,
+            borderRadius: 2,
+            px: 3,
+            fontWeight: 700,
+            textTransform: 'none',
+            fontSize: '0.9rem',
+            transition: 'all 0.2s',
+            zIndex: 1,
+            '&.Mui-selected': {
+                color: 'primary.main',
+            },
+            '&:hover': {
+                bgcolor: 'rgba(99, 102, 241, 0.05)'
+            }
+        },
+        previewContainer: {
+            position: 'relative',
+            transition: 'all 0.3s ease',
+            '&::after': {
+                content: '""',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.05)',
+                pointerEvents: 'none',
+                zIndex: 10
+            }
         }
+    };
+
+    const ActiveTemplate = TEMPLATES[selectedTemplate].component;
+
+    const handleTabChange = (_: any, newValue: number) => {
+        setSelectedTemplate(newValue);
     };
 
     return (
@@ -181,131 +271,40 @@ const Resume = () => {
                 </Tooltip>
             </Box>
 
-            <Box>
+            <Box sx={styles.templatePicker}>
+                <Typography variant="h5" fontWeight={900} sx={{ mb: 3, letterSpacing: '-0.02em', color: 'text.primary' }}>
+                    Choose Your Resume Style
+                </Typography>
+                <Tabs
+                    value={selectedTemplate}
+                    onChange={handleTabChange}
+                    variant="scrollable"
+                    scrollButtons="auto"
+                    sx={styles.tabs}
+                >
+                    {TEMPLATES.map((tmpl) => (
+                        <Tab
+                            key={tmpl.id}
+                            label={tmpl.name}
+                            icon={tmpl.icon}
+                            iconPosition="start"
+                            sx={styles.tab}
+                        />
+                    ))}
+                </Tabs>
+            </Box>
+
+            <Box sx={styles.previewContainer}>
                 {/* The Paper component acts as our strict A4 Canvas */}
-                <Paper ref={resumeRef} sx={styles.paper} elevation={0}>
-
-                    {/* Header */}
-                    <Box sx={styles.header}>
-                        <Typography component="h1" sx={styles.name}>
-                            {user.name || 'Your Name'}
-                        </Typography>
-                        <Box sx={styles.contactInfo}>
-                            <Typography sx={styles.contactItem}>{user.email}</Typography>
-                            {user.socialHandles?.linkedin && (
-                                <Typography sx={styles.contactItem}>
-                                    LinkedIn : {user.socialHandles.linkedin.replace(/^https?:\/\/(www\.)?linkedin\.com\/in\//, '')}
-                                </Typography>
-                            )}
-                            {user.socialHandles?.github && (
-                                <Typography sx={styles.contactItem}>
-                                    GitHub : {user.socialHandles?.github.replace(/^https?:\/\/(www\.)?github\.com\//, '')}
-                                </Typography>
-                            )}
-                            {user.socialHandles?.leetcode && (
-                                <Typography sx={styles.contactItem}>
-                                    Leetcode : {user.socialHandles?.leetcode.replace(/^https?:\/\/(www\.)?github\.com\//, '')}
-                                </Typography>
-                            )}
-                        </Box>
-                        {user.bio && (
-                            <Typography sx={styles.tagline}>
-                                {user.bio}
-                            </Typography>
-                        )}
-                    </Box>
-
-                    {/* Summary */}
-                    {user.about && (
-                        <Box sx={styles.sectionBox}>
-                            <Typography sx={styles.sectionTitle}>Summary</Typography>
-                            <Typography sx={styles.content}>
-                                {user.about}
-                            </Typography>
-                        </Box>
-                    )}
-
-                    {/* Skills */}
-                    {user.skills && user.skills.length > 0 && (
-                        <Box sx={styles.sectionBox}>
-                            <Typography sx={styles.sectionTitle}>Technical Skills</Typography>
-                            <Typography sx={styles.skillText}>
-                                {user.skills.join(' , ')}
-                            </Typography>
-                        </Box>
-                    )}
-
-                    {/* Experience */}
-                    {user.experience && user.experience.length > 0 && (
-                        <Box sx={styles.sectionBox}>
-                            <Typography sx={styles.sectionTitle}>Experience</Typography>
-                            <Stack spacing={1.5}>
-                                {user.experience.map((exp, index) => (
-                                    <Box key={index}>
-                                        <Box sx={styles.itemHeader}>
-                                            <Typography sx={styles.itemTitle}>{exp.role}</Typography>
-                                            <Typography sx={styles.itemDate}>
-                                                {formatDate(exp.startDate)} — {exp.current ? 'Present' : formatDate(exp.endDate)}
-                                            </Typography>
-                                        </Box>
-                                        <Typography sx={styles.itemSubtitle}>{exp.company} | {exp.jobType}</Typography>
-                                        <Typography sx={styles.content}>
-                                            {exp.description}
-                                        </Typography>
-                                    </Box>
-                                ))}
-                            </Stack>
-                        </Box>
-                    )}
-
-                    {/* Projects */}
-                    {user.projects && user.projects.length > 0 && (
-                        <Box sx={styles.sectionBox}>
-                            <Typography sx={styles.sectionTitle}>Projects</Typography>
-                            <Stack spacing={1.5}>
-                                {user.projects.map((project, index) => (
-                                    <Box key={index}>
-                                        <Box sx={styles.itemHeader}>
-                                            <Typography sx={styles.itemTitle}>{project.title}</Typography>
-                                            <Typography sx={styles.itemDate}>
-                                                {formatDate(project.startDate)} — {project.current ? 'Present' : formatDate(project.endDate)}
-                                            </Typography>
-                                        </Box>
-                                        {project.organization && (
-                                            <Typography sx={styles.itemSubtitle}>{project.organization}</Typography>
-                                        )}
-                                        <Typography sx={styles.content}>
-                                            {project.description}
-                                        </Typography>
-                                        {project.techStack && project.techStack.length > 0 && (
-                                            <Typography variant="caption" sx={{ color: '#000', fontWeight: 700, mt: 0.3, display: 'block' }}>
-                                                Keywords: {project.techStack.join(', ')}
-                                            </Typography>
-                                        )}
-                                    </Box>
-                                ))}
-                            </Stack>
-                        </Box>
-                    )}
-
-                    {/* Certifications */}
-                    {user.certifications && user.certifications.length > 0 && (
-                        <Box sx={styles.sectionBox}>
-                            <Typography sx={styles.sectionTitle}>Certifications</Typography>
-                            <Stack spacing={0.5}>
-                                {user.certifications.map((cert, index) => (
-                                    <Box key={index}>
-                                        <Box sx={styles.itemHeader}>
-                                            <Typography sx={{ ...styles.itemTitle, fontSize: '9.5pt' }}>{cert.title}</Typography>
-                                            <Typography sx={{ ...styles.itemDate, fontSize: '9pt' }}>{formatDate(cert.issueDate)}</Typography>
-                                        </Box>
-                                        <Typography sx={{ ...styles.itemSubtitle, fontSize: '8.5pt' }}>{cert.description}</Typography>
-                                        <Typography sx={{ ...styles.itemSubtitle, fontSize: '8.5pt' }}>Issued By&nbsp;: {cert.issuer}</Typography>
-                                    </Box>
-                                ))}
-                            </Stack>
-                        </Box>
-                    )}
+                <Paper ref={resumeRef} elevation={0} sx={{
+                    borderRadius: 0,
+                    width: '210mm',
+                    minHeight: '297mm',
+                    overflow: 'hidden',
+                    bgcolor: 'white',
+                    boxShadow: '0 20px 50px rgba(0,0,0,0.1)'
+                }}>
+                    <ActiveTemplate user={user} formatDate={formatDate} />
                 </Paper>
             </Box>
         </Box>

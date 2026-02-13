@@ -11,15 +11,14 @@ import {
     AccordionDetails,
     Chip,
     Stack,
-    Divider,
     List,
     ListItem,
     ListItemText,
     ListItemIcon,
     Grid,
-    Card,
-    CardContent,
     useTheme,
+    useMediaQuery,
+    Fade,
     Table,
     TableBody,
     TableCell,
@@ -27,11 +26,7 @@ import {
     TableHead,
     TableRow,
     TextField,
-    InputAdornment,
-    IconButton,
-    Tooltip,
-    Alert,
-    Badge
+    Alert
 } from '@mui/material';
 import {
     ExpandMore as ExpandMoreIcon,
@@ -42,13 +37,11 @@ import {
     CheckCircle as CheckCircleIcon,
     Dashboard as DashboardIcon,
     Search as SearchIcon,
-    ContentCopy as CopyIcon,
     RocketLaunch as RocketIcon,
-    Security as SecurityIcon,
     School as SchoolIcon,
     Api as ApiIcon,
     Lock as LockIcon,
-    LockOpen as LockOpenIcon
+    KeyboardArrowDown as ChevronIcon
 } from '@mui/icons-material';
 import {
     architecture,
@@ -58,9 +51,7 @@ import {
     pages,
     apiEndpoints,
     gettingStartedSteps,
-    bestPractices,
-    securityFeatures,
-    developmentWorkflow
+    bestPractices
 } from '../utils/data.tsx';
 import TerminalDemo from '../components/TerminalDemo';
 import CodeBlock from '../components/CodeBlock';
@@ -82,22 +73,16 @@ function TabPanel(props: TabPanelProps) {
 
 const Documentation: React.FC = () => {
     const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
     const [tabValue, setTabValue] = useState(0);
     const [searchQuery, setSearchQuery] = useState('');
-    const [copiedCode, setCopiedCode] = useState<string | null>(null);
 
     const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
         setTabValue(newValue);
-        setSearchQuery(''); // Reset search when changing tabs
+        setSearchQuery('');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    const handleCopyCode = (code: string, id: string) => {
-        navigator.clipboard.writeText(code);
-        setCopiedCode(id);
-        setTimeout(() => setCopiedCode(null), 2000);
-    };
-
-    // Filter API endpoints by search query
     const filteredApiEndpoints = useMemo(() => {
         if (!searchQuery) return apiEndpoints;
         const query = searchQuery.toLowerCase();
@@ -109,127 +94,142 @@ const Documentation: React.FC = () => {
         );
     }, [searchQuery]);
 
+    const colors = {
+        primary: '#6366f1',
+        secondary: '#8b5cf6',
+        accent: '#06b6d4',
+        bg: theme.palette.mode === 'light' ? '#f8fafc' : '#020617',
+        glass: theme.palette.mode === 'light' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(15, 23, 42, 0.7)'
+    };
+
     const styles = {
         root: {
             minHeight: '100vh',
-            bgcolor: 'background.default',
-            py: 4
+            bgcolor: colors.bg,
+            position: 'relative',
+            overflow: 'hidden',
+        },
+        backgroundBlob: {
+            position: 'fixed',
+            width: '600px',
+            height: '600px',
+            borderRadius: '50%',
+            filter: 'blur(120px)',
+            opacity: 0.15,
+            zIndex: 0,
+            pointerEvents: 'none',
+        },
+        container: {
+            position: 'relative',
+            zIndex: 1,
+            pt: { xs: 4, md: 8 },
+            pb: 8,
+        },
+        sidebar: {
+            position: 'sticky',
+            top: 100,
+            height: 'fit-content',
+            display: { xs: 'none', md: 'block' },
+        },
+        navPaper: {
+            p: 1.5,
+            borderRadius: 4,
+            bgcolor: colors.glass,
+            backdropFilter: 'blur(20px)',
+            border: '1px solid',
+            borderColor: 'divider',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.05)',
+        },
+        mainContent: {
+            pl: { md: 4 },
         },
         header: {
-            mb: 4,
-            textAlign: 'center',
-            position: 'relative',
-            '&::before': {
-                content: '""',
-                position: 'absolute',
-                top: 0,
-                left: '50%',
-                transform: 'translateX(-50%)',
-                width: '200px',
-                height: '4px',
-                background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-                borderRadius: '2px'
-            }
+            mb: 6,
+            textAlign: 'left',
         },
         title: {
             fontWeight: 900,
-            background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
+            fontSize: { xs: '2.5rem', md: '3.75rem' },
+            letterSpacing: '-0.02em',
+            background: `linear-gradient(135deg, ${colors.primary} 0%, ${colors.secondary} 50%, ${colors.accent} 100%)`,
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             mb: 1,
-            pt: 2
         },
-        versionChip: {
-            fontWeight: 700,
-            fontSize: '0.9rem'
+        subtitle: {
+            fontSize: '1.25rem',
+            color: 'text.secondary',
+            fontWeight: 500,
+            maxWidth: '600px',
         },
-        searchBox: {
-            mb: 3,
-            '& .MuiOutlinedInput-root': {
-                borderRadius: 2,
-                bgcolor: theme.palette.mode === 'light' ? 'grey.50' : 'grey.900'
+        tab: {
+            justifyContent: 'flex-start',
+            textAlign: 'left',
+            minHeight: 52,
+            px: 2,
+            borderRadius: 2,
+            textTransform: 'none',
+            fontSize: '0.95rem',
+            fontWeight: 600,
+            mb: 0.5,
+            transition: 'all 0.2s',
+            '&.Mui-selected': {
+                bgcolor: 'primary.main',
+                color: 'white',
+                boxShadow: `0 4px 12px ${theme.palette.primary.main}40`,
+            },
+            '&:hover:not(.Mui-selected)': {
+                bgcolor: 'action.hover',
+                transform: 'translateX(4px)',
             }
         },
-        paper: {
-            p:4,
-            mb: 3,
-            borderRadius: 2,
-            overflow: 'hidden',
-            boxShadow: theme.shadows[3]
+        contentPanel: {
+            p: { xs: 3, md: 5 },
+            borderRadius: 5,
+            bgcolor: colors.glass,
+            backdropFilter: 'blur(20px)',
+            border: '1px solid',
+            borderColor: 'divider',
+            boxShadow: '0 20px 40px rgba(0,0,0,0.04)',
         },
         sectionTitle: {
-            fontWeight: 700,
-            mb: 2,
+            fontWeight: 800,
+            fontSize: '1.75rem',
+            mb: 3,
             display: 'flex',
             alignItems: 'center',
-            gap: 1,
-            background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent'
+            gap: 2,
+            color: 'text.primary',
         },
         card: {
             height: '100%',
-            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-            borderRadius: 2,
-            border: '1px solid',
-            borderColor: 'divider',
-            '&:hover': {
-                transform: 'translateY(-8px)',
-                boxShadow: theme.shadows[12],
-                borderColor: 'primary.main'
-            }
-        },
-        codeBlock: {
-            position: 'relative',
-            bgcolor: theme.palette.mode === 'light' ? 'grey.100' : 'grey.900',
-            p: 2,
-            borderRadius: 2,
-            fontFamily: 'monospace',
-            fontSize: '0.875rem',
-            overflowX: 'auto',
-            border: '1px solid',
-            borderColor: 'divider',
-            '&:hover .copy-button': {
-                opacity: 1
-            }
-        },
-        copyButton: {
-            position: 'absolute',
-            top: 8,
-            right: 8,
-            opacity: 0,
-            transition: 'opacity 0.2s'
-        },
-        methodChip: (method: string) => ({
-            fontWeight: 700,
-            minWidth: '70px',
-            bgcolor:
-                method === 'GET'
-                    ? 'success.main'
-                    : method === 'POST'
-                        ? 'primary.main'
-                        : method === 'PUT'
-                            ? 'warning.main'
-                            : method === 'DELETE'
-                                ? 'error.main'
-                                : 'info.main',
-            color: 'white'
-        }),
-        stepCard: {
-            mb: 2,
             p: 3,
-            borderRadius: 2,
-            border: '2px solid',
+            borderRadius: 3,
+            bgcolor: theme.palette.mode === 'light' ? 'white' : 'rgba(30, 41, 59, 0.5)',
+            border: '1px solid',
             borderColor: 'divider',
-            transition: 'all 0.3s',
+            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
             '&:hover': {
-                borderColor: 'primary.main',
-                boxShadow: theme.shadows[4]
+                transform: 'translateY(-6px) scale(1.02)',
+                boxShadow: theme.shadows[15],
+                borderColor: colors.primary,
             }
-        }
+        },
+        methodBadge: (method: string) => ({
+            px: 1.5,
+            py: 0.5,
+            borderRadius: 1,
+            fontSize: '0.75rem',
+            fontWeight: 800,
+            color: 'white',
+            bgcolor:
+                method === 'GET' ? '#10b981' :
+                    method === 'POST' ? '#6366f1' :
+                        method === 'PUT' ? '#f59e0b' :
+                            method === 'DELETE' ? '#ef4444' : '#64748b'
+        })
     };
 
-    // Group API endpoints by category
     const apiByCategory = useMemo(() => {
         const grouped: Record<string, typeof apiEndpoints> = {};
         filteredApiEndpoints.forEach((endpoint) => {
@@ -241,569 +241,375 @@ const Documentation: React.FC = () => {
         return grouped;
     }, [filteredApiEndpoints]);
 
+    const renderTabs = () => (
+        <Tabs
+            orientation={isMobile ? "horizontal" : "vertical"}
+            value={tabValue}
+            onChange={handleTabChange}
+            variant={isMobile ? "scrollable" : "standard"}
+            scrollButtons="auto"
+            TabIndicatorProps={{ sx: { display: 'none' } }}
+            sx={{
+                '& .MuiTabs-flexContainer': { gap: 0.5 },
+                border: 'none',
+            }}
+        >
+            <Tab icon={<RocketIcon sx={{ fontSize: 20 }} />} label="Getting Started" iconPosition="start" sx={styles.tab} />
+            <Tab icon={<DescriptionIcon sx={{ fontSize: 20 }} />} label="Overview" iconPosition="start" sx={styles.tab} />
+            <Tab icon={<LayersIcon sx={{ fontSize: 20 }} />} label="Architecture" iconPosition="start" sx={styles.tab} />
+            <Tab icon={<ApiIcon sx={{ fontSize: 20 }} />} label="API Reference" iconPosition="start" sx={styles.tab} />
+            <Tab icon={<CodeIcon sx={{ fontSize: 20 }} />} label="Components" iconPosition="start" sx={styles.tab} />
+            <Tab icon={<DashboardIcon sx={{ fontSize: 20 }} />} label="Pages" iconPosition="start" sx={styles.tab} />
+            <Tab icon={<SchoolIcon sx={{ fontSize: 20 }} />} label="Best Practices" iconPosition="start" sx={styles.tab} />
+            <Tab icon={<SettingsIcon sx={{ fontSize: 20 }} />} label="Dependencies" iconPosition="start" sx={styles.tab} />
+        </Tabs>
+    );
+
     return (
         <Box sx={styles.root}>
-            <Container maxWidth="lg">
-                {/* Header */}
-                <Box sx={styles.header}>
-                    <Typography variant="h2" sx={styles.title}>
-                        DevConnect Documentation
-                    </Typography>
-                    <Typography variant="h6" color="text.secondary" sx={{ mb: 2 }}>
-                        Comprehensive Developer Platform
-                    </Typography>
-                    <Stack direction="row" spacing={1} justifyContent="center" sx={{ mb: 2 }} flexWrap="wrap">
-                        <Chip label="Version 1.0.0" color="primary" sx={styles.versionChip} />
-                        <Chip label="React 18" variant="outlined" />
-                        <Chip label="TypeScript" variant="outlined" />
-                        <Chip label="Material-UI 6" variant="outlined" />
-                        <Chip label="Node.js" variant="outlined" />
-                        <Chip label="MongoDB" variant="outlined" />
-                    </Stack>
-                    <Typography variant="body2" color="text.secondary">
-                        Last Updated: February 12, 2026
-                    </Typography>
-                </Box>
+            {/* Background Decorations */}
+            <Box sx={{ ...styles.backgroundBlob, top: '-10%', left: '-10%', bgcolor: colors.primary }} />
+            <Box sx={{ ...styles.backgroundBlob, bottom: '10%', right: '-10%', bgcolor: colors.secondary }} />
+            <Box sx={{ ...styles.backgroundBlob, top: '40%', right: '20%', bgcolor: colors.accent, width: '400px', height: '400px', opacity: 0.1 }} />
 
-                {/* Tabs */}
-                <Paper sx={styles.paper}>
-                    <Tabs
-                        value={tabValue}
-                        onChange={handleTabChange}
-                        variant="scrollable"
-                        scrollButtons="auto"
-                        sx={{ borderBottom: 1, borderColor: 'divider', px: 1 }}
-                    >
-                        <Tab icon={<RocketIcon />} label="Getting Started" iconPosition="start" />
-                        <Tab icon={<DescriptionIcon />} label="Overview" iconPosition="start" />
-                        <Tab icon={<LayersIcon />} label="Architecture" iconPosition="start" />
-                        <Tab icon={<ApiIcon />} label="API Reference" iconPosition="start" />
-                        <Tab icon={<CodeIcon />} label="Components" iconPosition="start" />
-                        <Tab icon={<DashboardIcon />} label="Pages" iconPosition="start" />
-                        <Tab icon={<SchoolIcon />} label="Best Practices" iconPosition="start" />
-                        <Tab icon={<SettingsIcon />} label="Dependencies" iconPosition="start" />
-                    </Tabs>
-
-                    {/* Getting Started Tab */}
-                    <TabPanel value={tabValue} index={0}>
-                        <Typography variant="h5" sx={styles.sectionTitle}>
-                            <RocketIcon /> Getting Started
-                        </Typography>
-                        <Alert severity="info" sx={{ mb: 3 }}>
-                            Follow these steps to set up DevConnect on your local machine and start contributing. Make sure you have Node.js 18+, npm 9+, and MongoDB installed.
-                        </Alert>
-
-                        {/* Animated Terminal Demo */}
-                        <Box sx={{ mb: 4, p: 4 }}>
-                            <TerminalDemo />
-                        </Box>
-
-                        <Divider sx={{ my: 4 }}>
-                            <Chip label="Detailed Setup Guide" />
-                        </Divider>
-
-                        {gettingStartedSteps.map((step, index) => (
-                            <Box key={index} sx={styles.stepCard}>
-                                <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, color: 'primary.main' }}>
-                                    {step.title}
+            <Container maxWidth="lg" sx={styles.container}>
+                <Grid container spacing={0}>
+                    {/* Sticky Sidebar Navigation */}
+                    <Grid item xs={12} md={3}>
+                        <Box sx={styles.sidebar}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2, px: 2 }}>
+                                <Typography variant="overline" sx={{ fontWeight: 800, color: 'primary.main' }}>
+                                    Documentation
                                 </Typography>
-                                <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
-                                    {step.description}
-                                </Typography>
-
-                                {step.code && (
-                                    <CodeBlock code={step.code} />
-                                )}
-
-                                {step.notes && step.notes.length > 0 && (
-                                    <List dense sx={{ mt: 2 }}>
-                                        {step.notes.map((note, idx) => (
-                                            <ListItem key={idx} sx={{ py: 0.5 }}>
-                                                <ListItemIcon sx={{ minWidth: 32 }}>
-                                                    <CheckCircleIcon color="success" fontSize="small" />
-                                                </ListItemIcon>
-                                                <ListItemText primary={note} />
-                                            </ListItem>
-                                        ))}
-                                    </List>
-                                )}
+                                <Chip
+                                    label="v1.0.0"
+                                    size="small"
+                                    onClick={() => { }} 
+                                    sx={{
+                                        fontWeight: 800,
+                                        height: 24,
+                                        fontSize: '0.65rem',
+                                        bgcolor: `${colors.primary}15`,
+                                        color: colors.primary,
+                                        borderRadius: 1.5,
+                                        cursor: 'pointer',
+                                        transition: 'all 0.2s',
+                                        border: '1px solid transparent',
+                                        '&:hover': {
+                                            bgcolor: `${colors.primary}25`,
+                                            borderColor: `${colors.primary}40`,
+                                            transform: 'translateY(-1px)'
+                                        },
+                                        '& .MuiChip-label': { px: 1, display: 'flex', alignItems: 'center', gap: 0.5 }
+                                    }}
+                                    icon={<ChevronIcon sx={{ fontSize: '1rem !important', color: `${colors.primary} !important` }} />}
+                                />
                             </Box>
-                        ))}
-                    </TabPanel>
+                            <Paper sx={styles.navPaper}>
+                                {renderTabs()}
+                            </Paper>
 
-                    {/* Overview Tab */}
-                    <TabPanel value={tabValue} index={1}>
-                        <Typography variant="h5" sx={styles.sectionTitle}>
-                            <DescriptionIcon /> Project Overview
-                        </Typography>
-                        <Typography paragraph>
-                            DevConnect is a comprehensive developer platform that combines social networking,
-                            productivity tools, and professional portfolio management. Built with modern web
-                            technologies, it provides developers with a centralized hub to showcase their work,
-                            track their progress, and connect with a global community.
-                        </Typography>
+                            <Box sx={{ mt: 4, px: 2 }}>
+                                <Alert icon={false} severity="info" sx={{ borderRadius: 3, bgcolor: `${colors.primary}10`, border: `1px solid ${colors.primary}20` }}>
+                                    <Typography variant="caption" fontWeight={700} color="primary.main">
+                                        V1.0.0 Stable Ready
+                                    </Typography>
+                                </Alert>
+                            </Box>
+                        </Box>
+                    </Grid>
 
-                        <Divider sx={{ my: 3 }} />
+                    {/* Main Content Area */}
+                    <Grid item xs={12} md={9}>
+                        <Box sx={styles.mainContent}>
+                            {/* Modern Header */}
+                            <Box sx={styles.header}>
+                                <Fade in timeout={800}>
+                                    <Box>
+                                        <Typography variant="h1" sx={styles.title}>
+                                            DevConnect
+                                        </Typography>
+                                        <Typography sx={styles.subtitle}>
+                                            The ultimate platform for modern developers to build, connect, and showcase their journey.
+                                        </Typography>
+                                        <Stack direction="row" spacing={1} sx={{ mt: 3 }} flexWrap="wrap">
+                                            {['React 18', 'TypeScript', 'Node.js', 'MUI 6'].map(tag => (
+                                                <Chip key={tag} label={tag} size="small" variant="outlined" sx={{ fontWeight: 600, borderRadius: 1.5 }} />
+                                            ))}
+                                        </Stack>
+                                    </Box>
+                                </Fade>
+                            </Box>
 
-                        <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
-                            Key Features
-                        </Typography>
-                        <Grid container spacing={2}>
-                            {features.map((feature, index) => (
-                                <Grid item xs={12} md={6} key={index}>
-                                    <Card sx={styles.card}>
-                                        <CardContent>
-                                            <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
-                                                {feature.title}
-                                            </Typography>
-                                            <List dense>
-                                                {feature.items.map((item, idx) => (
-                                                    <ListItem key={idx} sx={{ py: 0.5 }}>
-                                                        <ListItemIcon sx={{ minWidth: 32 }}>
-                                                            <CheckCircleIcon color="primary" fontSize="small" />
-                                                        </ListItemIcon>
-                                                        <ListItemText primary={item} />
-                                                    </ListItem>
-                                                ))}
-                                            </List>
-                                        </CardContent>
-                                    </Card>
-                                </Grid>
-                            ))}
-                        </Grid>
+                            {/* Mobile Navigation */}
+                            {isMobile && (
+                                <Box sx={{ mb: 4 }}>
+                                    <Paper sx={{ ...styles.navPaper, borderRadius: 3 }}>
+                                        {renderTabs()}
+                                    </Paper>
+                                </Box>
+                            )}
 
-                        <Divider sx={{ my: 4 }} />
+                            {/* Content Panels with Transitions */}
+                            <Fade in key={tabValue} timeout={400}>
+                                <Paper sx={styles.contentPanel}>
+                                    {/* Getting Started */}
+                                    <TabPanel value={tabValue} index={0}>
+                                        <Typography variant="h4" sx={styles.sectionTitle}>
+                                            <RocketIcon color="primary" sx={{ fontSize: 32 }} /> Getting Started
+                                        </Typography>
+                                        <Typography variant="body1" color="text.secondary" sx={{ mb: 4, fontSize: '1.1rem' }}>
+                                            Accelerate your development cycle with our streamlined setup process.
+                                        </Typography>
 
-                        <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
-                            <SecurityIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
-                            Security Features
-                        </Typography>
-                        <Grid container spacing={2}>
-                            {securityFeatures.map((section, index) => (
-                                <Grid item xs={12} md={4} key={index}>
-                                    <Card sx={styles.card}>
-                                        <CardContent>
-                                            <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, color: 'error.main' }}>
-                                                {section.title}
-                                            </Typography>
-                                            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                                                {section.description}
-                                            </Typography>
-                                            <List dense>
-                                                {section.features.map((feature, idx) => (
-                                                    <ListItem key={idx} sx={{ py: 0.5 }}>
-                                                        <ListItemIcon sx={{ minWidth: 32 }}>
-                                                            <CheckCircleIcon color="success" fontSize="small" />
-                                                        </ListItemIcon>
-                                                        <ListItemText primary={feature} primaryTypographyProps={{ fontSize: '0.875rem' }} />
-                                                    </ListItem>
-                                                ))}
-                                            </List>
-                                        </CardContent>
-                                    </Card>
-                                </Grid>
-                            ))}
-                        </Grid>
-                    </TabPanel>
+                                        <Box sx={{ mb: 6, borderRadius: 5, overflow: 'hidden', boxShadow: '0 32px 64px rgba(0,0,0,0.1)' }}>
+                                            <TerminalDemo />
+                                        </Box>
 
-                    {/* Architecture Tab */}
-                    <TabPanel value={tabValue} index={2}>
-                        <Typography variant="h5" sx={styles.sectionTitle}>
-                            <LayersIcon /> System Architecture
-                        </Typography>
-                        <Typography paragraph>
-                            DevConnect follows a modern, layered architecture pattern with clear separation of concerns.
-                        </Typography>
+                                        <Grid container spacing={3}>
+                                            {gettingStartedSteps.map((step, idx) => (
+                                                <Grid item xs={12} key={idx}>
+                                                    <Box sx={{ ...styles.card, transform: 'none', '&:hover': { transform: 'translateY(-4px)' } }}>
+                                                        <Typography variant="h6" fontWeight={800} color="primary.main" gutterBottom>
+                                                            {step.title}
+                                                        </Typography>
+                                                        <Typography paragraph color="text.secondary">{step.description}</Typography>
+                                                        {step.code && <CodeBlock code={step.code} />}
+                                                        {step.notes && (
+                                                            <Stack spacing={1} sx={{ mt: 2 }}>
+                                                                {step.notes.map((note, i) => (
+                                                                    <Stack key={i} direction="row" spacing={1.5} alignItems="center">
+                                                                        <CheckCircleIcon sx={{ fontSize: 16, color: colors.accent }} />
+                                                                        <Typography variant="body2" fontWeight={500}>{note}</Typography>
+                                                                    </Stack>
+                                                                ))}
+                                                            </Stack>
+                                                        )}
+                                                    </Box>
+                                                </Grid>
+                                            ))}
+                                        </Grid>
+                                    </TabPanel>
 
-                        <TableContainer component={Paper} variant="outlined" sx={{ mb: 3 }}>
-                            <Table>
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell><strong>Layer</strong></TableCell>
-                                        <TableCell><strong>Description</strong></TableCell>
-                                        <TableCell><strong>Technologies</strong></TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {architecture.map((layer, index) => (
-                                        <TableRow key={index} hover>
-                                            <TableCell sx={{ fontWeight: 600 }}>{layer.layer}</TableCell>
-                                            <TableCell>{layer.description}</TableCell>
-                                            <TableCell>
-                                                <Stack direction="row" spacing={0.5} flexWrap="wrap" useFlexGap>
-                                                    {layer.technologies.map((tech, idx) => (
-                                                        <Chip key={idx} label={tech} size="small" variant="outlined" />
+                                    {/* Overview */}
+                                    <TabPanel value={tabValue} index={1}>
+                                        <Typography variant="h4" sx={styles.sectionTitle}>
+                                            <DescriptionIcon color="primary" sx={{ fontSize: 32 }} /> Project Overview
+                                        </Typography>
+                                        <Typography variant="body1" sx={{ mb: 4, fontSize: '1.1rem', lineHeight: 1.7 }}>
+                                            DevConnect is a decentralized hub designed to empower developers worldwide. It bridges the gap between professional growth and social interaction.
+                                        </Typography>
+
+                                        <Grid container spacing={3}>
+                                            {features.map((feature, idx) => (
+                                                <Grid item xs={12} md={6} key={idx}>
+                                                    <Box sx={styles.card}>
+                                                        <Typography variant="h6" fontWeight={800} sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                            {feature.title}
+                                                        </Typography>
+                                                        <List dense disablePadding>
+                                                            {feature.items.map((item, i) => (
+                                                                <ListItem key={i} sx={{ px: 0, py: 0.5 }}>
+                                                                    <ListItemIcon sx={{ minWidth: 28 }}>
+                                                                        <CheckCircleIcon sx={{ fontSize: 16, color: colors.primary }} />
+                                                                    </ListItemIcon>
+                                                                    <ListItemText primary={item} primaryTypographyProps={{ fontWeight: 500, fontSize: '0.9rem' }} />
+                                                                </ListItem>
+                                                            ))}
+                                                        </List>
+                                                    </Box>
+                                                </Grid>
+                                            ))}
+                                        </Grid>
+                                    </TabPanel>
+
+                                    {/* Architecture */}
+                                    <TabPanel value={tabValue} index={2}>
+                                        <Typography variant="h4" sx={styles.sectionTitle}>
+                                            <LayersIcon color="primary" sx={{ fontSize: 32 }} /> Architecture
+                                        </Typography>
+
+                                        <Stack spacing={3}>
+                                            {architecture.map((layer, idx) => (
+                                                <Box key={idx} sx={styles.card}>
+                                                    <Grid container alignItems="center">
+                                                        <Grid item xs={12} sm={4}>
+                                                            <Typography variant="subtitle2" fontWeight={900} color="text.disabled" sx={{ textTransform: 'uppercase', mb: 0.5 }}>Layer</Typography>
+                                                            <Typography variant="h6" fontWeight={800} color="primary.main">{layer.layer}</Typography>
+                                                        </Grid>
+                                                        <Grid item xs={12} sm={8}>
+                                                            <Typography variant="body2" sx={{ mb: 2, fontWeight: 500 }}>{layer.description}</Typography>
+                                                            <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                                                                {layer.technologies.map(tech => (
+                                                                    <Chip key={tech} label={tech} size="small" sx={{ fontWeight: 700, borderRadius: 1 }} />
+                                                                ))}
+                                                            </Stack>
+                                                        </Grid>
+                                                    </Grid>
+                                                </Box>
+                                            ))}
+                                        </Stack>
+                                    </TabPanel>
+
+                                    {/* API Reference */}
+                                    <TabPanel value={tabValue} index={3}>
+                                        <Typography variant="h4" sx={styles.sectionTitle}>
+                                            <ApiIcon color="primary" sx={{ fontSize: 32 }} /> API Explorer
+                                        </Typography>
+
+                                        <TextField
+                                            fullWidth
+                                            placeholder="Filter endpoints..."
+                                            value={searchQuery}
+                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                            sx={{
+                                                mb: 4,
+                                                '& .MuiOutlinedInput-root': {
+                                                    borderRadius: 3,
+                                                    bgcolor: 'action.hover',
+                                                    border: 'none',
+                                                    '& fieldset': { border: 'none' }
+                                                }
+                                            }}
+                                            InputProps={{
+                                                startAdornment: <SearchIcon sx={{ color: 'text.disabled', mr: 1 }} />
+                                            }}
+                                        />
+
+                                        {Object.entries(apiByCategory).map(([category, endpoints]) => (
+                                            <Box key={category} sx={{ mb: 6 }}>
+                                                <Typography variant="h6" fontWeight={800} sx={{ mb: 3, px: 1, borderLeft: '4px solid', borderColor: colors.accent, color: 'text.primary' }}>
+                                                    {category}
+                                                </Typography>
+                                                <Stack spacing={2}>
+                                                    {endpoints.map((ep, idx) => (
+                                                        <Accordion key={idx} sx={{
+                                                            borderRadius: 3,
+                                                            '&:before': { display: 'none' },
+                                                            boxShadow: 'none',
+                                                            border: '1px solid',
+                                                            borderColor: 'divider',
+                                                            overflow: 'hidden',
+                                                            '&.Mui-expanded': { border: `1px solid ${colors.primary}50` }
+                                                        }}>
+                                                            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                                                                <Stack direction="row" spacing={2} alignItems="center">
+                                                                    <Box sx={styles.methodBadge(ep.method)}>{ep.method}</Box>
+                                                                    <Typography variant="body2" fontWeight={700} sx={{ fontFamily: 'JetBrains Mono, monospace' }}>{ep.path}</Typography>
+                                                                    {ep.auth && <LockIcon sx={{ fontSize: 14, color: 'error.main' }} />}
+                                                                </Stack>
+                                                            </AccordionSummary>
+                                                            <AccordionDetails sx={{ pt: 0, px: 3, pb: 3 }}>
+                                                                <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>{ep.description}</Typography>
+                                                                {ep.requestBody && <Box sx={{ mb: 2 }}><Typography variant="caption" fontWeight={800} sx={{ display: 'block', mb: 1 }}>Payload</Typography><CodeBlock code={ep.requestBody} /></Box>}
+                                                                {ep.responseExample && <Box><Typography variant="caption" fontWeight={800} sx={{ display: 'block', mb: 1 }}>Response</Typography><CodeBlock code={ep.responseExample} /></Box>}
+                                                            </AccordionDetails>
+                                                        </Accordion>
                                                     ))}
                                                 </Stack>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
-
-                        <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
-                            Project Structure
-                        </Typography>
-                        <Box sx={styles.codeBlock}>
-                            <IconButton
-                                size="small"
-                                className="copy-button"
-                                sx={styles.copyButton}
-                                onClick={() => handleCopyCode(`client/
-├── src/
-│   ├── api/              # API configuration
-│   ├── components/       # Reusable components
-│   │   ├── landing/     # Landing page components
-│   │   ├── profile/     # Profile components
-│   │   ├── feed/        # Feed components
-│   │   ├── dashboard/   # Dashboard components
-│   │   └── board/       # Board components
-│   ├── context/         # React Context providers
-│   ├── layouts/         # Layout components
-│   ├── pages/           # Page components
-│   ├── services/        # API services
-│   ├── types/           # TypeScript types
-│   ├── theme.ts         # MUI theme configuration
-│   └── App.tsx          # Main app component
-├── package.json
-└── vite.config.ts`, 'structure')}
-                            >
-                                <Tooltip title={copiedCode === 'structure' ? 'Copied!' : 'Copy code'}>
-                                    <CopyIcon fontSize="small" />
-                                </Tooltip>
-                            </IconButton>
-                            <pre style={{ margin: 0 }}>{`client/
-├── src/
-│   ├── api/              # API configuration
-│   ├── components/       # Reusable components
-│   │   ├── landing/     # Landing page components
-│   │   ├── profile/     # Profile components
-│   │   ├── feed/        # Feed components
-│   │   ├── dashboard/   # Dashboard components
-│   │   └── board/       # Board components
-│   ├── context/         # React Context providers
-│   ├── layouts/         # Layout components
-│   ├── pages/           # Page components
-│   ├── services/        # API services
-│   ├── types/           # TypeScript types
-│   ├── theme.ts         # MUI theme configuration
-│   └── App.tsx          # Main app component
-├── package.json
-└── vite.config.ts`}</pre>
-                        </Box>
-                    </TabPanel>
-
-                    {/* API Reference Tab */}
-                    <TabPanel value={tabValue} index={3}>
-                        <Typography variant="h5" sx={styles.sectionTitle}>
-                            <ApiIcon /> API Reference
-                        </Typography>
-                        <Typography paragraph>
-                            Complete REST API documentation with request/response examples for all endpoints.
-                        </Typography>
-
-                        <TextField
-                            fullWidth
-                            placeholder="Search API endpoints..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            sx={styles.searchBox}
-                            InputProps={{
-                                startAdornment: (
-                                    <InputAdornment position="start">
-                                        <SearchIcon />
-                                    </InputAdornment>
-                                )
-                            }}
-                        />
-
-                        {Object.entries(apiByCategory).map(([category, endpoints]) => (
-                            <Accordion key={category} defaultExpanded>
-                                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                                    <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                                        <Badge badgeContent={endpoints.length} color="primary" sx={{ mr: 2 }}>
-                                            {category}
-                                        </Badge>
-                                    </Typography>
-                                </AccordionSummary>
-                                <AccordionDetails>
-                                    <Stack spacing={2}>
-                                        {endpoints.map((endpoint, idx) => (
-                                            <Card key={idx} variant="outlined">
-                                                <CardContent>
-                                                    <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
-                                                        <Chip label={endpoint.method} size="small" sx={styles.methodChip(endpoint.method)} />
-                                                        <Typography variant="body1" sx={{ fontFamily: 'monospace', fontWeight: 600 }}>
-                                                            {endpoint.path}
-                                                        </Typography>
-                                                        {endpoint.auth ? (
-                                                            <Tooltip title="Requires authentication">
-                                                                <LockIcon fontSize="small" color="error" />
-                                                            </Tooltip>
-                                                        ) : (
-                                                            <Tooltip title="Public endpoint">
-                                                                <LockOpenIcon fontSize="small" color="success" />
-                                                            </Tooltip>
-                                                        )}
-                                                    </Stack>
-                                                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                                                        {endpoint.description}
-                                                    </Typography>
-
-                                                    {endpoint.requestBody && (
-                                                        <>
-                                                            <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1 }}>
-                                                                Request Body:
-                                                            </Typography>
-                                                            <CodeBlock code={endpoint.requestBody} />
-                                                        </>
-                                                    )}
-
-                                                    {endpoint.responseExample && (
-                                                        <>
-                                                            <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1, mt: 2 }}>
-                                                                Response Example:
-                                                            </Typography>
-                                                            <CodeBlock code={endpoint.responseExample} />
-                                                        </>
-                                                    )}
-                                                </CardContent>
-                                            </Card>
-                                        ))}
-                                    </Stack>
-                                </AccordionDetails>
-                            </Accordion>
-                        ))}
-                    </TabPanel>
-
-                    {/* Components Tab */}
-                    <TabPanel value={tabValue} index={4}>
-                        <Typography variant="h5" sx={styles.sectionTitle}>
-                            <CodeIcon /> Component Library
-                        </Typography>
-                        <Typography paragraph>
-                            DevConnect uses a modular component architecture with reusable, well-documented components.
-                        </Typography>
-
-                        {Object.entries(components).map(([category, items], index) => (
-                            <Accordion key={index} defaultExpanded={index === 0}>
-                                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                                    <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                                        {category} ({items.length})
-                                    </Typography>
-                                </AccordionSummary>
-                                <AccordionDetails>
-                                    <Grid container spacing={2}>
-                                        {items.map((component, idx) => (
-                                            <Grid item xs={12} sm={6} md={4} key={idx}>
-                                                <Card variant="outlined" sx={{ height: '100%' }}>
-                                                    <CardContent>
-                                                        <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1 }}>
-                                                            <CodeIcon color="primary" fontSize="small" />
-                                                            <Typography sx={{ fontWeight: 600 }}>{component.name}</Typography>
-                                                        </Stack>
-                                                        <Typography variant="body2" color="text.secondary">
-                                                            {component.description}
-                                                        </Typography>
-                                                    </CardContent>
-                                                </Card>
-                                            </Grid>
-                                        ))}
-                                    </Grid>
-                                </AccordionDetails>
-                            </Accordion>
-                        ))}
-                    </TabPanel>
-
-                    {/* Pages Tab */}
-                    <TabPanel value={tabValue} index={5}>
-                        <Typography variant="h5" sx={styles.sectionTitle}>
-                            <DashboardIcon /> Application Pages
-                        </Typography>
-                        <Typography paragraph>
-                            DevConnect consists of {pages.length} main pages, each serving a specific purpose in the user journey.
-                        </Typography>
-
-                        <Grid container spacing={2}>
-                            {pages.map((page, index) => (
-                                <Grid item xs={12} md={6} key={index}>
-                                    <Card sx={styles.card}>
-                                        <CardContent>
-                                            <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 1 }}>
-                                                {page.icon}
-                                                <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                                                    {page.name}
-                                                </Typography>
-                                            </Stack>
-                                            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                                                {page.description}
-                                            </Typography>
-                                            <Chip label={page.route} size="small" variant="outlined" />
-                                        </CardContent>
-                                    </Card>
-                                </Grid>
-                            ))}
-                        </Grid>
-                    </TabPanel>
-
-                    {/* Best Practices Tab */}
-                    <TabPanel value={tabValue} index={6}>
-                        <Typography variant="h5" sx={styles.sectionTitle}>
-                            <SchoolIcon /> Best Practices
-                        </Typography>
-                        <Typography paragraph>
-                            Follow these best practices to maintain code quality, performance, and security in DevConnect.
-                        </Typography>
-
-                        {bestPractices.map((section, index) => (
-                            <Accordion key={index} defaultExpanded={index === 0}>
-                                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                                    <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                                        {section.category}
-                                    </Typography>
-                                </AccordionSummary>
-                                <AccordionDetails>
-                                    <Stack spacing={3}>
-                                        {section.practices.map((practice, idx) => (
-                                            <Box key={idx}>
-                                                <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1, color: 'primary.main' }}>
-                                                    {practice.title}
-                                                </Typography>
-                                                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                                                    {practice.description}
-                                                </Typography>
-                                                {practice.example && (
-                                                    <Box sx={styles.codeBlock}>
-                                                        <IconButton
-                                                            size="small"
-                                                            className="copy-button"
-                                                            sx={styles.copyButton}
-                                                            onClick={() => handleCopyCode(practice.example!, `bp-${index}-${idx}`)}
-                                                        >
-                                                            <Tooltip title={copiedCode === `bp-${index}-${idx}` ? 'Copied!' : 'Copy'}>
-                                                                <CopyIcon fontSize="small" />
-                                                            </Tooltip>
-                                                        </IconButton>
-                                                        <pre style={{ margin: 0 }}>{practice.example}</pre>
-                                                    </Box>
-                                                )}
                                             </Box>
                                         ))}
-                                    </Stack>
-                                </AccordionDetails>
-                            </Accordion>
-                        ))}
+                                    </TabPanel>
 
-                        <Divider sx={{ my: 4 }} />
-
-                        <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
-                            Development Workflow
-                        </Typography>
-
-                        <Grid container spacing={3}>
-                            <Grid item xs={12} md={6}>
-                                <Card variant="outlined">
-                                    <CardContent>
-                                        <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
-                                            Git Workflow
+                                    {/* Components */}
+                                    <TabPanel value={tabValue} index={4}>
+                                        <Typography variant="h4" sx={styles.sectionTitle}>
+                                            <CodeIcon color="primary" sx={{ fontSize: 32 }} /> Core Components
                                         </Typography>
-                                        <List dense>
-                                            {developmentWorkflow.gitWorkflow.map((item, idx) => (
-                                                <ListItem key={idx} sx={{ flexDirection: 'column', alignItems: 'flex-start', mb: 2 }}>
-                                                    <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
-                                                        {item.step}
+                                        <Grid container spacing={2}>
+                                            {Object.entries(components).flatMap(([_, items]) => items).map((comp, idx) => (
+                                                <Grid item xs={12} sm={6} md={4} key={idx}>
+                                                    <Box sx={styles.card}>
+                                                        <Typography variant="subtitle1" fontWeight={800} gutterBottom>{comp.name}</Typography>
+                                                        <Typography variant="body2" color="text.secondary">{comp.description}</Typography>
+                                                    </Box>
+                                                </Grid>
+                                            ))}
+                                        </Grid>
+                                    </TabPanel>
+
+                                    {/* Pages */}
+                                    <TabPanel value={tabValue} index={5}>
+                                        <Typography variant="h4" sx={styles.sectionTitle}>
+                                            <DashboardIcon color="primary" sx={{ fontSize: 32 }} /> Interface Map
+                                        </Typography>
+                                        <Grid container spacing={3}>
+                                            {pages.map((p, idx) => (
+                                                <Grid item xs={12} md={6} key={idx}>
+                                                    <Box sx={styles.card}>
+                                                        <Stack direction="row" spacing={2} alignItems="flex-start">
+                                                            <Box sx={{ p: 1, borderRadius: 2, bgcolor: 'primary.main', color: 'white' }}>{p.icon}</Box>
+                                                            <Box>
+                                                                <Typography variant="h6" fontWeight={800}>{p.name}</Typography>
+                                                                <Typography variant="caption" sx={{ color: colors.accent, fontWeight: 700, display: 'block', mb: 1 }}>{p.route}</Typography>
+                                                                <Typography variant="body2" color="text.secondary">{p.description}</Typography>
+                                                            </Box>
+                                                        </Stack>
+                                                    </Box>
+                                                </Grid>
+                                            ))}
+                                        </Grid>
+                                    </TabPanel>
+
+                                    {/* Best Practices */}
+                                    <TabPanel value={tabValue} index={6}>
+                                        <Typography variant="h4" sx={styles.sectionTitle}>
+                                            <SchoolIcon color="primary" sx={{ fontSize: 32 }} /> Developer Guidelines
+                                        </Typography>
+                                        <Stack spacing={4}>
+                                            {bestPractices.map((section, idx) => (
+                                                <Box key={idx}>
+                                                    <Typography variant="h6" fontWeight={900} sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                        <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: colors.primary }} />
+                                                        {section.category}
                                                     </Typography>
-                                                    <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                                                        {item.description}
-                                                    </Typography>
-                                                    {item.command !== '# Edit files, test locally' && item.command !== '# Create PR on GitHub' && item.command !== '# Wait for review and approval' && (
-                                                        <Box sx={{ ...styles.codeBlock, width: '100%', p: 1 }}>
-                                                            <pre style={{ margin: 0, fontSize: '0.75rem' }}>{item.command}</pre>
-                                                        </Box>
-                                                    )}
-                                                </ListItem>
+                                                    <Grid container spacing={3}>
+                                                        {section.practices.map((p, i) => (
+                                                            <Grid item xs={12} key={i}>
+                                                                <Box sx={{ ...styles.card, borderLeft: `4px solid ${colors.secondary}` }}>
+                                                                    <Typography variant="subtitle1" fontWeight={800} color="secondary.main" gutterBottom>{p.title}</Typography>
+                                                                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>{p.description}</Typography>
+                                                                    {p.example && <CodeBlock code={p.example} />}
+                                                                </Box>
+                                                            </Grid>
+                                                        ))}
+                                                    </Grid>
+                                                </Box>
                                             ))}
-                                        </List>
-                                    </CardContent>
-                                </Card>
-                            </Grid>
+                                        </Stack>
+                                    </TabPanel>
 
-                            <Grid item xs={12} md={6}>
-                                <Card variant="outlined" sx={{ mb: 2 }}>
-                                    <CardContent>
-                                        <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
-                                            Testing Strategy
+                                    {/* Dependencies */}
+                                    <TabPanel value={tabValue} index={7}>
+                                        <Typography variant="h4" sx={styles.sectionTitle}>
+                                            <SettingsIcon color="primary" sx={{ fontSize: 32 }} /> Built With
                                         </Typography>
-                                        <List dense>
-                                            {developmentWorkflow.testingStrategy.map((item, idx) => (
-                                                <ListItem key={idx}>
-                                                    <ListItemIcon sx={{ minWidth: 32 }}>
-                                                        <CheckCircleIcon color="primary" fontSize="small" />
-                                                    </ListItemIcon>
-                                                    <ListItemText primary={item} />
-                                                </ListItem>
-                                            ))}
-                                        </List>
-                                    </CardContent>
-                                </Card>
-
-                                <Card variant="outlined">
-                                    <CardContent>
-                                        <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
-                                            Deployment Process
-                                        </Typography>
-                                        <List dense>
-                                            {developmentWorkflow.deploymentProcess.map((item, idx) => (
-                                                <ListItem key={idx}>
-                                                    <ListItemIcon sx={{ minWidth: 32 }}>
-                                                        <CheckCircleIcon color="success" fontSize="small" />
-                                                    </ListItemIcon>
-                                                    <ListItemText primary={item} />
-                                                </ListItem>
-                                            ))}
-                                        </List>
-                                    </CardContent>
-                                </Card>
-                            </Grid>
-                        </Grid>
-                    </TabPanel>
-
-                    {/* Dependencies Tab */}
-                    <TabPanel value={tabValue} index={7}>
-                        <Typography variant="h5" sx={styles.sectionTitle}>
-                            <SettingsIcon /> Dependencies
-                        </Typography>
-                        <Typography paragraph>
-                            DevConnect uses carefully selected, well-maintained libraries to ensure reliability and performance.
-                        </Typography>
-
-                        <TableContainer component={Paper} variant="outlined">
-                            <Table>
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell><strong>Package</strong></TableCell>
-                                        <TableCell><strong>Version</strong></TableCell>
-                                        <TableCell><strong>Description</strong></TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {dependencies.map((dep, index) => (
-                                        <TableRow key={index} hover>
-                                            <TableCell sx={{ fontFamily: 'monospace', fontWeight: 600 }}>
-                                                {dep.name}
-                                            </TableCell>
-                                            <TableCell>
-                                                <Chip label={dep.version} size="small" color="primary" variant="outlined" />
-                                            </TableCell>
-                                            <TableCell>{dep.description}</TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
-                    </TabPanel>
-                </Paper>
+                                        <TableContainer component={Paper} sx={{ borderRadius: 4, overflow: 'hidden', border: '1px solid', borderColor: 'divider', boxShadow: 'none' }}>
+                                            <Table>
+                                                <TableHead sx={{ bgcolor: 'action.hover' }}>
+                                                    <TableRow>
+                                                        <TableCell sx={{ fontWeight: 800 }}>Dependency</TableCell>
+                                                        <TableCell sx={{ fontWeight: 800 }}>Version</TableCell>
+                                                        <TableCell sx={{ fontWeight: 800 }}>Role</TableCell>
+                                                    </TableRow>
+                                                </TableHead>
+                                                <TableBody>
+                                                    {dependencies.map((dep, idx) => (
+                                                        <TableRow key={idx} hover>
+                                                            <TableCell sx={{ fontWeight: 700, fontFamily: 'monospace' }}>{dep.name}</TableCell>
+                                                            <TableCell><Chip label={dep.version} size="small" sx={{ fontWeight: 800, borderRadius: 1 }} /></TableCell>
+                                                            <TableCell color="text.secondary">{dep.description}</TableCell>
+                                                        </TableRow>
+                                                    ))}
+                                                </TableBody>
+                                            </Table>
+                                        </TableContainer>
+                                    </TabPanel>
+                                </Paper>
+                            </Fade>
+                        </Box>
+                    </Grid>
+                </Grid>
             </Container>
         </Box>
     );

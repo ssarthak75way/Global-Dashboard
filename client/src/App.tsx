@@ -18,6 +18,7 @@ const Board = lazy(() => import("./pages/Board"));
 const Feed = lazy(() => import("./pages/Feed"));
 const Resume = lazy(() => import("./pages/Resume"));
 const Documentation = lazy(() => import("./pages/Documentation"));
+const PublicDocumentation = lazy(() => import("./pages/PublicDocumentation"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const LoadingFallback = () => (
@@ -68,6 +69,14 @@ const router = createBrowserRouter([
     )
   },
   {
+      path: "/guide",
+        element: (
+          <Suspense fallback={<LoadingFallback />}>
+            <PublicDocumentation />
+          </Suspense>
+        )
+      },
+  {
     element: <PublicLayout />,
     children: [
       {
@@ -86,6 +95,7 @@ const router = createBrowserRouter([
           </Suspense>
         )
       },
+      
       {
         path: "/login",
         element: (

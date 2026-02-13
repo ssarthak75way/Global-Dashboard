@@ -168,11 +168,9 @@ const EditProfileDialog: React.FC<EditProfileDialogProps> = ({ open, onClose, us
                 skills: user.skills || [],
                 hobbies: user.hobbies || [],
                 experience: user.experience?.map(exp => ({
-                    role: exp.role || "",
-                    company: exp.company || "",
+                    ...exp,
                     startDate: exp.startDate ? new Date(exp.startDate).toISOString().split('T')[0] : "",
                     endDate: exp.endDate ? new Date(exp.endDate).toISOString().split('T')[0] : "",
-                    description: exp.description || "",
                     current: !!exp.current
                 })) || [],
                 projects: user.projects?.map(p => ({

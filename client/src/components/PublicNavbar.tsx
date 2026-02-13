@@ -18,7 +18,7 @@ import {
     Tooltip
 } from '@mui/material';
 
-    import {MenuBook as DocumentationIcon} from "@mui/icons-material";
+import { MenuBook as DocumentationIcon } from "@mui/icons-material";
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -146,7 +146,7 @@ const PublicNavbar: React.FC = () => {
                 </IconButton>
             </Box>
             <List>
-               
+
                 {isAuthenticated ? (
                     <ListItem disablePadding>
                         <ListItemButton onClick={() => { navigate('/dashboard'); setMobileOpen(false); }}>
@@ -158,6 +158,14 @@ const PublicNavbar: React.FC = () => {
                     </ListItem>
                 ) : (
                     <>
+                        <ListItem disablePadding>
+                            <ListItemButton onClick={() => { navigate('/guide'); setMobileOpen(false); }}>
+                                <ListItemText
+                                    primary="Guide"
+                                    primaryTypographyProps={{ fontWeight: 600 }}
+                                />
+                            </ListItemButton>
+                        </ListItem>
                         <ListItem disablePadding>
                             <ListItemButton onClick={() => { navigate('/login'); setMobileOpen(false); }}>
                                 <ListItemText
@@ -207,10 +215,10 @@ const PublicNavbar: React.FC = () => {
                             </IconButton>
                         ) : (
                             <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                
+
                                 {isAuthenticated ? (
                                     <>
-                                     <Button
+                                        <Button
                                             startIcon={<DocumentationIcon />}
                                             onClick={() => navigate('/documentation')}
                                             sx={{ ...styles.navButton, ml: 2 }}
@@ -235,7 +243,7 @@ const PublicNavbar: React.FC = () => {
                                                     src={user?.avatar}
                                                     sx={{ width: 35, height: 35, bgcolor: 'primary.main' }}
                                                 >
-                                                    {user?.name?.[0]?.toUpperCase()||user?.email?.[0]?.toUpperCase() || '?'}
+                                                    {user?.name?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || '?'}
                                                 </Avatar>
                                             </IconButton>
                                         </Tooltip>
@@ -247,6 +255,12 @@ const PublicNavbar: React.FC = () => {
                                     </>
                                 ) : (
                                     <>
+                                        <Button
+                                            onClick={() => navigate('/guide')}
+                                            sx={{ ...styles.navButton, ml: 2 }}
+                                        >
+                                            Guide
+                                        </Button>
                                         <Button
                                             onClick={() => navigate('/login')}
                                             sx={{ ...styles.navButton, ml: 2 }}
