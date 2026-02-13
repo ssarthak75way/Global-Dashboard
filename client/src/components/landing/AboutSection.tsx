@@ -1,19 +1,23 @@
 import React from 'react';
 import { Box, Container, Typography, Grid, Stack, Paper, useTheme } from '@mui/material';
 import { CheckCircle as CheckIcon } from '@mui/icons-material';
+import { getLandingColors } from '../../utils/landingTheme';
 
 const AboutSection: React.FC = () => {
     const theme = useTheme();
+    const colors = getLandingColors(theme);
 
     const styles = {
         section: {
-            py: { xs: 6, md: 12 }
+            py: { xs: 8, md: 15 },
+            bgcolor: colors.bg
         },
         sectionTitle: {
             fontWeight: 900,
             fontSize: { xs: '1.75rem', sm: '2.5rem', md: '3rem' },
             mb: 2,
-            textAlign: 'center'
+            textAlign: 'center',
+            color: colors.text
         }
     };
 
@@ -25,11 +29,11 @@ const AboutSection: React.FC = () => {
                         <Typography variant="h2" sx={{ ...styles.sectionTitle, textAlign: 'left' }}>
                             What is DevConnect?
                         </Typography>
-                        <Typography sx={{ fontSize: '1.1rem', color: 'text.secondary', mb: 3 }}>
+                        <Typography sx={{ fontSize: '1.1rem', color: colors.textSecondary, mb: 3 }}>
                             DevConnect is your complete professional platform designed specifically for developers. Whether you're a student, freelancer, or experienced professional, DevConnect helps you establish a strong online presence and manage your career growth.
                         </Typography>
-                        <Typography sx={{ fontSize: '1.1rem', color: 'text.secondary', mb: 3 }}>
-                            <strong>What you get:</strong> A professional profile that showcases your skills and experience, an ATS-optimized resume builder for job applications, a task management system to stay organized, social features to network with developers, and analytics to track your growth.
+                        <Typography sx={{ fontSize: '1.1rem', color: colors.textSecondary, mb: 3 }}>
+                            <strong style={{ color: colors.text }}>What you get:</strong> A professional profile that showcases your skills and experience, an ATS-optimized resume builder for job applications, a task management system to stay organized, social features to network with developers, and analytics to track your growth.
                         </Typography>
                         <Stack spacing={2}>
                             {[
@@ -42,7 +46,7 @@ const AboutSection: React.FC = () => {
                             ].map((item, index) => (
                                 <Stack key={index} direction="row" spacing={2} alignItems="center">
                                     <CheckIcon color="primary" />
-                                    <Typography variant="body1" sx={{ fontWeight: 500 }}>{item}</Typography>
+                                    <Typography variant="body1" sx={{ fontWeight: 500, color: colors.text }}>{item}</Typography>
                                 </Stack>
                             ))}
                         </Stack>

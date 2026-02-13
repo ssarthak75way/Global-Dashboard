@@ -21,7 +21,9 @@ import {
     StepLabel,
     StepContent,
     LinearProgress,
-    Chip
+    Chip,
+    Menu,
+    MenuItem
 } from '@mui/material';
 import {
     RocketLaunch as RocketIcon,
@@ -36,6 +38,7 @@ import {
 import PublicNavbar from '../components/PublicNavbar';
 import LandingFooter from '../components/landing/LandingFooter';
 import { useNavigate } from 'react-router-dom';
+import { docVersions } from '../utils/data';
 
 interface TabPanelProps {
     children?: React.ReactNode;
@@ -87,10 +90,23 @@ const PublicDocumentation: React.FC = () => {
     const navigate = useNavigate();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
     const [tabValue, setTabValue] = useState(0);
+    const [activeVersion, setActiveVersion] = useState(docVersions[0]);
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
     const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
         setTabValue(newValue);
         window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    const handleVersionClick = (event: React.MouseEvent<HTMLElement>) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleVersionClose = (version?: typeof docVersions[0]) => {
+        setAnchorEl(null);
+        if (version) {
+            setActiveVersion(version);
+        }
     };
 
     const colors = {
@@ -342,9 +358,9 @@ const PublicDocumentation: React.FC = () => {
                                     User Guide
                                 </Typography>
                                 <Chip
-                                    label="v1.0.0"
+                                    label={activeVersion.version}
                                     size="small"
-                                    onClick={() => { }} // Future functionality
+                                    onClick={handleVersionClick}
                                     sx={{
                                         fontWeight: 800,
                                         height: 24,
@@ -364,6 +380,45 @@ const PublicDocumentation: React.FC = () => {
                                     }}
                                     icon={<ChevronIcon sx={{ fontSize: '1rem !important', color: `${colors.primary} !important` }} />}
                                 />
+                                <Menu
+                                    anchorEl={anchorEl}
+                                    open={Boolean(anchorEl)}
+                                    onClose={() => handleVersionClose()}
+                                    PaperProps={{
+                                        sx: {
+                                            mt: 1,
+                                            borderRadius: 3,
+                                            boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
+                                            border: '1px solid',
+                                            borderColor: 'divider',
+                                            minWidth: 160,
+                                            bgcolor: colors.glass,
+                                            backdropFilter: 'blur(20px)',
+                                        }
+                                    }}
+                                >
+                                    {docVersions.map((v) => (
+                                        <MenuItem
+                                            key={v.version}
+                                            onClick={() => handleVersionClose(v)}
+                                            selected={v.version === activeVersion.version}
+                                            sx={{
+                                                fontSize: '0.85rem',
+                                                fontWeight: 700,
+                                                borderRadius: 1.5,
+                                                mx: 1,
+                                                my: 0.5,
+                                                '&:hover': { bgcolor: `${colors.primary}10` },
+                                                '&.Mui-selected': { bgcolor: `${colors.primary}20`, color: colors.primary }
+                                            }}
+                                        >
+                                            <Stack direction="row" justifyContent="space-between" width="100%" alignItems="center">
+                                                <Typography variant="inherit">{v.label}</Typography>
+                                                <Typography variant="caption" sx={{ opacity: 0.5, fontSize: '0.65rem' }}>{v.date}</Typography>
+                                            </Stack>
+                                        </MenuItem>
+                                    ))}
+                                </Menu>
                             </Box>
                             <Paper sx={styles.navPaper}>
                                 {renderTabs()}

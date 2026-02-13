@@ -3,7 +3,8 @@ import {
     Box, Typography, Avatar, IconButton, TextField,
     InputAdornment, Paper, useTheme, Menu, MenuItem,
     ListItemIcon, ListItemText, Dialog, DialogTitle,
-    DialogContent, DialogActions, Button, Snackbar, Alert
+    DialogContent, DialogActions, Button, Snackbar,
+    Stack
 } from '@mui/material';
 import {
     Send as SendIcon,
@@ -349,6 +350,42 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ conversation, onBack }) => {
                                     <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', lineHeight: 1.5 }}>
                                         {msg.content}
                                     </Typography>
+
+                                    {msg.postId && (
+                                        <Box
+                                            sx={{
+                                                mt: 2,
+                                                p: 1.5,
+                                                bgcolor: isMine ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
+                                                borderRadius: 2,
+                                                cursor: 'pointer',
+                                                border: '1px solid',
+                                                borderColor: isMine ? 'rgba(255,255,255,0.2)' : 'divider',
+                                                '&:hover': {
+                                                    bgcolor: isMine ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)'
+                                                }
+                                            }}
+                                            onClick={() => navigate('/feed')}
+                                        >
+                                            <Stack direction="row" spacing={1.5} alignItems="center">
+                                                {msg.postId.imageUrl && (
+                                                    <Avatar
+                                                        variant="rounded"
+                                                        src={msg.postId.imageUrl}
+                                                        sx={{ width: 48, height: 48 }}
+                                                    />
+                                                )}
+                                                <Box>
+                                                    <Typography variant="caption" sx={{ color: isMine ? 'primary.contrastText' : 'text.secondary', display: 'block', fontWeight: 600 }}>
+                                                        Shared Post
+                                                    </Typography>
+                                                    <Typography variant="subtitle2" sx={{ fontWeight: 700, lineHeight: 1.2 }}>
+                                                        {msg.postId.title}
+                                                    </Typography>
+                                                </Box>
+                                            </Stack>
+                                        </Box>
+                                    )}
 
                                     {!msg.isDeletedForEveryone && (
                                         <IconButton

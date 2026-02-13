@@ -64,7 +64,8 @@ export const getMessages = async (req: Request, res: Response, next: NextFunctio
             deletedForUsers: { $ne: userId }
         })
             .sort({ createdAt: 1 })
-            .populate('senderId', 'name avatar');
+            .populate('senderId', 'name avatar')
+            .populate('postId', 'title imageUrl');
 
         res.status(200).json({
             success: true,
@@ -77,7 +78,7 @@ export const getMessages = async (req: Request, res: Response, next: NextFunctio
 
 export const sendMessage = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { receiverId, content } = req.body;
+        const { receiverId, content, postId } = req.body;
         const senderId = (req as any).user._id;
 
         // Check if blocked
@@ -112,6 +113,7 @@ export const sendMessage = async (req: Request, res: Response, next: NextFunctio
             conversationId: conversation._id,
             senderId,
             content,
+            postId,
             readBy: [senderId]
         });
 

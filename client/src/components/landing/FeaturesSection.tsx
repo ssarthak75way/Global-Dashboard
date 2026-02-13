@@ -1,126 +1,100 @@
 import React from 'react';
-import { Box, Container, Typography, Grid, Card, CardContent, useTheme } from '@mui/material';
+import { Box, Container, Typography, Grid, useTheme } from '@mui/material';
 import {
     Description as ResumeIcon,
     Person as ProfileIcon,
     CalendarMonth as HeatmapIcon,
     Dashboard as BoardIcon,
     Forum as FeedIcon,
-    Work as ProjectIcon,
-    School as SkillIcon,
-    CardMembership as CertIcon,
-    TrendingUp as ActivityIcon
+    Work as ProjectIcon
 } from '@mui/icons-material';
+import { getLandingColors } from '../../utils/landingTheme';
 
 const FeaturesSection: React.FC = () => {
     const theme = useTheme();
+    const colors = getLandingColors(theme);
 
     const features = [
         {
             icon: <ResumeIcon sx={{ fontSize: 40 }} />,
-            title: 'ATS-Optimized Resume Builder',
-            description: 'Create professional, ATS-friendly resumes with our easy-to-use builder. Fill in your details once and export to PDF instantly. Perfect for job applications.'
+            title: 'ATS-Optimized Resume',
+            description: 'Generate professional, job-ready resumes instantly from your developer profile.',
+            color: colors.primary
         },
         {
             icon: <ProfileIcon sx={{ fontSize: 40 }} />,
-            title: 'Comprehensive Profile',
-            description: 'Build your complete professional profile with work experience, education, projects, skills, and certifications. Make your online presence strong and discoverable.'
+            title: 'Comprehensive Identity',
+            description: 'Your complete professional fingerprint: experience, stack, and certifications.',
+            color: colors.secondary
         },
         {
             icon: <HeatmapIcon sx={{ fontSize: 40 }} />,
-            title: 'Activity Tracking',
-            description: 'Track your coding journey with a GitHub-style activity heatmap. Visualize your consistency, maintain streaks, and see your progress over time.'
+            title: 'Activity Analytics',
+            description: 'Visualize your coding consistency with professional heatmaps and streak tracking.',
+            color: colors.accent
         },
         {
             icon: <BoardIcon sx={{ fontSize: 40 }} />,
-            title: 'Task Management Board',
-            description: 'Organize your work with a powerful Kanban board. Create tasks, drag-and-drop between columns (To Do, In Progress, Done), and stay productive.'
+            title: 'Native Kanban',
+            description: 'Stay focused with embedded task management built for developer workflows.',
+            color: colors.accentAlt
         },
         {
             icon: <FeedIcon sx={{ fontSize: 40 }} />,
-            title: 'Social Feed & Networking',
-            description: 'Share your thoughts, projects, and achievements. Like, comment, and engage with posts from developers worldwide. Build your professional network.'
+            title: 'Global Social Feed',
+            description: 'Engage with the community, share knowledge, and build your professional network.',
+            color: colors.primary
         },
         {
             icon: <ProjectIcon sx={{ fontSize: 40 }} />,
-            title: 'Project Showcase',
-            description: 'Display your projects with descriptions, tech stacks, live links, and GitHub repositories. Let recruiters and peers see what you\'ve built.'
-        },
-        {
-            icon: <SkillIcon sx={{ fontSize: 40 }} />,
-            title: 'Skills & Expertise',
-            description: 'List all your technical skills, programming languages, frameworks, and tools. Organize them by proficiency to highlight your strengths.'
-        },
-        {
-            icon: <CertIcon sx={{ fontSize: 40 }} />,
-            title: 'Certifications & Achievements',
-            description: 'Showcase your certifications, courses, and professional achievements. Add credential IDs and links to verify your accomplishments.'
-        },
-        {
-            icon: <ActivityIcon sx={{ fontSize: 40 }} />,
-            title: 'Analytics Dashboard',
-            description: 'Get insights into your activity with detailed analytics. Track posts, followers, following, projects, and overall engagement metrics.'
+            title: 'Live Case Studies',
+            description: 'Showcase your real-world contributions with deep repository integration.',
+            color: colors.secondary
         }
     ];
 
-    const styles = {
-        section: {
-            py: { xs: 6, md: 12 }
-        },
-        sectionTitle: {
-            fontWeight: 900,
-            fontSize: { xs: '1.75rem', sm: '2.5rem', md: '3rem' },
-            mb: 2,
-            textAlign: 'center'
-        },
-        sectionSubtitle: {
-            fontSize: { xs: '0.9rem', sm: '1.1rem' },
-            color: 'text.secondary',
-            textAlign: 'center',
-            mb: { xs: 4, md: 6 },
-            maxWidth: 800,
-            mx: 'auto'
-        },
-        featureCard: {
-            height: '100%',
-            p: 4,
-            borderRadius: 3,
-            transition: 'all 0.3s ease',
-            border: '1px solid',
-            borderColor: 'divider',
-            '&:hover': {
-                transform: 'translateY(-8px)',
-                boxShadow: `0 12px 40px ${theme.palette.primary.main}20`,
-                borderColor: 'primary.main'
-            }
-        }
-    };
-
     return (
-        <Box id="features" sx={{ ...styles.section, bgcolor: 'background.paper' }}>
+        <Box id="features" sx={{ py: { xs: 8, md: 15 }, bgcolor: colors.bg, position: 'relative' }}>
             <Container maxWidth="lg">
-                <Typography variant="h2" sx={styles.sectionTitle}>
-                    Everything You Need in One Platform
-                </Typography>
-                <Typography sx={styles.sectionSubtitle}>
-                    DevConnect provides all the tools you need to build your professional brand, manage your work, and connect with the global developer community
-                </Typography>
-                <Grid container spacing={4}>
+                <Box sx={{ textAlign: 'center', mb: 10 }}>
+                    <Typography variant="overline" sx={{ fontWeight: 900, color: colors.primary, letterSpacing: 4 }}>
+                        ECOSYSTEM FEATURES
+                    </Typography>
+                    <Typography variant="h2" sx={{ fontWeight: 900, color: colors.text, mt: 2, mb: 3 }}>
+                        Engineered for Engineers
+                    </Typography>
+                    <Typography variant="h6" sx={{ color: colors.textMuted, maxWidth: 800, mx: 'auto', fontWeight: 500 }}>
+                        Every tool you need to architect your career and collaborate with colleagues in one unified platform.
+                    </Typography>
+                </Box>
+
+                <Grid container spacing={3}>
                     {features.map((feature, index) => (
                         <Grid item xs={12} sm={6} md={4} key={index}>
-                            <Card elevation={0} sx={styles.featureCard}>
-                                <CardContent>
-                                    <Box sx={{ color: 'primary.main', mb: 2 }}>
-                                        {feature.icon}
-                                    </Box>
-                                    <Typography variant="h5" sx={{ fontWeight: 700, mb: 2 }}>
-                                        {feature.title}
-                                    </Typography>
-                                    <Typography color="text.secondary">
-                                        {feature.description}
-                                    </Typography>
-                                </CardContent>
-                            </Card>
+                            <Box sx={{
+                                height: '100%',
+                                p: 4,
+                                borderRadius: '32px',
+                                border: `1px solid ${colors.border}`,
+                                bgcolor: colors.bgCard,
+                                transition: 'all 0.3s ease',
+                                '&:hover': {
+                                    transform: 'translateY(-10px)',
+                                    bgcolor: colors.bgCardHover,
+                                    borderColor: colors.borderHover,
+                                    boxShadow: `0 20px 40px ${colors.shadow}`
+                                }
+                            }}>
+                                <Box sx={{ color: feature.color, mb: 3, display: 'flex' }}>
+                                    {feature.icon}
+                                </Box>
+                                <Typography variant="h5" sx={{ fontWeight: 900, color: colors.text, mb: 2 }}>
+                                    {feature.title}
+                                </Typography>
+                                <Typography variant="body1" sx={{ color: colors.textSecondary, lineHeight: 1.6, fontWeight: 500 }}>
+                                    {feature.description}
+                                </Typography>
+                            </Box>
                         </Grid>
                     ))}
                 </Grid>

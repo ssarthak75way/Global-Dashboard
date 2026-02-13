@@ -26,7 +26,9 @@ import {
     TableHead,
     TableRow,
     TextField,
-    Alert
+    Alert,
+    Menu,
+    MenuItem
 } from '@mui/material';
 import {
     ExpandMore as ExpandMoreIcon,
@@ -41,7 +43,10 @@ import {
     School as SchoolIcon,
     Api as ApiIcon,
     Lock as LockIcon,
-    KeyboardArrowDown as ChevronIcon
+    KeyboardArrowDown as ChevronIcon,
+    Help as HelpIcon,
+    BugReport as BugReportIcon,
+    Update as UpdateIcon
 } from '@mui/icons-material';
 import {
     architecture,
@@ -51,7 +56,11 @@ import {
     pages,
     apiEndpoints,
     gettingStartedSteps,
-    bestPractices
+    bestPractices,
+    docVersions,
+    faqs,
+    troubleshooting,
+    migrationGuides
 } from '../utils/data.tsx';
 import TerminalDemo from '../components/TerminalDemo';
 import CodeBlock from '../components/CodeBlock';
@@ -76,11 +85,24 @@ const Documentation: React.FC = () => {
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
     const [tabValue, setTabValue] = useState(0);
     const [searchQuery, setSearchQuery] = useState('');
+    const [activeVersion, setActiveVersion] = useState(docVersions[0]);
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
     const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
         setTabValue(newValue);
         setSearchQuery('');
         window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    const handleVersionClick = (event: React.MouseEvent<HTMLElement>) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleVersionClose = (version?: typeof docVersions[0]) => {
+        setAnchorEl(null);
+        if (version) {
+            setActiveVersion(version);
+        }
     };
 
     const filteredApiEndpoints = useMemo(() => {
@@ -262,6 +284,9 @@ const Documentation: React.FC = () => {
             <Tab icon={<DashboardIcon sx={{ fontSize: 20 }} />} label="Pages" iconPosition="start" sx={styles.tab} />
             <Tab icon={<SchoolIcon sx={{ fontSize: 20 }} />} label="Best Practices" iconPosition="start" sx={styles.tab} />
             <Tab icon={<SettingsIcon sx={{ fontSize: 20 }} />} label="Dependencies" iconPosition="start" sx={styles.tab} />
+            <Tab icon={<HelpIcon sx={{ fontSize: 20 }} />} label="FAQ" iconPosition="start" sx={styles.tab} />
+            <Tab icon={<BugReportIcon sx={{ fontSize: 20 }} />} label="Troubleshooting" iconPosition="start" sx={styles.tab} />
+            {!activeVersion.isLatest && <Tab icon={<UpdateIcon sx={{ fontSize: 20 }} />} label="Migration Guide" iconPosition="start" sx={styles.tab} />}
         </Tabs>
     );
 
@@ -282,9 +307,9 @@ const Documentation: React.FC = () => {
                                     Documentation
                                 </Typography>
                                 <Chip
-                                    label="v1.0.0"
+                                    label={activeVersion.version}
                                     size="small"
-                                    onClick={() => { }} 
+                                    onClick={handleVersionClick}
                                     sx={{
                                         fontWeight: 800,
                                         height: 24,
@@ -304,6 +329,45 @@ const Documentation: React.FC = () => {
                                     }}
                                     icon={<ChevronIcon sx={{ fontSize: '1rem !important', color: `${colors.primary} !important` }} />}
                                 />
+                                <Menu
+                                    anchorEl={anchorEl}
+                                    open={Boolean(anchorEl)}
+                                    onClose={() => handleVersionClose()}
+                                    PaperProps={{
+                                        sx: {
+                                            mt: 1,
+                                            borderRadius: 3,
+                                            boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
+                                            border: '1px solid',
+                                            borderColor: 'divider',
+                                            minWidth: 160,
+                                            bgcolor: colors.glass,
+                                            backdropFilter: 'blur(20px)',
+                                        }
+                                    }}
+                                >
+                                    {docVersions.map((v) => (
+                                        <MenuItem
+                                            key={v.version}
+                                            onClick={() => handleVersionClose(v)}
+                                            selected={v.version === activeVersion.version}
+                                            sx={{
+                                                fontSize: '0.85rem',
+                                                fontWeight: 700,
+                                                borderRadius: 1.5,
+                                                mx: 1,
+                                                my: 0.5,
+                                                '&:hover': { bgcolor: `${colors.primary}10` },
+                                                '&.Mui-selected': { bgcolor: `${colors.primary}20`, color: colors.primary }
+                                            }}
+                                        >
+                                            <Stack direction="row" justifyContent="space-between" width="100%" alignItems="center">
+                                                <Typography variant="inherit">{v.label}</Typography>
+                                                <Typography variant="caption" sx={{ opacity: 0.5, fontSize: '0.65rem' }}>{v.date}</Typography>
+                                            </Stack>
+                                        </MenuItem>
+                                    ))}
+                                </Menu>
                             </Box>
                             <Paper sx={styles.navPaper}>
                                 {renderTabs()}
@@ -312,7 +376,7 @@ const Documentation: React.FC = () => {
                             <Box sx={{ mt: 4, px: 2 }}>
                                 <Alert icon={false} severity="info" sx={{ borderRadius: 3, bgcolor: `${colors.primary}10`, border: `1px solid ${colors.primary}20` }}>
                                     <Typography variant="caption" fontWeight={700} color="primary.main">
-                                        V1.0.0 Stable Ready
+                                        {activeVersion.version} {activeVersion.isLatest ? 'Stable Ready' : 'Maintenance Mode'}
                                     </Typography>
                                 </Alert>
                             </Box>
@@ -605,6 +669,194 @@ const Documentation: React.FC = () => {
                                             </Table>
                                         </TableContainer>
                                     </TabPanel>
+
+                                    {/* FAQ */}
+                                    <TabPanel value={tabValue} index={8}>
+                                        <Typography variant="h4" sx={styles.sectionTitle}>
+                                            <HelpIcon color="primary" sx={{ fontSize: 32 }} /> Frequently Asked Questions
+                                        </Typography>
+                                        <Typography variant="body2" color="text.secondary" sx={{ mb: 4 }}>
+                                            Find answers to common questions about DevConnect
+                                        </Typography>
+
+                                        {Object.entries(
+                                            faqs.reduce((acc, faq) => {
+                                                if (!acc[faq.category]) acc[faq.category] = [];
+                                                acc[faq.category].push(faq);
+                                                return acc;
+                                            }, {} as Record<string, typeof faqs>)
+                                        ).map(([category, categoryFaqs]) => (
+                                            <Box key={category} sx={{ mb: 4 }}>
+                                                <Typography variant="h6" sx={{ mb: 2, fontWeight: 800, color: 'primary.main' }}>
+                                                    {category}
+                                                </Typography>
+                                                <Stack spacing={2}>
+                                                    {categoryFaqs.map((faq, idx) => (
+                                                        <Paper
+                                                            key={idx}
+                                                            sx={{
+                                                                p: 3,
+                                                                borderRadius: 3,
+                                                                border: '1px solid',
+                                                                borderColor: 'divider',
+                                                                bgcolor: colors.glass,
+                                                                backdropFilter: 'blur(10px)',
+                                                                transition: 'all 0.2s',
+                                                                '&:hover': {
+                                                                    borderColor: 'primary.main',
+                                                                    transform: 'translateY(-2px)',
+                                                                    boxShadow: `0 8px 24px ${colors.primary}20`
+                                                                }
+                                                            }}
+                                                        >
+                                                            <Typography variant="subtitle1" sx={{ fontWeight: 800, mb: 1, color: 'primary.main' }}>
+                                                                Q: {faq.question}
+                                                            </Typography>
+                                                            <Typography variant="body2" color="text.secondary">
+                                                                {faq.answer}
+                                                            </Typography>
+                                                        </Paper>
+                                                    ))}
+                                                </Stack>
+                                            </Box>
+                                        ))}
+                                    </TabPanel>
+
+                                    {/* Troubleshooting */}
+                                    <TabPanel value={tabValue} index={9}>
+                                        <Typography variant="h4" sx={styles.sectionTitle}>
+                                            <BugReportIcon color="primary" sx={{ fontSize: 32 }} /> Troubleshooting Guide
+                                        </Typography>
+                                        <Typography variant="body2" color="text.secondary" sx={{ mb: 4 }}>
+                                            Solutions to common issues and problems
+                                        </Typography>
+
+                                        {Object.entries(
+                                            troubleshooting.reduce((acc, item) => {
+                                                if (!acc[item.category]) acc[item.category] = [];
+                                                acc[item.category].push(item);
+                                                return acc;
+                                            }, {} as Record<string, typeof troubleshooting>)
+                                        ).map(([category, categoryItems]) => (
+                                            <Box key={category} sx={{ mb: 4 }}>
+                                                <Typography variant="h6" sx={{ mb: 2, fontWeight: 800, color: 'primary.main' }}>
+                                                    {category}
+                                                </Typography>
+                                                <Stack spacing={3}>
+                                                    {categoryItems.map((item, idx) => (
+                                                        <Paper
+                                                            key={idx}
+                                                            sx={{
+                                                                p: 3,
+                                                                borderRadius: 3,
+                                                                border: '1px solid',
+                                                                borderColor: 'divider',
+                                                                bgcolor: colors.glass,
+                                                                backdropFilter: 'blur(10px)'
+                                                            }}
+                                                        >
+                                                            <Typography variant="h6" sx={{ fontWeight: 800, mb: 2, color: 'error.main' }}>
+                                                                ⚠️ {item.issue}
+                                                            </Typography>
+
+                                                            <Box sx={{ mb: 2 }}>
+                                                                <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1 }}>
+                                                                    Symptoms:
+                                                                </Typography>
+                                                                <Stack component="ul" spacing={0.5} sx={{ pl: 2, m: 0 }}>
+                                                                    {item.symptoms.map((symptom, i) => (
+                                                                        <Typography key={i} component="li" variant="body2" color="text.secondary">
+                                                                            {symptom}
+                                                                        </Typography>
+                                                                    ))}
+                                                                </Stack>
+                                                            </Box>
+
+                                                            <Box>
+                                                                <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1, color: 'success.main' }}>
+                                                                    Solutions:
+                                                                </Typography>
+                                                                <Stack component="ol" spacing={1} sx={{ pl: 2, m: 0 }}>
+                                                                    {item.solutions.map((solution, i) => (
+                                                                        <Typography key={i} component="li" variant="body2" color="text.secondary">
+                                                                            {solution}
+                                                                        </Typography>
+                                                                    ))}
+                                                                </Stack>
+                                                            </Box>
+                                                        </Paper>
+                                                    ))}
+                                                </Stack>
+                                            </Box>
+                                        ))}
+                                    </TabPanel>
+
+                                    {/* Migration Guide */}
+                                    {!activeVersion.isLatest && (
+                                        <TabPanel value={tabValue} index={10}>
+                                            <Typography variant="h4" sx={styles.sectionTitle}>
+                                                <UpdateIcon color="primary" sx={{ fontSize: 32 }} /> Migration Guide
+                                            </Typography>
+                                            <Typography variant="body2" color="text.secondary" sx={{ mb: 4 }}>
+                                                Upgrade from {activeVersion.version} to the latest version
+                                            </Typography>
+
+                                            {migrationGuides
+                                                .filter(guide => guide.fromVersion === activeVersion.version)
+                                                .map((guide, idx) => (
+                                                    <Box key={idx}>
+                                                        <Alert severity="info" sx={{ mb: 3, borderRadius: 3 }}>
+                                                            <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+                                                                Migrating from {guide.fromVersion} to {guide.toVersion}
+                                                            </Typography>
+                                                        </Alert>
+
+                                                        {guide.breaking.length > 0 && (
+                                                            <Paper sx={{ p: 3, mb: 3, borderRadius: 3, border: '2px solid', borderColor: 'error.main', bgcolor: 'error.lighter' }}>
+                                                                <Typography variant="h6" sx={{ fontWeight: 800, mb: 2, color: 'error.main' }}>
+                                                                    ⚠️ Breaking Changes
+                                                                </Typography>
+                                                                <Stack component="ul" spacing={1} sx={{ pl: 2, m: 0 }}>
+                                                                    {guide.breaking.map((change, i) => (
+                                                                        <Typography key={i} component="li" variant="body2" sx={{ fontWeight: 600 }}>
+                                                                            {change}
+                                                                        </Typography>
+                                                                    ))}
+                                                                </Stack>
+                                                            </Paper>
+                                                        )}
+
+                                                        <Paper sx={{ p: 3, mb: 3, borderRadius: 3, border: '1px solid', borderColor: 'divider', bgcolor: colors.glass }}>
+                                                            <Typography variant="h6" sx={{ fontWeight: 800, mb: 2, color: 'primary.main' }}>
+                                                                📋 Migration Steps
+                                                            </Typography>
+                                                            <Stack component="ol" spacing={2} sx={{ pl: 2, m: 0 }}>
+                                                                {guide.steps.map((step, i) => (
+                                                                    <Typography key={i} component="li" variant="body2" color="text.secondary">
+                                                                        {step}
+                                                                    </Typography>
+                                                                ))}
+                                                            </Stack>
+                                                        </Paper>
+
+                                                        {guide.notes.length > 0 && (
+                                                            <Paper sx={{ p: 3, borderRadius: 3, border: '1px solid', borderColor: 'info.main', bgcolor: 'info.lighter' }}>
+                                                                <Typography variant="h6" sx={{ fontWeight: 800, mb: 2, color: 'info.main' }}>
+                                                                    💡 Important Notes
+                                                                </Typography>
+                                                                <Stack component="ul" spacing={1} sx={{ pl: 2, m: 0 }}>
+                                                                    {guide.notes.map((note, i) => (
+                                                                        <Typography key={i} component="li" variant="body2" color="text.secondary">
+                                                                            {note}
+                                                                        </Typography>
+                                                                    ))}
+                                                                </Stack>
+                                                            </Paper>
+                                                        )}
+                                                    </Box>
+                                                ))}
+                                        </TabPanel>
+                                    )}
                                 </Paper>
                             </Fade>
                         </Box>

@@ -12,8 +12,8 @@ export const getMessages = async (conversationId: string) => {
     return response.data;
 };
 
-export const sendMessage = async (receiverId: string, content: string) => {
-    const response = await api.post(`${API_URL}/send`, { receiverId, content });
+export const sendMessage = async (receiverId: string, content: string, postId?: string) => {
+    const response = await api.post(`${API_URL}/send`, { receiverId, content, postId });
     return response.data;
 };
 

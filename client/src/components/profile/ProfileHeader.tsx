@@ -4,20 +4,25 @@ import { Email as EmailIcon } from '@mui/icons-material';
 import { useAuth, User } from '../../context/AuthContext';
 import FollowButton from '../FollowButton';
 import { GoVerified } from "react-icons/go";
-import { AiOutlineEdit } from "react-icons/ai";
+import { AiOutlineEdit, AiFillStar } from "react-icons/ai";
 
 import { useNavigate } from 'react-router-dom';
+import { ContactPage as ContactPageIcon } from '@mui/icons-material';
+import DevCardModal from './DevCardModal';
+import { useState } from 'react';
 
 interface ProfileHeaderProps {
     displayUser: User | null;
     isOwnProfile: boolean;
     onEditClick: () => void;
     styles: any;
+    totalRating?: number;
 }
 
-const ProfileHeader: React.FC<ProfileHeaderProps> = ({ displayUser, isOwnProfile, onEditClick, styles }) => {
+const ProfileHeader: React.FC<ProfileHeaderProps> = ({ displayUser, isOwnProfile, onEditClick, styles, totalRating = 0 }) => {
     const { user: currentUser } = useAuth();
     const navigate = useNavigate();
+    const [devCardOpen, setDevCardOpen] = useState(false);
     const isFollowing = currentUser?.following?.includes(displayUser?._id || '') || false;
 
     const handleMessageClick = () => {
@@ -84,6 +89,29 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ displayUser, isOwnProfile
                         {displayUser?.isVerified && (
                             <GoVerified size={32} />
                         )}
+                        <Box sx={{ display: 'flex', alignItems: 'center', ml: { sm: 2 }, mt: { xs: 1, sm: 0 } }}>
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    bgcolor: (theme) => theme.palette.mode === 'light' ? 'primary.50' : 'rgba(99, 102, 241, 0.1)',
+                                    px: 2,
+                                    py: 0.5,
+                                    borderRadius: 2,
+                                    border: '1px solid',
+                                    borderColor: 'primary.main',
+                                    boxShadow: (theme) => `0 4px 12px ${theme.palette.primary.main}20`
+                                }}
+                            >
+                                <AiFillStar style={{ color: '#FFD700', fontSize: '1.2rem', marginRight: '6px' }} />
+                                <Typography variant="h6" sx={{ fontWeight: 900, color: 'primary.main' }}>
+                                    {totalRating}
+                                </Typography>
+                                <Typography variant="caption" sx={{ ml: 0.5, fontWeight: 700, opacity: 0.7, textTransform: 'uppercase', fontSize: '0.65rem' }}>
+                                    Total Rating
+                                </Typography>
+                            </Box>
+                        </Box>
                     </Stack>
 
                     {displayUser?.bio && (
@@ -118,8 +146,33 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ displayUser, isOwnProfile
                                 </Button>
                             </>
                         }
+                        {isOwnProfile && (
+                            <Button
+                                variant="outlined"
+                                startIcon={<ContactPageIcon />}
+                                onClick={() => setDevCardOpen(true)}
+                                sx={{
+                                    fontWeight: 700,
+                                    borderRadius: 1.5,
+                                    border: '2px solid',
+                                    '&:hover': {
+                                        border: '2px solid',
+                                        bgcolor: 'primary.50'
+                                    }
+                                }}
+                            >
+                                Get Dev Card
+                            </Button>
+                        )}
                     </Stack>
                 </Box>
+
+                <DevCardModal
+                    open={devCardOpen}
+                    onClose={() => setDevCardOpen(false)}
+                    user={displayUser}
+                    totalRating={totalRating}
+                />
                 <Box>
                     {isOwnProfile &&
                         <Tooltip title="Edit Profile" onClick={onEditClick} style={styles.editbutton} >

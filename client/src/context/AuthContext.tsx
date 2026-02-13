@@ -53,6 +53,7 @@ export interface User {
     blockedUsers: string[];
     createdAt?: string;
     status?: string;
+    totalRating?: number;
 }
 
 interface AuthContextType {

@@ -11,26 +11,32 @@ import {
     ListItem,
     ListItemButton,
     ListItemText,
-    useTheme,
+    useTheme as useMuiTheme,
     useMediaQuery,
     Container,
     Avatar,
     Tooltip
 } from '@mui/material';
 
-import { MenuBook as DocumentationIcon } from "@mui/icons-material";
+import {
+    MenuBook as DocumentationIcon,
+    LightMode as LightModeIcon,
+    DarkMode as DarkModeIcon
+} from "@mui/icons-material";
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import UserMenu from './UserMenu';
 
 const PublicNavbar: React.FC = () => {
     const { isAuthenticated, user } = useAuth();
+    const { theme: themeMode, toggleTheme } = useTheme();
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [mobileOpen, setMobileOpen] = useState(false);
-    const theme = useTheme();
+    const theme = useMuiTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
     const navigate = useNavigate();
     const location = useLocation();
@@ -146,6 +152,17 @@ const PublicNavbar: React.FC = () => {
                 </IconButton>
             </Box>
             <List>
+                <ListItem disablePadding>
+                    <ListItemButton onClick={() => { toggleTheme(); setMobileOpen(false); }}>
+                        <ListItemText
+                            primary={`Switch to ${themeMode === 'light' ? 'Dark' : 'Light'} Mode`}
+                            primaryTypographyProps={{ fontWeight: 600 }}
+                        />
+                        <IconButton size="small" sx={{ ml: 1 }}>
+                            {themeMode === 'light' ? <DarkModeIcon /> : <LightModeIcon />}
+                        </IconButton>
+                    </ListItemButton>
+                </ListItem>
 
                 {isAuthenticated ? (
                     <ListItem disablePadding>
@@ -203,6 +220,20 @@ const PublicNavbar: React.FC = () => {
                         </Box>
 
                         <Box sx={{ flexGrow: 1 }} />
+
+                        <Tooltip title={`Switch to ${themeMode === 'light' ? 'Dark' : 'Light'} Mode`}>
+                            <IconButton
+                                onClick={toggleTheme}
+                                color="inherit"
+                                sx={{
+                                    bgcolor: 'action.hover',
+                                    '&:hover': { bgcolor: 'primary.main', color: 'white' },
+                                    mr: 1
+                                }}
+                            >
+                                {themeMode === 'light' ? <DarkModeIcon /> : <LightModeIcon />}
+                            </IconButton>
+                        </Tooltip>
 
                         {isMobile ? (
                             <IconButton

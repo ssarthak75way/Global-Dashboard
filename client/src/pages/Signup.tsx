@@ -5,6 +5,7 @@ import { useNavigate, Link } from "react-router-dom";
 import api from "../api/axios";
 import axios from "axios";
 import { useState, useMemo } from "react";
+import { useToast } from "../context/ToastContext";
 import {
     Box,
     Typography,
@@ -13,7 +14,6 @@ import {
     Paper,
     Link as MuiLink,
     Divider,
-    Alert,
     Stack,
     Fade,
     Grow,
@@ -64,7 +64,7 @@ const Signup = () => {
     });
 
     const navigate = useNavigate();
-    const [serverError, setServerError] = useState<string | null>(null);
+    const { showToast } = useToast();
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
 
@@ -106,16 +106,18 @@ const Signup = () => {
 
     const onSubmit = async (data: SignupFormInputs) => {
         setLoading(true);
-        setServerError(null);
         try {
             await api.post("/auth/signup", data);
+            showToast("Account created successfully! Please verify your email.", "success");
             navigate("/verify-otp", { state: { email: data.email } });
         } catch (error: unknown) {
+            let errorMsg = "Signup failed";
             if (axios.isAxiosError(error)) {
-                setServerError(error.response?.data?.message || "Signup failed");
+                errorMsg = error.response?.data?.message || "Signup failed";
             } else if (error instanceof Error) {
-                setServerError(error.message);
+                errorMsg = error.message;
             }
+            showToast(errorMsg, "error");
         } finally {
             setLoading(false);
         }
@@ -328,13 +330,6 @@ const Signup = () => {
                     </Box>
                 </Grow>
 
-                {serverError && (
-                    <Grow in>
-                        <Alert severity="error" variant="filled" sx={styles.alert}>
-                            {serverError}
-                        </Alert>
-                    </Grow>
-                )}
 
                 <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
                     <Stack spacing={3}>

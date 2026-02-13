@@ -4,6 +4,7 @@ import { getTheme } from "./theme";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { ThemeProvider, useTheme } from "./context/ThemeContext";
+import { ToastProvider } from "./context/ToastContext";
 import PublicLayout from "./layouts/PublicLayout";
 import PrivateLayout from "./layouts/PrivateLayout";
 import { ErrorBoundary, FallbackProps } from "react-error-boundary";
@@ -19,9 +20,13 @@ const Feed = lazy(() => import("./pages/Feed"));
 const Resume = lazy(() => import("./pages/Resume"));
 const Messages = lazy(() => import("./pages/Messages"));
 const Documentation = lazy(() => import("./pages/Documentation"));
+const Settings = lazy(() => import("./pages/Settings"));
+const LikedPosts = lazy(() => import("./pages/LikedPosts"));
+const CommentedPosts = lazy(() => import("./pages/CommentedPosts"));
 import { SocketProvider } from "./context/SocketContext";
 const PublicDocumentation = lazy(() => import("./pages/PublicDocumentation"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+import ScrollToTop from "./components/ScrollToTop";
 
 const LoadingFallback = () => (
   <Box
@@ -174,6 +179,30 @@ const router = createBrowserRouter([
             <Documentation />
           </Suspense>
         )
+      },
+      {
+        path: "/settings",
+        element: (
+          <Suspense fallback={<LoadingFallback />}>
+            <Settings />
+          </Suspense>
+        )
+      },
+      {
+        path: "/settings/likes",
+        element: (
+          <Suspense fallback={<LoadingFallback />}>
+            <LikedPosts />
+          </Suspense>
+        )
+      },
+      {
+        path: "/settings/comments",
+        element: (
+          <Suspense fallback={<LoadingFallback />}>
+            <CommentedPosts />
+          </Suspense>
+        )
       }
     ]
   },
@@ -198,6 +227,7 @@ const AppContent = () => {
     <MuiThemeProvider theme={muiTheme}>
       <CssBaseline />
       <RouterProvider router={router} />
+      <ScrollToTop />
     </MuiThemeProvider>
   );
 };
@@ -207,9 +237,11 @@ function App() {
     <ErrorBoundary FallbackComponent={ErrorFallback}>
       <ThemeProvider>
         <AuthProvider>
-          <SocketProvider>
-            <AppContent />
-          </SocketProvider>
+          <ToastProvider>
+            <SocketProvider>
+              <AppContent />
+            </SocketProvider>
+          </ToastProvider>
         </AuthProvider>
       </ThemeProvider>
     </ErrorBoundary>

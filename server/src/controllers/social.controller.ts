@@ -224,8 +224,8 @@ export const getNetwork = async (req: Request, res: Response): Promise<void> => 
     try {
         const userId = req.params.id;
         const user = await User.findById(userId)
-            .populate("followers", "name email isVerified socialHandles")
-            .populate("following", "name email isVerified socialHandles");
+            .populate("followers", "name email avatar isVerified socialHandles")
+            .populate("following", "name email avatar isVerified socialHandles");
 
         if (!user) {
             res.status(404).json({ message: "User not found" });

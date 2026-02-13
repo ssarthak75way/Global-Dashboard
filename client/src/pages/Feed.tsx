@@ -13,13 +13,14 @@ import FeedHeader from "../components/feed/FeedHeader";
 import CreatePost from "../components/feed/CreatePost";
 import PostItem from "../components/feed/PostItem";
 import CommentModal from "../components/feed/CommentModal";
+import { deleteComment as deleteCommentService } from "../services/socialService";
 
 interface Comment {
     _id: string;
     user: {
         _id: string;
         name: string;
-        avatar:string;
+        avatar: string;
     };
     text: string;
     createdAt: string;
@@ -32,12 +33,13 @@ interface Post {
     author: {
         _id: string;
         name: string;
-        avatar:string;
+        avatar: string;
         email: string;
     };
     imageUrl?: string;
     likes: string[];
     comments: Comment[];
+    ratings: { user: string; score: number }[];
     createdAt: string;
 }
 
@@ -178,9 +180,28 @@ const Feed = () => {
         setExpandedComments(prev => ({ ...prev, [postId]: !prev[postId] }));
     };
 
+    const handleDeleteComment = async (postId: string, commentId: string) => {
+        if (!window.confirm("Are you sure you want to delete this comment?")) return;
+        try {
+            const { data } = await deleteCommentService(postId, commentId);
+            setPosts(posts.map(p => p._id === postId ? data : p));
+        } catch (error) {
+            console.error("Failed to delete comment", error);
+        }
+    };
+
+    const handleRate = async (postId: string, score: number) => {
+        try {
+            const { data } = await api.post(`/posts/${postId}/rate`, { score });
+            setPosts(posts.map(p => p._id === postId ? data : p));
+        } catch (error) {
+            console.error("Failed to rate post", error);
+        }
+    };
+
     const styles = {
         loadingContainer: { display: "flex", justifyContent: "center", mt: 8 },
-        mainContainer: { maxWidth: 800, mx: "auto", px: { xs: 2, sm: 3 }, pb: 8, minHeight:"100vh" }
+        mainContainer: { maxWidth: 800, mx: "auto", px: { xs: 2, sm: 3 }, pb: 8, minHeight: "100vh" }
     };
 
     if (loading) return (
@@ -225,6 +246,8 @@ const Feed = () => {
                             toggleComments={toggleComments}
                             isCommentsExpanded={!!expandedComments[post._id]}
                             openCommentModal={openCommentModal}
+                            handleDeleteComment={handleDeleteComment}
+                            handleRate={handleRate}
                         />
                     ))}
                 </Stack>

@@ -8,48 +8,60 @@ export default defineConfig({
       output: {
         manualChunks(id) {
           if (id.includes('node_modules')) {
-            // Specific core packages to avoid circular dependencies and over-bundling
-            if (id.includes('/node_modules/react/') ||
+            // Core React & Routing
+            if (
+              id.includes('/node_modules/react/') ||
               id.includes('/node_modules/react-dom/') ||
-              id.includes('/node_modules/react-router-dom/')) {
+              id.includes('/node_modules/react-router/') ||
+              id.includes('/node_modules/react-router-dom/') ||
+              id.includes('/node_modules/scheduler/')
+            ) {
               return 'vendor-react-core';
             }
-            if (id.includes('/node_modules/@mui/material/')) {
-              // Further split MUI if it's still large
-              if (id.includes('/node_modules/@mui/material/styles/') ||
-                id.includes('/node_modules/@mui/material/transitions/') ||
-                id.includes('/node_modules/@mui/material/colors/')) {
-                return 'vendor-mui-core-internal';
-              }
-              if (id.includes('/node_modules/@mui/material/Box/') ||
-                id.includes('/node_modules/@mui/material/Stack/') ||
-                id.includes('/node_modules/@mui/material/Typography/')) {
-                return 'vendor-mui-layout-components';
-              }
+
+            // MUI - Merged to avoid circular dependencies and simplify
+            if (
+              id.includes('/node_modules/@mui/material/') ||
+              id.includes('/node_modules/@mui/system/') ||
+              id.includes('/node_modules/@mui/styled-engine/') ||
+              id.includes('/node_modules/@mui/utils/') ||
+              id.includes('/node_modules/@mui/base/') ||
+              id.includes('/node_modules/@emotion/styled/') ||
+              id.includes('/node_modules/@emotion/react/')
+            ) {
               return 'vendor-mui-material';
             }
-            if (id.includes('/node_modules/@mui/system/') || id.includes('/node_modules/@mui/styled-engine/')) {
-              return 'vendor-mui-system';
-            }
+
             if (id.includes('/node_modules/@mui/icons-material/')) {
               return 'vendor-mui-icons';
             }
-            if (id.includes('/node_modules/@mui/')) {
-              return 'vendor-mui-other';
+
+            // Socket.io
+            if (
+              id.includes('/node_modules/socket.io-client/') ||
+              id.includes('/node_modules/socket.io-parser/') ||
+              id.includes('/node_modules/engine.io-client/')
+            ) {
+              return 'vendor-socket';
             }
 
-            // Large PDF Generation Dependencies
+            // PDF Generation
             if (id.includes('/node_modules/jspdf/')) {
               return 'vendor-jspdf';
             }
             if (id.includes('/node_modules/html2canvas/')) {
               return 'vendor-html2canvas';
             }
-            if (id.includes('/node_modules/html2pdf.js/')) {
-              return 'vendor-html2pdf-wrapper';
+            if (
+              id.includes('/node_modules/html2pdf.js/') ||
+              id.includes('/node_modules/html-to-image/') ||
+              id.includes('/node_modules/canvg/') ||
+              id.includes('/node_modules/dompurify/')
+            ) {
+              return 'vendor-pdf-tools';
             }
 
-            // Heavy Dependencies
+            // Large UI Components
             if (id.includes('/node_modules/react-quill-new/')) {
               return 'vendor-quill';
             }
@@ -59,28 +71,30 @@ export default defineConfig({
             if (id.includes('/node_modules/@dnd-kit/')) {
               return 'vendor-dnd';
             }
-            if (id.includes('/node_modules/@emotion/')) {
-              return 'vendor-emotion';
-            }
-            if (id.includes('/node_modules/react-hook-form/') || id.includes('/node_modules/@hookform/')) {
+
+            // Form & Validation
+            if (id.includes('/node_modules/react-hook-form/') || id.includes('/node_modules/@hookform/resolvers/')) {
               return 'vendor-hook-form';
             }
-            // Catch other UI extras and group them
-            if (id.includes('/node_modules/react-select/') ||
-              id.includes('/node_modules/react-icons/') ||
-              id.includes('/node_modules/react-calendar-heatmap/') ||
-              id.includes('/node_modules/react-error-boundary/')) {
-              return 'vendor-ui-extra';
+            if (id.includes('/node_modules/zod/')) {
+              return 'vendor-zod';
             }
 
             // Utilities
-            if (id.includes('/node_modules/zod/') ||
-              id.includes('/node_modules/date-fns/') ||
-              id.includes('/node_modules/axios/')) {
+            if (id.includes('/node_modules/axios/') || id.includes('/node_modules/date-fns/')) {
               return 'vendor-utils';
             }
 
-            // Everything else in node_modules
+            // Other extras
+            if (
+              id.includes('/node_modules/react-select/') ||
+              id.includes('/node_modules/react-icons/') ||
+              id.includes('/node_modules/react-calendar-heatmap/') ||
+              id.includes('/node_modules/react-error-boundary/')
+            ) {
+              return 'vendor-ui-extra';
+            }
+
             return 'vendor-common';
           }
         }

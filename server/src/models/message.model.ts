@@ -4,6 +4,7 @@ export interface IMessage extends Document {
     conversationId: mongoose.Types.ObjectId;
     senderId: mongoose.Types.ObjectId;
     content: string;
+    postId?: mongoose.Types.ObjectId;
     readBy: mongoose.Types.ObjectId[];
     isDeletedForEveryone: boolean;
     deletedForUsers: mongoose.Types.ObjectId[];
@@ -25,6 +26,10 @@ const MessageSchema: Schema = new Schema({
         type: String,
         required: true,
         trim: true
+    },
+    postId: {
+        type: Schema.Types.ObjectId,
+        ref: 'Post'
     },
     readBy: [{
         type: Schema.Types.ObjectId,

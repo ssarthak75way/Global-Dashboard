@@ -202,3 +202,126 @@ export const deletePost = async (req: Request, res: Response): Promise<void> => 
         }
     }
 };
+// Get Liked Posts
+export const getLikedPosts = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const userId = req.user?._id;
+        const posts = await Post.find({ likes: userId })
+            .populate("author", "email avatar name")
+            .populate("comments.user", "name avatar")
+            .sort({ createdAt: -1 });
+        res.status(200).json(posts);
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            res.status(500).json({ message: error.message });
+        } else {
+            res.status(500).json({ message: "An unknown error occurred" });
+        }
+    }
+};
+
+// Get Commented Posts
+export const getCommentedPosts = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const userId = req.user?._id;
+        const posts = await Post.find({ "comments.user": userId })
+            .populate("author", "email avatar name")
+            .populate("comments.user", "name avatar")
+            .sort({ createdAt: -1 });
+        res.status(200).json(posts);
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            res.status(500).json({ message: error.message });
+        } else {
+            res.status(500).json({ message: "An unknown error occurred" });
+        }
+    }
+};
+// Delete Comment
+export const deleteComment = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { id, commentId } = req.params;
+        const userId = req.user?._id;
+
+        const post = await Post.findById(id);
+        if (!post) {
+            res.status(404).json({ message: "Post not found" });
+            return;
+        }
+
+        if (!userId) {
+            res.status(401).json({ message: "User not authenticated" });
+            return;
+        }
+
+        const comment = post.comments.find(c => (c as any)._id.toString() === commentId);
+        if (!comment) {
+            res.status(404).json({ message: "Comment not found" });
+            return;
+        }
+
+        if (comment.user.toString() !== userId.toString()) {
+            res.status(403).json({ message: "Unauthorized to delete this comment" });
+            return;
+        }
+
+        post.comments = post.comments.filter(c => (c as any)._id.toString() !== commentId);
+
+        await post.save();
+        await post.populate("author", "email name");
+        await post.populate("comments.user", "name avatar");
+
+        res.status(200).json(post);
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            res.status(500).json({ message: error.message });
+        } else {
+            res.status(500).json({ message: "An unknown error occurred" });
+        }
+    }
+};
+
+// Rate Post
+export const ratePost = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { id } = req.params;
+        const { score } = req.body;
+        const userId = req.user?._id;
+
+        if (!userId) {
+            res.status(401).json({ message: "User not authenticated" });
+            return;
+        }
+
+        if (typeof score !== 'number' || score < 1 || score > 5) {
+            res.status(400).json({ message: "Invalid rating score. Must be between 1 and 5." });
+            return;
+        }
+
+        const post = await Post.findById(id);
+        if (!post) {
+            res.status(404).json({ message: "Post not found" });
+            return;
+        }
+
+        const existingRatingIndex = post.ratings.findIndex(r => r.user.toString() === userId.toString());
+
+        if (existingRatingIndex !== -1) {
+            post.ratings[existingRatingIndex].score = score;
+        } else {
+            post.ratings.push({ user: userId, score });
+        }
+
+        await post.save();
+        await post.populate("author", "email name avatar");
+        await post.populate("comments.user", "name avatar");
+
+        res.status(200).json(post);
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            res.status(500).json({ message: error.message });
+        } else {
+            res.status(500).json({ message: "An unknown error occurred" });
+        }
+    }
+};
