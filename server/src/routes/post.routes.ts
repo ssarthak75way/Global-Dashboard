@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createPost, getPosts, likePost, addComment, uploadImage, updatePost, deletePost } from "../controllers/post.controller";
+import { createPost, getPosts, likePost, ratePost, addComment, deleteComment, uploadImage, updatePost, deletePost, getLikedPosts, getCommentedPosts } from "../controllers/post.controller";
 import { protect } from "../middleware/auth.middleware";
 import { validate } from "../middleware/validate.middleware";
 import { createPostSchema } from "../validations/schema";
@@ -14,7 +14,11 @@ router.post("/", protect, validate(createPostSchema), createPost);
 router.post("/upload", protect, upload.single("image"), uploadImage);
 router.put("/:id", protect, updatePost);
 router.delete("/:id", protect, deletePost);
+router.get("/liked", protect, getLikedPosts);
+router.get("/commented", protect, getCommentedPosts);
 router.post("/:id/like", protect, likePost);
 router.post("/:id/comment", protect, addComment);
+router.delete("/:id/comment/:commentId", protect, deleteComment);
+router.post("/:id/rate", protect, ratePost);
 
 export default router;

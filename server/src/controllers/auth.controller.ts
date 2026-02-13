@@ -473,9 +473,10 @@ async function getGoogleUser({ id_token, access_token }: { id_token: string; acc
 }
 
 const calculateUserActivity = async (userId: string) => {
-    const posts = await Post.find({ author: userId }).select('createdAt comments').lean();
+    const posts = await Post.find({ author: userId }).select('createdAt ratings').lean();
 
     const activityMap = new Map<string, { posts: number; comments: number }>();
+    let totalScoreSum = 0;
 
     posts.forEach(post => {
         const date = new Date(post.createdAt);
@@ -484,6 +485,12 @@ const calculateUserActivity = async (userId: string) => {
         const existing = activityMap.get(dateStr) || { posts: 0, comments: 0 };
         existing.posts += 1;
         activityMap.set(dateStr, existing);
+
+        // Calculate average score for the post
+        if (post.ratings && post.ratings.length > 0) {
+            const avgScore = post.ratings.reduce((acc, r: any) => acc + r.score, 0) / post.ratings.length;
+            totalScoreSum += avgScore;
+        }
     });
 
     const allPosts = await Post.find({ 'comments.user': userId }).select('comments').lean();
@@ -501,6 +508,7 @@ const calculateUserActivity = async (userId: string) => {
     });
 
     const totalLikes = await Post.countDocuments({ likes: userId });
+    const totalRating = Math.round(totalScoreSum * 10);
 
     const activity = Array.from(activityMap.entries()).map(([date, details]) => ({
         date,
@@ -554,6 +562,7 @@ const calculateUserActivity = async (userId: string) => {
         stats: {
             totalPosts,
             totalLikes,
+            totalRating,
             currentStreak,
             longestStreak,
             activeDays

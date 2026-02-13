@@ -41,8 +41,8 @@ const CTASection: React.FC = () => {
                         onClick={() => navigate('/dashboard')}
                         sx={{
                             ...styles.ctaButton,
-                            bgcolor: 'white',
-                            color: 'primary.main',
+                            bgcolor: 'white !important',
+                            color: '#000',
                             '&:hover': {
                                 bgcolor: 'grey.100'
                             }
@@ -57,8 +57,8 @@ const CTASection: React.FC = () => {
                         onClick={() => navigate('/signup')}
                         sx={{
                             ...styles.ctaButton,
-                            bgcolor: 'white',
-                            color: 'primary.main',
+                            bgcolor: 'white !important',
+                            color: '#000',
                             '&:hover': {
                                 bgcolor: 'grey.100'
                             }

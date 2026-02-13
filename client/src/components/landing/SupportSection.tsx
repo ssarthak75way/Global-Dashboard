@@ -5,13 +5,17 @@ import {
     Phone as PhoneIcon,
     Code as CodeIcon
 } from '@mui/icons-material';
+import { getLandingColors } from '../../utils/landingTheme';
 
 const SupportSection: React.FC = () => {
     const theme = useTheme();
+    const colors = getLandingColors(theme);
 
     const styles = {
         section: {
-            py: { xs: 8, md: 12 }
+            py: { xs: 8, md: 15 },
+            bgcolor: colors.bgAlt,
+            color: colors.text
         },
         sectionTitle: {
             fontWeight: 900,
@@ -21,7 +25,7 @@ const SupportSection: React.FC = () => {
         },
         sectionSubtitle: {
             fontSize: '1.1rem',
-            color: 'text.secondary',
+            color: colors.textSecondary,
             textAlign: 'center',
             mb: 6,
             maxWidth: 700,
@@ -30,14 +34,15 @@ const SupportSection: React.FC = () => {
         featureCard: {
             height: '100%',
             p: 4,
-            borderRadius: 3,
+            borderRadius: '32px',
+            bgcolor: colors.bgCard,
             transition: 'all 0.3s ease',
-            border: '1px solid',
-            borderColor: 'divider',
+            border: `1px solid ${colors.border}`,
             '&:hover': {
                 transform: 'translateY(-8px)',
-                boxShadow: `0 12px 40px ${theme.palette.primary.main}20`,
-                borderColor: 'primary.main'
+                boxShadow: `0 12px 40px ${theme.palette.primary.main}15`,
+                borderColor: 'primary.main',
+                bgcolor: colors.bgCardHover
             }
         }
     };
@@ -59,7 +64,7 @@ const SupportSection: React.FC = () => {
                                 <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
                                     Email Support
                                 </Typography>
-                                <Typography color="text.secondary" sx={{ mb: 2 }}>
+                                <Typography sx={{ color: '#94a3b8', mb: 2 }}>
                                     Get help via email
                                 </Typography>
                                 <Link href="mailto:support@devconnect.com" underline="hover">
@@ -75,7 +80,7 @@ const SupportSection: React.FC = () => {
                                 <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
                                     Community Forum
                                 </Typography>
-                                <Typography color="text.secondary" sx={{ mb: 2 }}>
+                                <Typography sx={{ color: '#94a3b8', mb: 2 }}>
                                     Join discussions
                                 </Typography>
                                 <Link href="#" underline="hover">
@@ -91,7 +96,7 @@ const SupportSection: React.FC = () => {
                                 <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
                                     Documentation
                                 </Typography>
-                                <Typography color="text.secondary" sx={{ mb: 2 }}>
+                                <Typography sx={{ color: '#94a3b8', mb: 2 }}>
                                     Guides and tutorials
                                 </Typography>
                                 <Link href="#" underline="hover">

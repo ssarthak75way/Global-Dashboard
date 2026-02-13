@@ -21,6 +21,18 @@ export interface PageRoute {
     icon: React.ReactNode;
 }
 
+export interface DocVersion {
+    version: string;
+    label: string;
+    isLatest?: boolean;
+    date: string;
+}
+
+export const docVersions: DocVersion[] = [
+    { version: 'v1.1.0', label: 'v1.1.0 (Latest)', isLatest: true, date: 'Feb 2026' },
+    { version: 'v1.0.0', label: 'v1.0.0 (Previous)', isLatest: false, date: 'Jan 2026' }
+];
+
 export const dependencies: Dependency[] = [
     { name: '@mui/material', version: '^5.15.0', description: 'Material-UI component library' }, // Adjusted to stable v5 or v6 beta
     { name: 'react', version: '^18.2.0', description: 'React library' },
@@ -138,7 +150,7 @@ export const components = {
         { name: 'ActivityHeatmap', description: 'GitHub-style activity heatmap' },
         { name: 'TokenCountdown', description: 'Session token countdown timer' },
         { name: 'Loader', description: 'Loading spinner component' },
-        { name: 'ConfirmDialog', description: 'Confirmation dialog component' },
+        { name: 'CustomAlert', description: 'Premium confirmation dialog component' },
         { name: 'EditProfileDialog', description: 'Profile editing modal' }
     ]
 };
@@ -834,3 +846,205 @@ export const developmentWorkflow = {
         'Monitor logs and metrics post-deployment'
     ]
 };
+
+// FAQ Section
+export interface FAQItem {
+    question: string;
+    answer: string;
+    category: string;
+}
+
+export const faqs: FAQItem[] = [
+    {
+        category: 'Getting Started',
+        question: 'How do I create an account?',
+        answer: 'Click the "Sign Up" button on the homepage, fill in your name, email, and password. You\'ll receive an OTP via email to verify your account. Once verified, you can start building your profile!'
+    },
+    {
+        category: 'Getting Started',
+        question: 'What are the system requirements?',
+        answer: 'DevConnect works on all modern browsers (Chrome, Firefox, Safari, Edge). For development, you need Node.js 18+, npm 9+, and MongoDB 5.0+. The platform is fully responsive and works on desktop, tablet, and mobile devices.'
+    },
+    {
+        category: 'Profile & Resume',
+        question: 'How do I download my resume as PDF?',
+        answer: 'Navigate to the Resume page, customize your resume template and content, then click the "Download PDF" button. Your resume will be generated with professional formatting optimized for ATS systems.'
+    },
+    {
+        category: 'Profile & Resume',
+        question: 'Can I customize my profile URL?',
+        answer: 'Currently, profile URLs are based on your user ID. Custom URLs are planned for a future release. You can track this feature request in our roadmap.'
+    },
+    {
+        category: 'Social Features',
+        question: 'How does the activity heatmap work?',
+        answer: 'The activity heatmap tracks your daily contributions including posts, comments, profile updates, and task completions. It helps you visualize your consistency and build streaks, similar to GitHub\'s contribution graph.'
+    },
+    {
+        category: 'Social Features',
+        question: 'Can I delete my posts or comments?',
+        answer: 'Yes! You can delete your own posts and comments at any time. Click the three-dot menu on your post/comment and select "Delete". Note that this action cannot be undone.'
+    },
+    {
+        category: 'Technical',
+        question: 'Is my data secure?',
+        answer: 'Absolutely! We use industry-standard security practices including bcrypt password hashing, JWT authentication, HTTPS encryption, input validation, and regular security audits. Your data is stored securely and never shared with third parties.'
+    },
+    {
+        category: 'Technical',
+        question: 'How long do sessions last?',
+        answer: 'Sessions last for 24 hours by default. You\'ll see a countdown timer in the navbar showing your remaining session time. You can extend your session by refreshing your token before it expires.'
+    },
+    {
+        category: 'Features',
+        question: 'What is the Kanban board used for?',
+        answer: 'The Kanban board is your personal task management tool. Create tasks, organize them into columns (Todo, In Progress, Done), and drag-and-drop to update their status. Perfect for tracking your projects and goals!'
+    },
+    {
+        category: 'Features',
+        question: 'Can I use Markdown in posts?',
+        answer: 'Yes! All posts support full Markdown formatting including headers, bold, italic, links, code blocks, lists, and more. This makes it easy to share technical content with proper formatting.'
+    }
+];
+
+// Troubleshooting Guide
+export interface TroubleshootingItem {
+    issue: string;
+    symptoms: string[];
+    solutions: string[];
+    category: string;
+}
+
+export const troubleshooting: TroubleshootingItem[] = [
+    {
+        category: 'Authentication',
+        issue: 'Cannot receive OTP email',
+        symptoms: [
+            'Email not arriving after signup',
+            'Waiting more than 5 minutes',
+            'Checked spam folder'
+        ],
+        solutions: [
+            'Verify your email address is correct',
+            'Check your spam/junk folder',
+            'Ensure your email provider isn\'t blocking automated emails',
+            'Try resending the OTP from the verification page',
+            'Contact support if issue persists after 10 minutes'
+        ]
+    },
+    {
+        category: 'Authentication',
+        issue: 'Session expires too quickly',
+        symptoms: [
+            'Getting logged out unexpectedly',
+            'Token expired errors',
+            'Frequent re-login required'
+        ],
+        solutions: [
+            'Check the session countdown timer in the navbar',
+            'Refresh your token before it expires',
+            'Ensure your system clock is accurate',
+            'Clear browser cache and cookies',
+            'Disable browser extensions that might interfere with authentication'
+        ]
+    },
+    {
+        category: 'Profile',
+        issue: 'Profile changes not saving',
+        symptoms: [
+            'Updates don\'t persist after refresh',
+            'Error messages when saving',
+            'Form validation errors'
+        ],
+        solutions: [
+            'Ensure all required fields are filled',
+            'Check for validation errors highlighted in red',
+            'Verify your session is still active',
+            'Try refreshing the page and re-entering data',
+            'Check browser console for specific error messages'
+        ]
+    },
+    {
+        category: 'Performance',
+        issue: 'Slow page loading',
+        symptoms: [
+            'Pages take long to load',
+            'Images loading slowly',
+            'Laggy interactions'
+        ],
+        solutions: [
+            'Check your internet connection speed',
+            'Clear browser cache (Ctrl+Shift+Delete)',
+            'Disable unnecessary browser extensions',
+            'Try a different browser',
+            'Check if the issue occurs on all pages or specific ones'
+        ]
+    },
+    {
+        category: 'Features',
+        issue: 'Kanban drag-and-drop not working',
+        symptoms: [
+            'Cannot drag tasks',
+            'Tasks snap back to original position',
+            'Drop zones not highlighting'
+        ],
+        solutions: [
+            'Ensure JavaScript is enabled in your browser',
+            'Try using a mouse instead of trackpad',
+            'Refresh the page to reset the board state',
+            'Check if browser extensions are interfering',
+            'Update your browser to the latest version'
+        ]
+    },
+    {
+        category: 'Development',
+        issue: 'MongoDB connection failed',
+        symptoms: [
+            'Server won\'t start',
+            'Connection timeout errors',
+            'ECONNREFUSED errors'
+        ],
+        solutions: [
+            'Ensure MongoDB is running: mongod',
+            'Check MONGODB_URI in .env file',
+            'Verify MongoDB is listening on port 27017',
+            'Check firewall settings',
+            'Try connecting with MongoDB Compass to test connection'
+        ]
+    }
+];
+
+// Migration Guides
+export interface MigrationGuide {
+    fromVersion: string;
+    toVersion: string;
+    breaking: string[];
+    steps: string[];
+    notes: string[];
+}
+
+export const migrationGuides: MigrationGuide[] = [
+    {
+        fromVersion: 'v1.0.0',
+        toVersion: 'v1.1.0',
+        breaking: [
+            'ConfirmDialog component removed - use CustomAlert instead',
+            'Native alert() calls replaced with CustomToast',
+            'Build chunk configuration updated - may affect custom builds'
+        ],
+        steps: [
+            'Update all ConfirmDialog imports to CustomAlert',
+            'Replace alert() calls with useToast() hook',
+            'Update vite.config.ts if you have custom chunk configuration',
+            'Run npm install to update dependencies',
+            'Test all confirmation dialogs and notifications',
+            'Update any custom components using old alert patterns'
+        ],
+        notes: [
+            'CustomAlert provides better UX with glassmorphic design',
+            'CustomToast is globally available via ToastContext',
+            'Build chunks are now optimized to be under 500kB',
+            'All changes are backward compatible except for removed components'
+        ]
+    }
+];

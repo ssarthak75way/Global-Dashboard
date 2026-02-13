@@ -33,7 +33,7 @@ const HeroSection: React.FC = () => {
         },
         heroSubtitle: {
             fontSize: { xs: '0.95rem', sm: '1.1rem', md: '1.4rem' },
-            color: 'text.secondary',
+            color: '#94a3b8',
             mb: { xs: 3, md: 4 },
             maxWidth: 600
         },
@@ -112,7 +112,7 @@ const HeroSection: React.FC = () => {
                                     '✓ Share posts & connect with developers',
                                     '✓ Showcase projects, skills & certifications'
                                 ].map((item, index) => (
-                                    <Typography key={index} variant="h6" sx={{ fontWeight: 600 }}>
+                                    <Typography key={index} variant="h6" sx={{ fontWeight: 600, color: 'white' }}>
                                         {item}
                                     </Typography>
                                 ))}

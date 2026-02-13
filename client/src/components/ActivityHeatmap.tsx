@@ -31,7 +31,7 @@ const heatmapStyles = {
             fontWeight: 600
         },
         '& .color-empty': (theme: Theme) => ({
-            fill: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'
+            fill: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(187, 12, 12, 0.05)'
         }),
         '& .color-scale-1': (theme: Theme) => ({
             fill: theme.palette.primary.light,

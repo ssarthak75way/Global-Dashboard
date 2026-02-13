@@ -5,6 +5,7 @@ import { useNavigate, Link } from "react-router-dom";
 import api from "../api/axios";
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/ToastContext";
 import Loader from "../components/Loader";
 import {
     Box,
@@ -14,7 +15,6 @@ import {
     Paper,
     Link as MuiLink,
     Divider,
-    Alert,
     Stack,
     Fade,
     Grow,
@@ -50,23 +50,25 @@ const Login = () => {
 
     const navigate = useNavigate();
     const { login } = useAuth();
-    const [serverError, setServerError] = useState<string | null>(null);
+    const { showToast } = useToast();
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
 
     const onSubmit = async (data: LoginFormInputs) => {
         setLoading(true);
-        setServerError(null);
         try {
             const response = await api.post("/auth/login", data);
             login(response.data, response.data.accessToken, response.data.expiresAt);
+            showToast("Welcome back! Login successful.", "success");
             navigate("/dashboard");
         } catch (error: unknown) {
+            let errorMsg = "Login failed";
             if (axios.isAxiosError(error)) {
-                setServerError(error.response?.data?.message || "Login failed");
+                errorMsg = error.response?.data?.message || "Login failed";
             } else if (error instanceof Error) {
-                setServerError(error.message);
+                errorMsg = error.message;
             }
+            showToast(errorMsg, "error");
         } finally {
             setLoading(false);
         }
@@ -245,13 +247,6 @@ const Login = () => {
                     </Box>
                 </Grow>
 
-                {serverError && (
-                    <Grow in>
-                        <Alert severity="error" variant="filled" sx={styles.alert}>
-                            {serverError}
-                        </Alert>
-                    </Grow>
-                )}
 
                 <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
                     <Stack spacing={3}>

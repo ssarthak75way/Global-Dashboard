@@ -30,7 +30,7 @@ const Profile = () => {
     const theme = useTheme();
 
     const [activityData, setActivityData] = useState<Array<{ date: string; count: number; posts?: number; comments?: number; likes?: number }>>([]);
-    const [activityStats, setActivityStats] = useState({ totalPosts: 0, currentStreak: 0, longestStreak: 0, activeDays: 0 });
+    const [activityStats, setActivityStats] = useState({ totalPosts: 0, currentStreak: 0, longestStreak: 0, activeDays: 0, totalRating: 0 });
     const [otherUser, setOtherUser] = useState<User | null>(null);
     const [networkStats, setNetworkStats] = useState({ followers: 0, following: 0 });
     const [networkModalOpen, setNetworkModalOpen] = useState(false);
@@ -283,6 +283,7 @@ const Profile = () => {
                                         isOwnProfile={isOwnProfile}
                                         onEditClick={() => setEditDialogOpen(true)}
                                         styles={styles}
+                                        totalRating={activityStats.totalRating}
                                     />
                                 </Grid>
                                 <Grid item xs={12}>

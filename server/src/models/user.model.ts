@@ -58,6 +58,7 @@ export interface IUser extends Document {
     otpExpires: Date | null;
     googleId?: string;
     refreshToken: string[];
+    blockedUsers: mongoose.Types.ObjectId[];
     status?: string;
     createdAt: Date;
     updatedAt: Date;
@@ -108,6 +109,7 @@ const userSchema: Schema = new Schema(
         hobbies: [String],
         followers: [{ type: Schema.Types.ObjectId, ref: "User", default: [] }],
         following: [{ type: Schema.Types.ObjectId, ref: "User", default: [] }],
+        blockedUsers: [{ type: Schema.Types.ObjectId, ref: "User", default: [] }],
         isVerified: { type: Boolean, default: false },
         avatar: { type: String, default: "" },
         dashboardOrder: { type: [String], default: [] },

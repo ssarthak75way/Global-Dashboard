@@ -13,6 +13,7 @@ export interface IPost extends Document {
     imageUrl?: string;
     likes: mongoose.Types.ObjectId[];
     comments: IComment[];
+    ratings: { user: mongoose.Types.ObjectId; score: number }[];
     createdAt: Date;
     updatedAt: Date;
 }
@@ -31,6 +32,12 @@ const postSchema = new Schema(
         imageUrl: { type: String },
         likes: [{ type: Schema.Types.ObjectId, ref: "User" }],
         comments: [commentSchema],
+        ratings: [
+            {
+                user: { type: Schema.Types.ObjectId, ref: "User", required: true },
+                score: { type: Number, required: true, min: 1, max: 5 },
+            },
+        ],
     },
     { timestamps: true }
 );

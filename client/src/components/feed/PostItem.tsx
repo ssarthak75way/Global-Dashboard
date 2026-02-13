@@ -10,7 +10,10 @@ import {
     Grow,
     Collapse,
     Grid,
-    Box
+    Box,
+    Rating,
+    Tooltip,
+    Badge
 } from "@mui/material";
 import {
     Favorite as LikeIcon,
@@ -18,16 +21,20 @@ import {
     ChatBubbleOutline as CommentIcon,
     AccessTime as TimeIcon,
     Edit as EditIcon,
-    Delete as DeleteIcon
+    Delete as DeleteIcon,
+    Send as SendIcon,
+    StarBorder as StarBorderIcon
 } from "@mui/icons-material";
 import { formatDistanceToNow } from "date-fns";
+import { useState } from "react";
+import SharePostModal from "./SharePostModal";
 
 // Reusing interfaces from feed for consistency, in a real app these go in a types file
 interface Comment {
     _id: string;
     user: {
         _id: string;
-        avatar:string;
+        avatar: string;
         name: string;
     };
     text: string;
@@ -47,6 +54,7 @@ interface Post {
     imageUrl?: string;
     likes: string[];
     comments: Comment[];
+    ratings: { user: string; score: number }[];
     createdAt: string;
 }
 
@@ -54,12 +62,14 @@ interface PostItemProps {
     post: Post;
     index: number;
     user: { _id: string } | null;
-    handleEditInitiate: (post: Post) => void;
-    handleDelete: (postId: string) => void;
-    handleLike: (postId: string) => void;
-    toggleComments: (postId: string) => void;
-    isCommentsExpanded: boolean;
-    openCommentModal: (postId: string) => void;
+    handleEditInitiate?: (post: Post) => void;
+    handleDelete?: (postId: string) => void;
+    handleLike?: (postId: string) => void;
+    toggleComments?: (postId: string) => void;
+    isCommentsExpanded?: boolean;
+    openCommentModal?: (postId: string) => void;
+    handleDeleteComment?: (postId: string, commentId: string) => void;
+    handleRate?: (postId: string, score: number) => void;
 }
 
 const PostItem = ({
@@ -71,7 +81,9 @@ const PostItem = ({
     handleLike,
     toggleComments,
     isCommentsExpanded,
-    openCommentModal
+    openCommentModal,
+    handleDeleteComment,
+    handleRate
 }: PostItemProps) => {
     const styles = {
         postCard: {
@@ -181,136 +193,204 @@ const PostItem = ({
     };
 
 
+    const [shareModalOpen, setShareModalOpen] = useState(false);
+
     return (
-        <Grow in timeout={500 + index * 100}>
-            <Card elevation={0} sx={styles.postCard}>
-                <CardHeader
-                    sx={styles.postCardHeader}
-                    avatar={
-                        <Avatar src={post.author?.avatar}
-                        >
-                            {!post.author?.avatar && (post.author?.name?.[0]?.toUpperCase() || post.author?.email?.[0]?.toUpperCase() || '?')}
-                        </Avatar>
-                    }
-                    title={<Typography sx={styles.postCardHeaderTitle}>{post.author.name || "Unknown Author"}</Typography>}
-                    subheader={
-                        <Stack direction="row" spacing={1} alignItems="center">
-                            <TimeIcon sx={styles.postCardTimeIcon} />
-                            <Typography variant="caption" color="text.disabled">
-                                {formatDistanceToNow(new Date(post.createdAt))} ago
-                            </Typography>
-                        </Stack>
-                    }
-                    action={
-                        post.author._id === user?._id && (
-                            <Stack direction="row">
-                                <IconButton size="small" onClick={() => handleEditInitiate(post)} sx={styles.postEditIcon}>
-                                    <EditIcon fontSize="small" />
-                                </IconButton>
-                                <IconButton size="small" onClick={() => handleDelete(post._id)} sx={styles.postDeleteIcon}>
-                                    <DeleteIcon fontSize="small" />
-                                </IconButton>
-                            </Stack>
-                        )
-                    }
-                />
-                <CardContent sx={styles.postContent}>
-                    <Typography variant="h5" sx={styles.postTitle}>
-                        {post.title}
-                    </Typography>
-
-                    {post.imageUrl && (
-                        <Box sx={styles.postImageContainer}>
-                            <Box component="img" src={post.imageUrl} alt={post.title} sx={styles.postImage} />
-                        </Box>
-                    )}
-
-                    <Box
-                        sx={styles.postHtmlContent}
-                        dangerouslySetInnerHTML={{ __html: post.content }}
-                    />
-
-                    <Divider sx={styles.divider} />
-
-                    <Stack direction="row" spacing={3} alignItems="center">
-                        <Stack direction="row" spacing={0.5} alignItems="center"
-                            sx={{ cursor: 'pointer', opacity: 0.8, "&:hover": { opacity: 1 } }}
-                            onClick={() => handleLike(post._id)}
-                        >
-                            <IconButton size="small" sx={{ color: post.likes.includes(user?._id || "") ? "error.main" : "inherit", p: 0.5 }}>
-                                {post.likes.includes(user?._id || "") ? <LikeIcon /> : <LikeBorderIcon />}
-                            </IconButton>
-                            <Typography variant="body2" sx={{ fontWeight: 700 }}>{post.likes.length}</Typography>
-                        </Stack>
-                        <Stack direction="row" spacing={0.5} alignItems="center"
-                            sx={{ cursor: 'pointer', opacity: 0.8, "&:hover": { opacity: 1 } }}
-                            onClick={() => toggleComments(post._id)}
-                        >
-                            <IconButton size="small" sx={{ p: 0.5 }}>
-                                <CommentIcon />
-                            </IconButton>
-                            <Typography variant="body2" sx={{ fontWeight: 700 }}>{post.comments.length}</Typography>
-                        </Stack>
-                    </Stack>
-
-                    {/* Comments Section */}
-                    <Collapse in={isCommentsExpanded}>
-                        <Box sx={styles.commentsSection}>
-                            <Box sx={styles.commentsHeader}>
-                                <Typography variant="subtitle2" color="text.secondary">
-                                    Comments
+        <>
+            <Grow in timeout={500 + index * 100}>
+                <Card elevation={0} sx={styles.postCard}>
+                    <CardHeader
+                        sx={styles.postCardHeader}
+                        avatar={
+                            <Avatar src={post.author?.avatar}
+                            >
+                                {!post.author?.avatar && (post.author?.name?.[0]?.toUpperCase() || post.author?.email?.[0]?.toUpperCase() || '?')}
+                            </Avatar>
+                        }
+                        title={<Typography sx={styles.postCardHeaderTitle}>{post.author.name || "Unknown Author"}</Typography>}
+                        subheader={
+                            <Stack direction="row" spacing={1} alignItems="center">
+                                <TimeIcon sx={styles.postCardTimeIcon} />
+                                <Typography variant="caption" color="text.disabled">
+                                    {formatDistanceToNow(new Date(post.createdAt))} ago
                                 </Typography>
-                                <IconButton
-                                    size="small"
-                                    onClick={() => openCommentModal(post._id)}
-                                    color="primary"
-                                    sx={styles.addCommentButton}
-                                >
-                                    <CommentIcon fontSize="small" />
-                                </IconButton>
-                            </Box>
+                            </Stack>
+                        }
+                        action={
+                            post.author._id === user?._id && (handleEditInitiate || handleDelete) && (
+                                <Stack direction="row">
+                                    {handleEditInitiate && (
+                                        <IconButton size="small" onClick={() => handleEditInitiate?.(post)} sx={styles.postEditIcon}>
+                                            <EditIcon fontSize="small" />
+                                        </IconButton>
+                                    )}
+                                    {handleDelete && (
+                                        <IconButton size="small" onClick={() => handleDelete?.(post._id)} sx={styles.postDeleteIcon}>
+                                            <DeleteIcon fontSize="small" />
+                                        </IconButton>
+                                    )}
+                                </Stack>
+                            )
+                        }
+                    />
+                    <CardContent sx={styles.postContent}>
+                        <Typography variant="h5" sx={styles.postTitle}>
+                            {post.title}
+                        </Typography>
 
-                            <Grid container spacing={2}>
-                                {post.comments.map(comment => (
-                                    <Grid item xs={12} key={comment._id}>
-                                        <Box sx={styles.commentBox}>
-                                            <Stack direction="row" spacing={1.5} alignItems="center" sx={styles.commentHeaderStack}>
-                                                {/* <Avatar sx={styles.commentAvatar}>
-                                                    
-                                                </Avatar> */}
-                                                <Avatar src={comment.user?.avatar}
-                                                >
-                                                    {comment.user?.name?.[0]?.toUpperCase() || "?"}
-                                                </Avatar>
-                                                <Box>
-                                                    <Typography variant="subtitle2" sx={styles.commentAuthor}>
-                                                        {comment.user?.name || "Anonymous"}
-                                                    </Typography>
-                                                    <Typography variant="caption" color="text.disabled" sx={{ display: 'block', lineHeight: 1 }}>
-                                                        {formatDistanceToNow(new Date(comment.createdAt))} ago
-                                                    </Typography>
-                                                </Box>
-                                            </Stack>
-                                            <Box
-                                                sx={{ ...styles.commentText, mt: 1, ml: 4.5 }}
-                                                dangerouslySetInnerHTML={{ __html: comment.text }}
-                                            />
-                                        </Box>
-                                    </Grid>
-                                ))}
-                                {post.comments.length === 0 && (
-                                    <Grid item xs={12}>
-                                        <Typography variant="body2" color="text.secondary" align="center" sx={{ py: 2 }}>
-                                            No comments yet. Be the first to share your thoughts!
+                        {post.imageUrl && (
+                            <Box sx={styles.postImageContainer}>
+                                <Box component="img" src={post.imageUrl} alt={post.title} sx={styles.postImage} />
+                            </Box>
+                        )}
+
+                        <Box
+                            sx={styles.postHtmlContent}
+                            dangerouslySetInnerHTML={{ __html: post.content }}
+                        />
+
+                        <Divider sx={styles.divider} />
+
+                        <Stack direction="row" spacing={3} alignItems="center">
+                            <Stack direction="row" spacing={0.5} alignItems="center"
+                                sx={{ cursor: 'pointer', opacity: 0.8, "&:hover": { opacity: 1 } }}
+                                onClick={() => handleLike?.(post._id)}
+                            >
+                                <IconButton size="small" sx={{ color: post.likes.includes(user?._id || "") ? "error.main" : "inherit", p: 0.5 }}>
+                                    {post.likes.includes(user?._id || "") ? <LikeIcon /> : <LikeBorderIcon />}
+                                </IconButton>
+                                <Typography variant="body2" sx={{ fontWeight: 700 }}>{post.likes.length}</Typography>
+                            </Stack>
+                            <Stack direction="row" spacing={0.5} alignItems="center"
+                                sx={{ cursor: 'pointer', opacity: 0.8, "&:hover": { opacity: 1 } }}
+                                onClick={() => toggleComments?.(post._id)}
+                            >
+                                <IconButton size="small" sx={{ p: 0.5 }}>
+                                    <CommentIcon />
+                                </IconButton>
+                                <Typography variant="body2" sx={{ fontWeight: 700 }}>{post.comments.length}</Typography>
+                            </Stack>
+
+                            <Stack direction="row" spacing={0.5} alignItems="center"
+                                sx={{ cursor: 'pointer', opacity: 0.8, "&:hover": { opacity: 1 } }}
+                                onClick={() => setShareModalOpen(true)}
+                            >
+                                <IconButton size="small" sx={{ p: 0.5 }}>
+                                    <SendIcon />
+                                </IconButton>
+                                <Typography variant="body2" sx={{ fontWeight: 700 }}>Share</Typography>
+                            </Stack>
+
+                            <Box sx={{ flexGrow: 1 }} />
+
+                            <Tooltip title={!user ? "Login to rate" : ""}>
+                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                    <Rating
+                                        name={`rating-${post._id}`}
+                                        value={post.ratings?.reduce((acc: number, r: any) => acc + r.score, 0) / (post.ratings?.length || 1)}
+                                        onChange={(_event, newValue) => {
+                                            if (user && newValue) {
+                                                handleRate?.(post._id, newValue);
+                                            }
+                                        }}
+                                        precision={0.5}
+                                        readOnly={!user}
+                                        emptyIcon={<StarBorderIcon fontSize="inherit" />}
+                                        size="small"
+                                    />
+                                    {post.ratings?.length > 0 && (
+                                        <Typography variant="caption" color="text.secondary" sx={{ ml: 0.5 }}>
+                                            ({post.ratings.length})
                                         </Typography>
-                                    </Grid>
-                                )}
-                            </Grid>
-                        </Box>
-                    </Collapse>
-                </CardContent>
-            </Card>
-        </Grow>
+                                    )}
+                                </Box>
+                            </Tooltip>
+                        </Stack>
+
+                        {/* Comments Section */}
+                        <Collapse in={isCommentsExpanded}>
+                            <Box sx={styles.commentsSection}>
+                                <Box sx={{ ...styles.commentsHeader, display: 'flex', alignItems: 'center', mb: 2 }}>
+                                    <Typography variant="subtitle2" color="text.secondary">
+                                        Comments
+                                    </Typography>
+                                    <Badge badgeContent={post.comments.length} color="primary" sx={{ ml: 1, mr: 1 }}>
+                                        <CommentIcon sx={{ fontSize: 16, opacity: 0.6 }} />
+                                    </Badge>
+                                    {user && (
+                                        <Tooltip title="Add Comment">
+                                            <IconButton
+                                                size="small"
+                                                onClick={() => openCommentModal?.(post._id)}
+                                                color="primary"
+                                                sx={{
+                                                    ...styles.addCommentButton,
+                                                    bgcolor: 'primary.main',
+                                                    color: 'white',
+                                                    p: 0.5,
+                                                    '&:hover': { bgcolor: 'primary.dark' }
+                                                }}
+                                            >
+                                                <CommentIcon sx={{ fontSize: 14 }} />
+                                            </IconButton>
+                                        </Tooltip>
+                                    )}
+                                </Box>
+
+                                <Grid container spacing={2}>
+                                    {post.comments.map(comment => (
+                                        <Grid item xs={12} key={comment._id}>
+                                            <Box sx={styles.commentBox}>
+                                                <Stack direction="row" spacing={1.5} alignItems="center" sx={styles.commentHeaderStack}>
+                                                    <Avatar src={comment.user?.avatar}
+                                                    >
+                                                        {comment.user?.name?.[0]?.toUpperCase() || "?"}
+                                                    </Avatar>
+                                                    <Box>
+                                                        <Typography variant="subtitle2" sx={styles.commentAuthor}>
+                                                            {comment.user?.name || "Anonymous"}
+                                                        </Typography>
+                                                        <Typography variant="caption" color="text.disabled" sx={{ display: 'block', lineHeight: 1 }}>
+                                                            {formatDistanceToNow(new Date(comment.createdAt))} ago
+                                                        </Typography>
+                                                    </Box>
+                                                    {comment.user?._id === user?._id && handleDeleteComment && (
+                                                        <IconButton
+                                                            size="small"
+                                                            onClick={() => handleDeleteComment(post._id, comment._id)}
+                                                            sx={{ ml: 'auto', color: 'error.main', opacity: 0.6, '&:hover': { opacity: 1 } }}
+                                                        >
+                                                            <DeleteIcon fontSize="small" />
+                                                        </IconButton>
+                                                    )}
+                                                </Stack>
+                                                <Box
+                                                    sx={{ ...styles.commentText, mt: 1, ml: 4.5 }}
+                                                    dangerouslySetInnerHTML={{ __html: comment.text }}
+                                                />
+                                            </Box>
+                                        </Grid>
+                                    ))}
+                                    {post.comments.length === 0 && (
+                                        <Grid item xs={12}>
+                                            <Typography variant="body2" color="text.secondary" align="center" sx={{ py: 2 }}>
+                                                No comments yet. Be the first to share your thoughts!
+                                            </Typography>
+                                        </Grid>
+                                    )}
+                                </Grid>
+                            </Box>
+                        </Collapse>
+                    </CardContent>
+                </Card>
+            </Grow>
+            <SharePostModal
+                open={shareModalOpen}
+                onClose={() => setShareModalOpen(false)}
+                postId={post._id}
+                postTitle={post.title}
+            />
+        </>
     );
 };
 
