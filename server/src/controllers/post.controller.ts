@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 // Create Post
 export const createPost = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { title, content, imageUrl, tags } = req.body;
+        const { title, content, imageUrl, tags, mediaType } = req.body;
         const userId = req.user?._id;
 
         const post = await Post.create({
@@ -14,6 +14,7 @@ export const createPost = async (req: Request, res: Response): Promise<void> => 
             content,
             author: userId,
             imageUrl,
+            mediaType: mediaType || 'image',
             tags: tags || []
         });
 
@@ -259,8 +260,10 @@ export const uploadImage = async (req: Request, res: Response): Promise<void> =>
             return;
         }
 
+        const file = req.file as any;
         res.status(200).json({
-            imageUrl: req.file.path, // Cloudinary URL
+            imageUrl: file.path, // Cloudinary URL
+            mediaType: file.mimetype?.startsWith('video') ? 'video' : 'image'
         });
     } catch (error: unknown) {
         if (error instanceof Error) {

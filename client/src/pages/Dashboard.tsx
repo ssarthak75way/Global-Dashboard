@@ -48,6 +48,7 @@ import WhatshotIcon from '@mui/icons-material/Whatshot';
 import EqualizerIcon from '@mui/icons-material/Equalizer';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import BoltIcon from '@mui/icons-material/Bolt';
+import AllInclusiveIcon from '@mui/icons-material/AllInclusive';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import CalendarHeatmap from 'react-calendar-heatmap';
 import 'react-calendar-heatmap/dist/styles.css';
@@ -498,10 +499,12 @@ const Dashboard = () => {
         actionsBox: { display: 'flex', gap: 2, width: { xs: '100%', md: 'auto' }, mt: { xs: 2, md: 0 } },
         verifiedChip: {
             fontWeight: 900,
-            borderRadius: 3,
-            flex: { xs: 1, md: 'none' },
+            borderRadius: '50%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
             height: 44,
-            px: 1,
+            width: 44,
             fontSize: { xs: '0.75rem', sm: '0.875rem' },
             boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
         },
@@ -552,6 +555,16 @@ const Dashboard = () => {
                     <Box sx={styles.actionsBox}>
                         <Chip
                             component="a"
+                            href="/infinite"
+                            variant="outlined"
+                            label={"See Infinite"}
+                            icon={<AllInclusiveIcon fontSize="large" />}
+
+                            color="primary"
+                            sx={styles.addfeedChip}
+                        />
+                        <Chip
+                            component="a"
                             href="/feed"
                             variant="outlined"
                             icon={<AddIcon fontSize="large" />}
@@ -562,7 +575,6 @@ const Dashboard = () => {
 
                         <Chip
                             icon={user?.isVerified ? <VerifiedIcon /> : <UnverifiedIcon />}
-                            label={user?.isVerified ? "Verified Status" : "Action Required"}
                             color={user?.isVerified ? "success" : "warning"}
                             sx={styles.verifiedChip}
                         />

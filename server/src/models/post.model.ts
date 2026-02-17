@@ -11,6 +11,7 @@ export interface IPost extends Document {
     content: string;
     author: mongoose.Types.ObjectId;
     imageUrl?: string;
+    mediaType?: 'image' | 'video';
     tags: string[];
     likes: mongoose.Types.ObjectId[];
     savedBy: mongoose.Types.ObjectId[];
@@ -32,6 +33,7 @@ const postSchema = new Schema(
         content: { type: String, required: true },
         author: { type: Schema.Types.ObjectId, ref: "User", required: true },
         imageUrl: { type: String },
+        mediaType: { type: String, enum: ['image', 'video'], default: 'image' },
         tags: [{ type: String }],
         likes: [{ type: Schema.Types.ObjectId, ref: "User" }],
         savedBy: [{ type: Schema.Types.ObjectId, ref: "User" }],

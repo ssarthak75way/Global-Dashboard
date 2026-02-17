@@ -14,8 +14,8 @@ export const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: {
         folder: "user_posts",
-        allowed_formats: ["jpg", "png", "jpeg"],
-    } as { folder: string; allowed_formats: string[] },
+        resource_type: "auto",
+    } as { folder: string; resource_type: string },
 });
 
 export default cloudinary;

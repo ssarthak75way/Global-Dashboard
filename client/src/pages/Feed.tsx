@@ -44,6 +44,7 @@ interface Post {
         email: string;
     };
     imageUrl?: string;
+    mediaType?: 'image' | 'video';
     likes: string[];
     savedBy: string[];
     comments: Comment[];
@@ -61,6 +62,7 @@ const Feed = () => {
     const [submitting, setSubmitting] = useState(false);
     const [uploading, setUploading] = useState(false);
     const [imageUrl, setImageUrl] = useState<string | null>(null);
+    const [mediaType, setMediaType] = useState<'image' | 'video'>('image');
     const [isExpanded, setIsExpanded] = useState(false);
     const [editingPostId, setEditingPostId] = useState<string | null>(null);
     const [expandedComments, setExpandedComments] = useState<Record<string, boolean>>({});
@@ -154,11 +156,11 @@ const Feed = () => {
         setSubmitting(true);
         try {
             if (editingPostId) {
-                const { data } = await api.put(`/posts/${editingPostId}`, { title, content, imageUrl, tags });
+                const { data } = await api.put(`/posts/${editingPostId}`, { title, content, imageUrl, tags, mediaType });
                 setPosts(posts.map(p => p._id === editingPostId ? data : p));
                 showToast("Post updated successfully", "success");
             } else {
-                const { data } = await api.post("/posts", { title, content, imageUrl, tags });
+                const { data } = await api.post("/posts", { title, content, imageUrl, tags, mediaType });
                 setPosts([data, ...posts]);
                 showToast("Post created successfully", "success");
             }
@@ -175,14 +177,16 @@ const Feed = () => {
         setTitle("");
         setContent("");
         setImageUrl(null);
+        setMediaType('image');
         setIsExpanded(false);
         setEditingPostId(null);
     };
 
-    const handleEditInitiate = (post: Post) => {
+    const handleEditInitiate = (post: any) => {
         setTitle(post.title);
         setContent(post.content);
         setImageUrl(post.imageUrl || null);
+        setMediaType(post.mediaType || 'image');
         // Use original ID for editing to ensure we update the real record
         setEditingPostId(post.originalId || post._id);
         setIsExpanded(true);
@@ -207,23 +211,24 @@ const Feed = () => {
         }
     };
 
-    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleMediaUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
 
         setUploading(true);
         const formData = new FormData();
-        formData.append("image", file);
+        formData.append("image", file); // Keep key as "image" for backward compat if backend expects it
 
         try {
             const { data } = await api.post("/posts/upload", formData, {
                 headers: { "Content-Type": "multipart/form-data" }
             });
             setImageUrl(data.imageUrl);
-            showToast("Image uploaded successfully", "success");
+            setMediaType(data.mediaType || 'image');
+            showToast("Media uploaded successfully", "success");
         } catch (error) {
-            console.error("Image upload failed", error);
-            showToast("Image upload failed", "error");
+            console.error("Media upload failed", error);
+            showToast("Media upload failed", "error");
         } finally {
             setUploading(false);
         }
@@ -422,7 +427,8 @@ const Feed = () => {
                     setIsExpanded={setIsExpanded}
                     editingPostId={editingPostId}
                     resetForm={resetForm}
-                    handleImageUpload={handleImageUpload}
+                    handleImageUpload={handleMediaUpload}
+                    mediaType={mediaType}
                 />
 
                 {loading ? (

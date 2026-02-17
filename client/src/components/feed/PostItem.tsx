@@ -10,8 +10,10 @@ import {
     Grow,
     Card,
     Collapse,
-    Grid,
-    CardHeader
+    CardHeader,
+    alpha,
+    Rating,
+    Grid
 } from "@mui/material";
 import {
     Favorite as LikeIcon,
@@ -50,6 +52,7 @@ interface Post {
         email: string;
     };
     imageUrl?: string;
+    mediaType?: 'image' | 'video';
     tags?: string[];
     likes: string[];
     savedBy: string[];
@@ -84,112 +87,172 @@ const PostItem = ({
     isCommentsExpanded,
     openCommentModal,
     handleDeleteComment,
+    handleRate,
     handleSave
 }: PostItemProps) => {
+    // Calculate average rating
+    const averageRating = post.ratings && post.ratings.length > 0
+        ? post.ratings.reduce((acc, curr) => acc + curr.score, 0) / post.ratings.length
+        : 0;
+
+    const userRating = post.ratings?.find(r => r.user === user?._id)?.score || 0;
+
     const styles = {
         postCard: {
             maxWidth: '100%',
-            borderRadius: 2,
+            borderRadius: 4,
             border: "1px solid",
-            borderColor: "divider",
-            transition: "all 0.3s ease",
+            borderColor: (theme: any) => theme.palette.mode === 'light'
+                ? alpha(theme.palette.divider, 0.4)
+                : alpha(theme.palette.divider, 0.1),
+            background: (theme: any) => theme.palette.mode === 'light'
+                ? alpha('#fff', 0.8)
+                : alpha(theme.palette.background.paper, 0.4),
+            backdropFilter: "blur(12px)",
+            transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
             "&:hover": {
-                borderColor: "primary.light",
-                transform: { xs: 'none', sm: "translateY(-4px)" },
-                boxShadow: "0 4px 20px rgba(0,0,0,0.05)"
+                borderColor: "primary.main",
+                transform: "translateY(-4px)",
+                boxShadow: (theme: any) => `0 12px 30px ${alpha(theme.palette.primary.main, 0.08)}`,
             }
         },
         postCardHeader: {
             px: { xs: 2, sm: 3 },
-            pt: 2,
-            pb: 1,
+            pt: 2.5,
+            pb: 2,
             "& .MuiCardHeader-avatar": {
-                marginRight: 2
+                marginRight: 1.5
             }
         },
         postCardHeaderAvatar: {
-            bgcolor: "secondary.main",
-            fontWeight: 700,
-            width: { xs: 32, sm: 40 },
-            height: { xs: 32, sm: 40 },
-            fontSize: { xs: '0.8rem', sm: '1rem' }
+            width: 42,
+            height: 42,
+            border: '1.5px solid',
+            borderColor: 'primary.main',
+            p: 0.2,
+            bgcolor: 'background.paper'
         },
         postCardHeaderTitle: {
-            fontWeight: 700,
-            fontSize: { xs: '0.9rem', sm: '1rem' }
-        },
-        postCardTimeIcon: { fontSize: "0.8rem", color: "text.disabled" },
-        postEditIcon: { color: "primary.main" },
-        postDeleteIcon: { color: "error.main" },
-        postContent: { pt: 0, px: { xs: 2, sm: 3 }, pb: "24px !important" },
-        postTitle: {
             fontWeight: 800,
+            fontSize: '1rem',
+            color: 'text.primary'
+        },
+        postContent: {
+            pt: 0,
+            px: { xs: 2.5, sm: 3.5 },
+            pb: "24px !important"
+        },
+        postTitle: {
+            fontWeight: 900,
             mb: 1.5,
-            lineHeight: 1.3,
-            fontSize: { xs: '1.25rem', sm: '1.5rem' },
-            wordBreak: 'break-word',
-            overflowWrap: 'break-word'
+            lineHeight: 1.25,
+            fontSize: { xs: '1.4rem', sm: '1.8rem' },
+            color: 'text.primary',
+            letterSpacing: '-0.01em'
         },
         postImageContainer: {
-            mx: { xs: -2, sm: -3 }, // Bleed to edge of card
+            position: 'relative',
             mb: 3,
-            mt: 2,
+            mt: 0.5,
+            borderRadius: 3,
             overflow: "hidden",
-            borderTop: "1px solid",
-            borderBottom: "1px solid",
-            borderColor: "divider"
+            bgcolor: "#000",
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+            maxHeight: 550
         },
-        postImage: {
-            width: "100%",
-            maxHeight: "500px", // Prevent super tall images
-            objectFit: "contain", // Show full image
-            bgcolor: "black",
-            display: "block"
+        mediaTag: {
+            position: 'absolute',
+            top: 12,
+            right: 12,
+            zIndex: 2,
+            bgcolor: alpha('#000', 0.5),
+            backdropFilter: 'blur(8px)',
+            color: 'white',
+            fontWeight: 800,
+            px: 1.2,
+            py: 0.4,
+            borderRadius: 1.5,
+            fontSize: '0.65rem',
+            textTransform: 'uppercase',
+            letterSpacing: '0.05em'
         },
         postHtmlContent: {
-            mb: 3,
-            "& p": { mb: 1.5, lineHeight: 1.6, fontSize: { xs: "0.95rem", sm: "1rem" } },
-            "& h1, h2, h3": { mb: 1.5, fontWeight: 800, fontSize: '1.2rem', mt: 2 },
-            "& pre": {
-                bgcolor: "action.hover",
-                p: 2,
-                borderRadius: 2,
-                overflowX: "auto",
-                mb: 2,
-                fontSize: '0.85em',
-                maxWidth: '100%'
-            },
-            "& img": { maxWidth: "100%", height: "auto", borderRadius: 1 },
+            mb: 3.5,
+            color: "text.secondary",
+            lineHeight: 1.6,
+            "& p": { mb: 2, fontSize: { xs: "0.95rem", sm: "1.05rem" } },
+            "& h1, h2, h3": { mb: 2, fontWeight: 800, fontSize: '1.3rem', mt: 2.5, color: 'text.primary' },
             "& blockquote": {
                 borderLeft: "4px solid",
                 borderColor: "primary.main",
-                pl: 2,
-                ml: 0,
+                bgcolor: (theme: any) => alpha(theme.palette.primary.main, 0.03),
+                p: 2,
+                pl: 3,
+                borderRadius: '0 8px 8px 0',
                 fontStyle: "italic",
-                mb: 2,
-                color: "text.secondary"
-            },
-            "& ul, ol": { pl: 3, mb: 2 }
+                my: 3,
+                mx: 0
+            }
         },
-        divider: { mb: 2, opacity: 0.5 },
-        commentsSection: { mt: 3, pt: 2, borderTop: "1px dashed", borderColor: "divider" },
+        interactionRow: {
+            pt: 2.5,
+            borderTop: "1px solid",
+            borderColor: (theme: any) => alpha(theme.palette.divider, 0.5),
+            mt: 1.5
+        },
+        actionButton: {
+            borderRadius: 2.5,
+            px: 1.8,
+            py: 0.8,
+            cursor: 'pointer',
+            transition: 'all 0.2s',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+            color: 'text.secondary',
+            '&:hover': {
+                bgcolor: (theme: any) => alpha(theme.palette.primary.main, 0.08),
+                color: 'primary.main',
+                '& .MuiSvgIcon-root': { transform: 'scale(1.1)' }
+            }
+        },
+        saveButton: {
+            bgcolor: (theme: any) => alpha(theme.palette.action.hover, 0.6),
+            borderRadius: 2,
+            p: 1,
+            '&:hover': { bgcolor: (theme: any) => alpha(theme.palette.primary.main, 0.1), color: 'primary.main' }
+        },
+        saveButtonActive: {
+            bgcolor: (theme: any) => alpha(theme.palette.primary.main, 0.1),
+            color: 'primary.main',
+            borderRadius: 2,
+            p: 1,
+            '&:hover': { bgcolor: (theme: any) => alpha(theme.palette.primary.main, 0.15) }
+        },
+        commentsSection: {
+            mt: 2,
+            pt: 2.5,
+            borderTop: "1px dashed",
+            borderColor: "divider"
+        },
         commentsHeader: { display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 },
-        addCommentButton: { borderRadius: "20px" },
         commentBox: {
-            p: 1.5,
-            bgcolor: "action.hover",
+            p: 2,
+            bgcolor: (theme: any) => alpha(theme.palette.action.hover, 0.4),
             borderRadius: 3,
-            height: "100%",
-            display: "flex",
-            flexDirection: "column"
+            border: '1px solid',
+            borderColor: (theme: any) => alpha(theme.palette.divider, 0.5),
         },
-        commentHeaderStack: { mb: 0.5 },
-        commentAvatar: { width: 24, height: 24, fontSize: "0.7rem", bgcolor: "secondary.main" },
-        commentAuthor: { fontWeight: 700, fontSize: '0.85rem' },
+        commentHeaderStack: { mb: 1 },
+        commentAvatar: { width: 30, height: 30, fontSize: '0.75rem', border: '1px solid', borderColor: 'divider' },
+        commentAuthor: { fontWeight: 800, fontSize: '0.85rem' },
         commentText: {
-            fontSize: '0.9rem',
-            wordBreak: "break-word",
-            "& p": { m: 0 }
+            fontSize: '0.92rem',
+            color: 'text.secondary',
+            lineHeight: 1.5
         }
     };
 
@@ -200,51 +263,51 @@ const PostItem = ({
         <>
             <Grow in timeout={500 + index * 100}>
                 <Card elevation={0} sx={styles.postCard}>
-                    {post.imageUrl && (
-                        <Box sx={{
-                            height: 200,
-                            overflow: 'hidden',
-                            borderBottom: '1px solid',
-                            borderColor: 'divider'
-                        }}>
-                            <Box
-                                component="img"
-                                src={post.imageUrl}
-                                alt={post.title}
-                                sx={{
-                                    width: '100%',
-                                    height: '100%',
-                                    objectFit: 'cover'
-                                }}
-                            />
-                        </Box>
-                    )}
                     <CardHeader
                         sx={styles.postCardHeader}
                         avatar={
-                            <Avatar src={post.author?.avatar}
+                            <Avatar
+                                src={post.author?.avatar}
+                                sx={styles.postCardHeaderAvatar}
                             >
-                                {!post.author?.avatar && (post.author?.name?.[0]?.toUpperCase() || post.author?.email?.[0]?.toUpperCase() || '?')}
+                                {!post.author?.avatar && (post.author?.name?.[0]?.toUpperCase() || '?')}
                             </Avatar>
                         }
                         title={
                             <Stack>
                                 <Typography sx={styles.postCardHeaderTitle}>{post.author.name || "Unknown Author"}</Typography>
-                                <Typography variant="caption" color="text.disabled">
-                                    {formatDistanceToNow(new Date(post.createdAt))} ago
-                                </Typography>
+                                <Stack direction="row" spacing={1} alignItems="center">
+                                    <Rating
+                                        value={averageRating}
+                                        precision={0.5}
+                                        readOnly
+                                        size="small"
+                                        sx={{
+                                            fontSize: '0.85rem',
+                                            color: 'primary.main',
+                                            '& .MuiRating-iconEmpty': { color: (theme) => alpha(theme.palette.text.disabled, 0.3) }
+                                        }}
+                                    />
+                                    <Typography variant="caption" color="text.disabled" sx={{ fontWeight: 700 }}>
+                                        ({post.ratings?.length || 0})
+                                    </Typography>
+                                    <Box sx={{ width: 4, height: 4, bgcolor: 'text.disabled', borderRadius: '50%', opacity: 0.5 }} />
+                                    <Typography variant="caption" color="text.disabled" sx={{ fontWeight: 600 }}>
+                                        {formatDistanceToNow(new Date(post.createdAt))} ago
+                                    </Typography>
+                                </Stack>
                             </Stack>
                         }
                         action={
                             post.author._id === user?._id && (handleEditInitiate || handleDelete) && (
-                                <Stack direction="row">
+                                <Stack direction="row" spacing={1}>
                                     {handleEditInitiate && (
-                                        <IconButton size="small" onClick={() => handleEditInitiate?.(post)} sx={styles.postEditIcon}>
+                                        <IconButton size="small" onClick={() => handleEditInitiate?.(post)} sx={{ opacity: 0.6, "&:hover": { opacity: 1, color: 'primary.main' } }}>
                                             <EditIcon fontSize="small" />
                                         </IconButton>
                                     )}
                                     {handleDelete && (
-                                        <IconButton size="small" onClick={() => handleDelete?.(post._id)} sx={styles.postDeleteIcon}>
+                                        <IconButton size="small" onClick={() => handleDelete?.(post._id)} sx={{ opacity: 0.6, "&:hover": { opacity: 1, color: 'error.main' } }}>
                                             <DeleteIcon fontSize="small" />
                                         </IconButton>
                                     )}
@@ -253,163 +316,195 @@ const PostItem = ({
                         }
                     />
                     <CardContent sx={styles.postContent}>
-                        <Box sx={{ pl: { sm: 7 } }}>
-                            <Typography variant="h4" sx={{ ...styles.postTitle, mb: 1 }}>
-                                {post.title}
-                            </Typography>
+                        <Typography variant="h4" sx={styles.postTitle}>
+                            {post.title}
+                        </Typography>
 
-                            {post.tags && post.tags.length > 0 && (
-                                <Stack direction="row" spacing={1} mb={2} flexWrap="wrap" gap={1}>
-                                    {post.tags.map((tag, idx) => (
-                                        <Chip
-                                            key={idx}
-                                            label={`#${tag.trim()}`}
-                                            size="small"
-                                            sx={{
-                                                bgcolor: 'transparent',
-                                                border: '1px solid',
-                                                borderColor: 'divider',
-                                                '&:hover': {
-                                                    borderColor: 'primary.main',
-                                                    color: 'primary.main',
-                                                    bgcolor: 'action.hover'
-                                                }
-                                            }}
-                                        />
-                                    ))}
-                                </Stack>
-                            )}
-
-                            <Box
-                                sx={styles.postHtmlContent}
-                                dangerouslySetInnerHTML={{ __html: post.content }}
-                            />
-
-                            <Stack direction="row" justifyContent="space-between" alignItems="center">
-                                <Stack direction="row" spacing={3} alignItems="center">
-                                    <Stack direction="row" spacing={0.5} alignItems="center"
-                                        sx={{ cursor: 'pointer', opacity: 0.8, "&:hover": { opacity: 1 } }}
-                                        onClick={() => handleLike?.(post._id)}
-                                    >
-                                        <IconButton size="small" sx={{ color: post.likes.includes(user?._id || "") ? "error.main" : "inherit", p: 0.5 }}>
-                                            {post.likes.includes(user?._id || "") ? <LikeIcon /> : <LikeBorderIcon />}
-                                        </IconButton>
-                                        <Typography variant="body2">{post.likes.length} Reactions</Typography>
-                                    </Stack>
-
-                                    <Stack direction="row" spacing={0.5} alignItems="center"
-                                        sx={{ cursor: 'pointer', opacity: 0.8, "&:hover": { opacity: 1 } }}
-                                        onClick={() => toggleComments?.(post._id)}
-                                    >
-                                        <IconButton size="small" sx={{ p: 0.5 }}>
-                                            <CommentIcon />
-                                        </IconButton>
-                                        <Typography variant="body2">{post.comments.length} Comments</Typography>
-                                    </Stack>
-
-                                    <Stack direction="row" spacing={0.5} alignItems="center"
-                                        sx={{ cursor: 'pointer', opacity: 0.8, "&:hover": { opacity: 1 } }}
-                                        onClick={() => setShareModalOpen(true)}
-                                    >
-                                        <IconButton size="small" sx={{ p: 0.5 }}>
-                                            <ShareIcon />
-                                        </IconButton>
-                                        <Typography variant="body2">Share</Typography>
-                                    </Stack>
-                                </Stack>
-
-                                <Stack direction="row" spacing={1}>
-                                    <Typography variant="caption" color="text.secondary" sx={{ display: 'flex', alignItems: 'center' }}>
-                                        {Math.ceil(post.content.length / 500)} min read
-                                    </Typography>
-
-                                    <IconButton
-                                        size="small"
-                                        onClick={() => handleSave?.(post._id)}
+                        {post.imageUrl && (
+                            <Box sx={styles.postImageContainer}>
+                                <Box sx={styles.mediaTag}>
+                                    {post.mediaType === 'video' ? 'Video' : 'Image'}
+                                </Box>
+                                {post.mediaType === 'video' ? (
+                                    <Box
+                                        component="video"
+                                        src={post.imageUrl}
+                                        controls
                                         sx={{
-                                            bgcolor: post.savedBy?.includes(user?._id || "") ? 'primary.light' : 'action.hover',
-                                            color: post.savedBy?.includes(user?._id || "") ? 'primary.main' : 'inherit',
-                                            '&:hover': { bgcolor: 'primary.light', color: 'primary.main' }
+                                            width: '100%',
+                                            display: 'block',
+                                            borderRadius: 'inherit'
                                         }}
-                                    >
-                                        {post.savedBy?.includes(user?._id || "") ? <SavedIcon /> : <SaveIcon />}
-                                    </IconButton>
-                                </Stack>
-                            </Stack>
-                        </Box>
+                                    />
+                                ) : (
+                                    <Box
+                                        component="img"
+                                        src={post.imageUrl}
+                                        alt={post.title}
+                                        sx={{
+                                            width: '100%',
+                                            maxHeight: 550,
+                                            objectFit: 'contain',
+                                            borderRadius: 'inherit'
+                                        }}
+                                    />
+                                )}
+                            </Box>
+                        )}
 
-                        {/* Comments Section */}
-                        <Collapse in={isCommentsExpanded}>
-                            <Box sx={styles.commentsSection}>
-                                <Box sx={{ ...styles.commentsHeader, display: 'flex', alignItems: 'center', mb: 2 }}>
-                                    <Typography variant="subtitle2" color="text.secondary">
-                                        Discussion ({post.comments.length})
-                                    </Typography>
-                                    {user && (
-                                        <Tooltip title="Add Comment">
-                                            <IconButton
-                                                size="small"
-                                                onClick={() => openCommentModal?.(post._id)}
-                                                color="primary"
-                                                sx={{
-                                                    ...styles.addCommentButton,
-                                                    bgcolor: 'primary.main',
-                                                    color: 'white',
-                                                    p: 0.5,
-                                                    '&:hover': { bgcolor: 'primary.dark' }
-                                                }}
-                                            >
-                                                <CommentIcon sx={{ fontSize: 14 }} />
-                                            </IconButton>
-                                        </Tooltip>
-                                    )}
+                        {post.tags && post.tags.length > 0 && (
+                            <Stack direction="row" spacing={1} mb={2.5} flexWrap="wrap" gap={1}>
+                                {post.tags.map((tag, idx) => (
+                                    <Chip
+                                        key={idx}
+                                        label={`#${tag.trim()}`}
+                                        size="small"
+                                        sx={{
+                                            fontWeight: 800,
+                                            fontSize: '0.7rem',
+                                            bgcolor: (theme: any) => alpha(theme.palette.primary.main, 0.05),
+                                            border: '1px solid',
+                                            borderColor: (theme: any) => alpha(theme.palette.primary.main, 0.1),
+                                            color: 'primary.main',
+                                            '&:hover': {
+                                                bgcolor: (theme: any) => alpha(theme.palette.primary.main, 0.1),
+                                            }
+                                        }}
+                                    />
+                                ))}
+                            </Stack>
+                        )}
+
+                        <Box
+                            sx={styles.postHtmlContent}
+                            dangerouslySetInnerHTML={{ __html: post.content }}
+                        />
+
+                        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={styles.interactionRow}>
+                            <Stack direction="row" spacing={{ xs: 0.5, sm: 2 }} alignItems="center">
+                                <Box
+                                    sx={{ ...styles.actionButton, color: post.likes.includes(user?._id || "") ? "error.main" : "text.secondary" }}
+                                    onClick={() => handleLike?.(post._id)}
+                                >
+                                    {post.likes.includes(user?._id || "") ? <LikeIcon /> : <LikeBorderIcon />}
+                                    <Typography variant="body2" sx={{ fontWeight: 800 }}>{post.likes.length}</Typography>
                                 </Box>
 
-                                <Grid container spacing={2}>
-                                    {post.comments.map(comment => (
-                                        <Grid item xs={12} key={comment._id}>
-                                            <Box sx={styles.commentBox}>
-                                                <Stack direction="row" spacing={1.5} alignItems="center" sx={styles.commentHeaderStack}>
-                                                    <Avatar src={comment.user?.avatar}
-                                                    >
-                                                        {comment.user?.name?.[0]?.toUpperCase() || "?"}
-                                                    </Avatar>
-                                                    <Box>
-                                                        <Typography variant="subtitle2" sx={styles.commentAuthor}>
-                                                            {comment.user?.name || "Anonymous"}
-                                                        </Typography>
-                                                        <Typography variant="caption" color="text.disabled" sx={{ display: 'block', lineHeight: 1 }}>
-                                                            {formatDistanceToNow(new Date(comment.createdAt))} ago
-                                                        </Typography>
-                                                    </Box>
-                                                    {comment.user?._id === user?._id && handleDeleteComment && (
-                                                        <IconButton
-                                                            size="small"
-                                                            onClick={() => handleDeleteComment(post._id, comment._id)}
-                                                            sx={{ ml: 'auto', color: 'error.main', opacity: 0.6, '&:hover': { opacity: 1 } }}
-                                                        >
-                                                            <DeleteIcon fontSize="small" />
-                                                        </IconButton>
-                                                    )}
-                                                </Stack>
-                                                <Box
-                                                    sx={{ ...styles.commentText, mt: 1, ml: 4.5 }}
-                                                    dangerouslySetInnerHTML={{ __html: comment.text }}
-                                                />
-                                            </Box>
-                                        </Grid>
-                                    ))}
-                                    {post.comments.length === 0 && (
-                                        <Grid item xs={12}>
-                                            <Typography variant="body2" color="text.secondary" align="center" sx={{ py: 2 }}>
-                                                No comments yet. Start the discussion!
-                                            </Typography>
-                                        </Grid>
-                                    )}
-                                </Grid>
-                            </Box>
-                        </Collapse>
+                                <Box
+                                    sx={{ ...styles.actionButton }}
+                                    onClick={() => toggleComments?.(post._id)}
+                                >
+                                    <CommentIcon />
+                                    <Typography variant="body2" sx={{ fontWeight: 800 }}>{post.comments.length}</Typography>
+                                </Box>
+
+                                <Box
+                                    sx={{ ...styles.actionButton }}
+                                    onClick={() => setShareModalOpen(true)}
+                                >
+                                    <ShareIcon />
+                                    <Typography variant="body2" sx={{ fontWeight: 800, display: { xs: 'none', sm: 'block' } }}>Share</Typography>
+                                </Box>
+
+                                <Box sx={{ display: 'flex', alignItems: 'center', ml: 1, gap: 1 }}>
+                                    <Rating
+                                        value={userRating}
+                                        onChange={(_, value) => handleRate?.(post._id, value || 0)}
+                                        size="small"
+                                        sx={{
+                                            '& .MuiRating-iconFilled': { color: 'primary.main' },
+                                            '&:hover .MuiRating-iconFilled': { color: 'primary.dark' }
+                                        }}
+                                    />
+                                </Box>
+                            </Stack>
+
+                            <Stack direction="row" spacing={1.5} alignItems="center">
+                                <Typography variant="caption" sx={{ fontWeight: 700, opacity: 0.6, display: { xs: 'none', sm: 'block' } }}>
+                                    {Math.ceil(post.content.length / 500)} min read
+                                </Typography>
+
+                                <IconButton
+                                    size="small"
+                                    onClick={() => handleSave?.(post._id)}
+                                    sx={post.savedBy?.includes(user?._id || "") ? styles.saveButtonActive : styles.saveButton}
+                                >
+                                    {post.savedBy?.includes(user?._id || "") ? <SavedIcon fontSize="small" /> : <SaveIcon fontSize="small" />}
+                                </IconButton>
+                            </Stack>
+                        </Stack>
                     </CardContent>
+                    {/* Comments Section */}
+                    <Collapse in={isCommentsExpanded}>
+                        <Box sx={styles.commentsSection}>
+                            <Box sx={{ ...styles.commentsHeader, display: 'flex', alignItems: 'center', mb: 2.5 }}>
+                                <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.secondary' }}>
+                                    Reviews & Discussion ({post.comments.length})
+                                </Typography>
+                                {user && (
+                                    <Tooltip title="Add Comment">
+                                        <IconButton
+                                            size="small"
+                                            onClick={() => openCommentModal?.(post._id)}
+                                            sx={{
+                                                bgcolor: 'primary.main',
+                                                color: 'white',
+                                                p: 0.5,
+                                                '&:hover': { bgcolor: 'primary.dark' }
+                                            }}
+                                        >
+                                            <CommentIcon sx={{ fontSize: 14 }} />
+                                        </IconButton>
+                                    </Tooltip>
+                                )}
+                            </Box>
+
+                            <Grid container spacing={2}>
+                                {post.comments.map(comment => (
+                                    <Grid item xs={12} key={comment._id}>
+                                        <Box sx={styles.commentBox}>
+                                            <Stack direction="row" spacing={1.5} alignItems="center" sx={styles.commentHeaderStack}>
+                                                <Avatar
+                                                    src={comment.user?.avatar}
+                                                    sx={styles.commentAvatar}
+                                                >
+                                                    {comment.user?.name?.[0]?.toUpperCase() || "?"}
+                                                </Avatar>
+                                                <Box>
+                                                    <Typography variant="subtitle2" sx={styles.commentAuthor}>
+                                                        {comment.user?.name || "Anonymous"}
+                                                    </Typography>
+                                                    <Typography variant="caption" color="text.disabled" sx={{ display: 'block', lineHeight: 1, fontWeight: 600 }}>
+                                                        {formatDistanceToNow(new Date(comment.createdAt))} ago
+                                                    </Typography>
+                                                </Box>
+                                                {comment.user?._id === user?._id && handleDeleteComment && (
+                                                    <IconButton
+                                                        size="small"
+                                                        onClick={() => handleDeleteComment(post._id, comment._id)}
+                                                        sx={{ ml: 'auto', opacity: 0.5, '&:hover': { opacity: 1, color: 'error.main' } }}
+                                                    >
+                                                        <DeleteIcon fontSize="small" />
+                                                    </IconButton>
+                                                )}
+                                            </Stack>
+                                            <Box
+                                                sx={{ ...styles.commentText, mt: 1, ml: { xs: 0, sm: 5.5 } }}
+                                                dangerouslySetInnerHTML={{ __html: comment.text }}
+                                            />
+                                        </Box>
+                                    </Grid>
+                                ))}
+                                {post.comments.length === 0 && (
+                                    <Grid item xs={12}>
+                                        <Typography variant="body2" color="text.secondary" align="center" sx={{ py: 3, opacity: 0.6, fontStyle: 'italic' }}>
+                                            No comments yet. Start the discussion!
+                                        </Typography>
+                                    </Grid>
+                                )}
+                            </Grid>
+                        </Box>
+                    </Collapse>
                 </Card>
             </Grow>
             <SharePostModal

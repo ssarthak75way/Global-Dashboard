@@ -11,7 +11,15 @@ const router = Router();
 
 router.get("/", protect, getPosts);
 router.post("/", protect, validate(createPostSchema), createPost);
-router.post("/upload", protect, upload.single("image"), uploadImage);
+router.post("/upload", protect, (req, res, next) => {
+    upload.single("image")(req, res, (err) => {
+        if (err) {
+            console.error("Multer error:", err);
+            return res.status(500).json({ message: "File upload failed", error: err.message });
+        }
+        next();
+    });
+}, uploadImage);
 router.put("/:id", protect, updatePost);
 router.delete("/:id", protect, deletePost);
 router.get("/liked", protect, getLikedPosts);

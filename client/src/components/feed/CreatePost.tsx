@@ -38,6 +38,7 @@ interface CreatePostProps {
     editingPostId: string | null;
     resetForm: () => void;
     handleImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    mediaType?: 'image' | 'video';
 }
 
 const CreatePost = ({
@@ -57,7 +58,8 @@ const CreatePost = ({
     setIsExpanded,
     editingPostId,
     resetForm,
-    handleImageUpload
+    handleImageUpload,
+    mediaType = 'image'
 }: CreatePostProps) => {
     const [tagInput, setTagInput] = useState("");
 
@@ -174,6 +176,7 @@ const CreatePost = ({
             right: 8,
             bgcolor: "rgba(0,0,0,0.6)",
             color: "white",
+            zIndex: 10,
             "&:hover": { bgcolor: "rgba(0,0,0,0.8)" }
         },
         actionButtonsBox: {
@@ -276,7 +279,19 @@ const CreatePost = ({
 
                     {imageUrl && (
                         <Box sx={styles.imagePreviewBox}>
-                            <img src={imageUrl} alt="Preview" style={styles.imagePreviewImage} />
+                            {mediaType === 'video' ? (
+                                <Box
+                                    component="video"
+                                    src={imageUrl}
+                                    controls
+                                    sx={{
+                                        ...styles.imagePreviewImage,
+                                        bgcolor: 'black'
+                                    }}
+                                />
+                            ) : (
+                                <img src={imageUrl} alt="Preview" style={styles.imagePreviewImage} />
+                            )}
                             <IconButton
                                 size="small"
                                 onClick={() => setImageUrl(null)}
@@ -290,7 +305,7 @@ const CreatePost = ({
                     <Box sx={styles.actionButtonsBox}>
                         <Box sx={{ width: { xs: "100%", sm: "auto" } }}>
                             <input
-                                accept="image/*"
+                                accept="image/*,video/*"
                                 style={{ display: "none" }}
                                 id="icon-button-file"
                                 type="file"
@@ -304,7 +319,7 @@ const CreatePost = ({
                                     disabled={uploading}
                                     sx={styles.uploadButton}
                                 >
-                                    {uploading ? "Uploading..." : "Add Image"}
+                                    {uploading ? "Uploading..." : "Add Media"}
                                 </Button>
                             </label>
                         </Box>

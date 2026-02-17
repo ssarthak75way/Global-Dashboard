@@ -72,15 +72,15 @@ const PrivateLayout = () => {
 
     const menuItems = [
         { text: 'Home', icon: <HomeIcon />, path: '/' },
+        { text: 'Documentation', icon: <DocumentationIcon />, path: '/documentation' },
         { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
         { text: 'Task Board', icon: <BoardIcon />, path: '/board' },
-        { text: 'Social Feed', icon: <FeedIcon />, path: '/feed' },
+        { text: 'Posts', icon: <FeedIcon />, path: '/feed' },
+        { text: 'Post Infinitive', icon: <AllInclusiveIcon />, path: '/infinite' },
         { text: 'Messages', icon: <ChatIcon />, path: '/messages' },
         { text: 'Profile', icon: <ProfileIcon />, path: '/profile' },
         { text: 'Resume', icon: <ResumeIcon />, path: '/resume' },
-        { text: 'Documentation', icon: <DocumentationIcon />, path: '/documentation' },
         { text: 'Settings', icon: <SettingsIcon />, path: '/settings' },
-        { text: 'Infinitive', icon: <AllInclusiveIcon />, path: '/infinite' },
     ];
 
     const currentTitle = menuItems.find(i => i.path === location.pathname)?.text || 'DevConnect';
