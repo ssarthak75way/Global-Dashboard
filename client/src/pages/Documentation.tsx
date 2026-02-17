@@ -426,7 +426,7 @@ const Documentation: React.FC = () => {
                                             Accelerate your development cycle with our streamlined setup process.
                                         </Typography>
 
-                                        <Box sx={{ mb: 6, borderRadius: 5, overflow: 'hidden', boxShadow: '0 32px 64px rgba(0,0,0,0.1)' }}>
+                                        <Box sx={{ mb: 6, borderRadius: 1, overflow: 'hidden', boxShadow: '0 32px 64px rgba(0,0,0,0.1)' }}>
                                             <TerminalDemo />
                                         </Box>
 

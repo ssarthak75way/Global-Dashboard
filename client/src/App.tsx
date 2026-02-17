@@ -23,6 +23,7 @@ const Documentation = lazy(() => import("./pages/Documentation"));
 const Settings = lazy(() => import("./pages/Settings"));
 const LikedPosts = lazy(() => import("./pages/LikedPosts"));
 const CommentedPosts = lazy(() => import("./pages/CommentedPosts"));
+const InfiniteFeed = lazy(() => import("./pages/InfiniteFeed"));
 import { SocketProvider } from "./context/SocketContext";
 const PublicDocumentation = lazy(() => import("./pages/PublicDocumentation"));
 const NotFound = lazy(() => import("./pages/NotFound"));
@@ -201,6 +202,14 @@ const router = createBrowserRouter([
         element: (
           <Suspense fallback={<LoadingFallback />}>
             <CommentedPosts />
+          </Suspense>
+        )
+      },
+      {
+        path: "/infinite",
+        element: (
+          <Suspense fallback={<LoadingFallback />}>
+            <InfiniteFeed />
           </Suspense>
         )
       }

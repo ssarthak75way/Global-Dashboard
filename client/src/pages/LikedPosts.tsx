@@ -31,6 +31,7 @@ interface Post {
     };
     imageUrl?: string;
     likes: string[];
+    savedBy: string[];
     comments: Comment[];
     ratings: { user: string; score: number }[];
     createdAt: string;

@@ -6,7 +6,8 @@ import {
     Button,
     Stack,
     IconButton,
-    Theme
+    Theme,
+    Chip // Import Chip
 } from "@mui/material";
 import {
     Create as CreateIcon,
@@ -16,7 +17,8 @@ import {
 } from "@mui/icons-material";
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
-import Loader from "../Loader"; 
+import Loader from "../Loader";
+import { useState } from "react"; // Import useState for local tag input
 
 interface CreatePostProps {
     user: any;
@@ -24,6 +26,8 @@ interface CreatePostProps {
     setTitle: (title: string) => void;
     content: string;
     setContent: (content: string) => void;
+    tags: string[]; // Add tags props
+    setTags: (tags: string[]) => void;
     handleCreatePost: (e: React.FormEvent) => void;
     submitting: boolean;
     uploading: boolean;
@@ -34,6 +38,7 @@ interface CreatePostProps {
     editingPostId: string | null;
     resetForm: () => void;
     handleImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    mediaType?: 'image' | 'video';
 }
 
 const CreatePost = ({
@@ -42,6 +47,8 @@ const CreatePost = ({
     setTitle,
     content,
     setContent,
+    tags,
+    setTags,
     handleCreatePost,
     submitting,
     uploading,
@@ -51,8 +58,25 @@ const CreatePost = ({
     setIsExpanded,
     editingPostId,
     resetForm,
-    handleImageUpload
+    handleImageUpload,
+    mediaType = 'image'
 }: CreatePostProps) => {
+    const [tagInput, setTagInput] = useState("");
+
+    const handleTagKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            const newTag = tagInput.trim();
+            if (newTag && !tags.includes(newTag)) {
+                setTags([...tags, newTag]);
+                setTagInput("");
+            }
+        }
+    };
+
+    const handleDeleteTag = (tagToDelete: string) => {
+        setTags(tags.filter((tag) => tag !== tagToDelete));
+    };
 
     // Simplified toolbar for mobile could be considered, but CSS wrapping is handled below
     const quillModules = {
@@ -112,7 +136,8 @@ const CreatePost = ({
             mb: 3,
             "& .ql-container": {
                 border: "none",
-                fontSize: { xs: "1rem", sm: "1.1rem" },
+                fontSize: { xs: "1rem", sm: "1.1rem" }, // minHeight handled by container, removing fixed height here
+                // minHeight: "120px"  <-- ReactQuill style usually better in CSS or container
                 minHeight: "120px"
             },
             "& .ql-toolbar": {
@@ -151,6 +176,7 @@ const CreatePost = ({
             right: 8,
             bgcolor: "rgba(0,0,0,0.6)",
             color: "white",
+            zIndex: 10,
             "&:hover": { bgcolor: "rgba(0,0,0,0.8)" }
         },
         actionButtonsBox: {
@@ -214,6 +240,32 @@ const CreatePost = ({
                         </IconButton>
                     </Stack>
 
+                    {/* Tag Input Section */}
+                    <Box sx={{ mb: 2 }}>
+                        <TextField
+                            fullWidth
+                            placeholder="Add tags (press Enter)..."
+                            variant="standard"
+                            value={tagInput}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTagInput(e.target.value)}
+                            onKeyDown={handleTagKeyDown}
+                            InputProps={{ disableUnderline: true }}
+                            sx={{ mb: 1 }}
+                        />
+                        <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap sx={{ mt: 1 }}>
+                            {tags.map((tag, index) => (
+                                <Chip
+                                    key={index}
+                                    label={tag}
+                                    onDelete={() => handleDeleteTag(tag)}
+                                    size="small"
+                                    color="primary"
+                                    variant="outlined"
+                                />
+                            ))}
+                        </Stack>
+                    </Box>
+
                     <Box sx={styles.qlContainerBox}>
                         <ReactQuill
                             theme="snow"
@@ -227,7 +279,19 @@ const CreatePost = ({
 
                     {imageUrl && (
                         <Box sx={styles.imagePreviewBox}>
-                            <img src={imageUrl} alt="Preview" style={styles.imagePreviewImage} />
+                            {mediaType === 'video' ? (
+                                <Box
+                                    component="video"
+                                    src={imageUrl}
+                                    controls
+                                    sx={{
+                                        ...styles.imagePreviewImage,
+                                        bgcolor: 'black'
+                                    }}
+                                />
+                            ) : (
+                                <img src={imageUrl} alt="Preview" style={styles.imagePreviewImage} />
+                            )}
                             <IconButton
                                 size="small"
                                 onClick={() => setImageUrl(null)}
@@ -241,7 +305,7 @@ const CreatePost = ({
                     <Box sx={styles.actionButtonsBox}>
                         <Box sx={{ width: { xs: "100%", sm: "auto" } }}>
                             <input
-                                accept="image/*"
+                                accept="image/*,video/*"
                                 style={{ display: "none" }}
                                 id="icon-button-file"
                                 type="file"
@@ -255,7 +319,7 @@ const CreatePost = ({
                                     disabled={uploading}
                                     sx={styles.uploadButton}
                                 >
-                                    {uploading ? "Uploading..." : "Add Image"}
+                                    {uploading ? "Uploading..." : "Add Media"}
                                 </Button>
                             </label>
                         </Box>

@@ -13,8 +13,11 @@ import {
     Skeleton,
     Theme,
     useTheme,
-    useMediaQuery
+    useMediaQuery,
+    Button,
+    Tooltip
 } from "@mui/material";
+import { format } from "date-fns";
 import {
     DndContext,
     closestCenter,
@@ -38,158 +41,209 @@ import AddIcon from '@mui/icons-material/Add';
 import { CSS } from '@dnd-kit/utilities';
 import VerifiedIcon from "@mui/icons-material/CheckCircle";
 import UnverifiedIcon from "@mui/icons-material/Error";
-import TaskIcon from "@mui/icons-material/Assignment";
-import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
-import GitHubIcon from "@mui/icons-material/GitHub";
-import LinkedInIcon from "@mui/icons-material/LinkedIn";
-import TerminalIcon from "@mui/icons-material/Terminal";
-import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
+import PostAddIcon from '@mui/icons-material/PostAdd';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import WhatshotIcon from '@mui/icons-material/Whatshot';
+import EqualizerIcon from '@mui/icons-material/Equalizer';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import BoltIcon from '@mui/icons-material/Bolt';
+import AllInclusiveIcon from '@mui/icons-material/AllInclusive';
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
+import CalendarHeatmap from 'react-calendar-heatmap';
+import 'react-calendar-heatmap/dist/styles.css';
 
 interface CardData {
     id: string;
     label: string;
-    value: string | number;
+    value: string | number | React.ReactNode;
     icon: React.ReactNode;
     color: string;
     description: string;
-    platform: string;
-}
-
-interface DragProps {
-    role?: string;
-    tabIndex?: number;
-    'aria-pressed'?: boolean | undefined;
-    'aria-roledescription'?: string;
-    'aria-describedby'?: string;
+    platform?: string;
+    colSpan?: { xs: number, sm?: number, md?: number };
+    customRenderer?: (data: any) => React.ReactNode;
 }
 
 const dashboardCardStyles = {
     card: (isOverlay: boolean, theme: Theme) => ({
-        borderRadius: 1,
+        borderRadius: 5,
         position: 'relative',
         overflow: 'hidden',
-        background: theme.palette.mode === 'light'
-            ? 'rgba(255, 255, 255, 0.8)'
-            : 'rgba(30, 41, 59, 0.6)',
+        bgcolor: theme.palette.mode === 'dark' ? 'rgba(28, 28, 30, 0.6)' : 'rgba(255, 255, 255, 0.8)',
         backdropFilter: 'blur(20px)',
         border: '1px solid',
-        borderColor: isOverlay ? 'primary.main' : 'divider',
+        borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)',
         boxShadow: isOverlay
-            ? '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
-            : (theme.palette.mode === 'light' ? '0 10px 15px -3px rgba(0, 0, 0, 0.05)' : 'none'),
-        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            ? '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
+            : (theme.palette.mode === 'dark' ? '0 4px 24px -1px rgba(0,0,0,0.2)' : '0 4px 20px -5px rgba(0,0,0,0.05)'),
+        transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
         cursor: isOverlay ? 'grabbing' : 'default',
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
         '&:hover': {
-            borderColor: !isOverlay ? 'primary.main' : 'inherit',
-            transform: !isOverlay ? 'translateY(-6px)' : 'none',
-            boxShadow: !isOverlay ? (theme.palette.mode === 'light'
-                ? '0 20px 25px -5px rgba(0, 0, 0, 0.1)'
-                : '0 20px 25px -5px rgba(0, 0, 0, 0.3)') : 'none',
+            transform: !isOverlay ? 'translateY(-4px)' : 'none',
+            boxShadow: theme.palette.mode === 'dark' ? '0 20px 40px -5px rgba(0,0,0,0.4)' : '0 20px 40px -5px rgba(0,0,0,0.1)',
+            borderColor: theme.palette.primary.main,
+            '& .drag-handle': { opacity: 1 }
+        },
+        '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: '4px',
+            background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+            opacity: 0,
+            transition: 'opacity 0.3s ease'
+        },
+        '&:hover::before': {
+            opacity: 1
         }
     }),
     cardContent: { p: 3, flexGrow: 1, display: 'flex', flexDirection: 'column' },
-    headerBox: { display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 3 },
-    avatar: (color: string) => ({
+    headerBox: { display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 1 },
+    mockChart: (color: string) => ({
+        width: '100%',
+        height: 48,
+        flexShrink: 0,
+        '& path': {
+            stroke: color,
+            fill: 'none',
+            strokeWidth: 3,
+            strokeLinecap: 'round',
+            strokeLinejoin: 'round'
+        }
+    }),
+    percentChip: (color: string) => ({
         bgcolor: `${color}15`,
         color: color,
-        width: 52,
-        height: 52,
-        borderRadius: 3,
-        border: '1.5px solid',
-        borderColor: `${color}30`
-    }),
-    dragHandle: {
-        cursor: 'grab',
-        color: 'text.disabled',
-        '&:hover': { color: 'primary.main', bgcolor: 'action.hover' },
-        p: 0.5,
-        borderRadius: 1.5,
-        transition: 'all 0.2s'
-    },
-    platformText: { color: 'text.secondary', fontWeight: 800, letterSpacing: 1, textTransform: 'uppercase', mb: 0.5, display: 'block' },
-    labelText: { fontWeight: 800, lineHeight: 1.3, mb: 1, color: 'text.primary' },
-    valueText: (color: string) => ({
-        fontWeight: 950,
-        letterSpacing: -2,
-        fontSize: '2.5rem',
-        background: `linear-gradient(45deg, ${color}, ${color}AA)`,
-        WebkitBackgroundClip: 'text',
-        WebkitTextFillColor: 'transparent'
-    }),
-    footerBox: (theme: Theme) => ({
-        display: 'flex',
+        fontWeight: 700,
+        borderRadius: '6px',
+        px: 1,
+        py: 0.5,
+        fontSize: '0.75rem',
+        display: 'inline-flex',
         alignItems: 'center',
-        gap: 1,
-        bgcolor: theme.palette.mode === 'light' ? 'rgba(0,0,0,0.03)' : 'rgba(255,255,255,0.04)',
-        px: 1.5,
-        py: 1,
-        borderRadius: 1,
-        border: '1px solid',
-        borderColor: 'divider'
+        gap: 0.5
     }),
-    trendingIcon: { color: 'success.main', fontSize: '1rem' },
-    descriptionText: { color: 'text.secondary', fontWeight: 700, fontSize: '0.75rem' },
-    progressBar: (color: string) => ({
-        height: 4,
+    platformIcon: {
+        fontSize: '1.25rem'
+    },
+    overlayBox: (_isMobile: boolean) => ({
         width: '100%',
-        background: `linear-gradient(90deg, transparent, ${color}, transparent)`,
-        opacity: 0.5
-    }),
-    dragIndicatorIcon: { fontSize: '1.25rem' },
-    platformIcon: { fontSize: '1.75rem' },
-    cardHeaderContentBox: { flexGrow: 1, mb: 2 },
-    overlayBox: (isMobile: boolean) => ({ width: isMobile ? '100%' : '100%' })
+        height: '100%'
+    })
 };
 
-const DashboardCard = ({ card, loading, isOverlay = false, dragProps = {} }: { card: CardData; loading: boolean; isOverlay?: boolean; dragProps?: DragProps | Record<string, unknown> }) => {
+// Mock Sparkline SVG Path generator
+const getSparklinePath = (id: string, width = 100, height = 40) => {
+    // Deterministic random-looking path based on ID
+    const seed = id.charCodeAt(0);
+    return `M0,${height / 2} Q${width / 4},${seed % height} ${width / 2},${height / 2} T${width},${height / 3}`;
+};
+
+const DashboardCard = ({ card, loading, isOverlay = false, data, dragProps = {} }: { card: CardData; loading: boolean; isOverlay?: boolean; data?: any; dragProps?: any }) => {
+    const theme = useTheme();
+    const sparklinePath = getSparklinePath(card.id);
+    const areaPath = `${sparklinePath} V 40 H 0 Z`;
+    const gradientId = `gradient-${card.id}`;
+
     return (
-        <Card
-            sx={(theme) => dashboardCardStyles.card(isOverlay, theme)}
-        >
+        <Card sx={(theme) => dashboardCardStyles.card(isOverlay, theme)} elevation={0}>
             <CardContent sx={dashboardCardStyles.cardContent}>
+                {/* Header: Label + Percent Change */}
                 <Box sx={dashboardCardStyles.headerBox}>
-                    <Avatar
-                        sx={dashboardCardStyles.avatar(card.color)}
-                    >
-                        {card.icon}
-                    </Avatar>
-                    {!isOverlay && (
-                        <Box {...dragProps} sx={dashboardCardStyles.dragHandle}>
-                            <DragIndicatorIcon sx={dashboardCardStyles.dragIndicatorIcon} />
+                    <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center' }}>
+                        <Box sx={{
+                            p: 1.2,
+                            borderRadius: '12px',
+                            bgcolor: theme.palette.mode === 'dark' ? '#2C2C2E' : '#f3f4f6',
+                            color: theme.palette.mode === 'dark' ? 'white' : 'black',
+                            display: 'flex'
+                        }}>
+                            {card.icon}
                         </Box>
-                    )}
+                        <Box>
+                            <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>
+                                {card.label}
+                            </Typography>
+                        </Box>
+                    </Box>
+                    <Box sx={dashboardCardStyles.percentChip(card.color)}>
+                        {card.id === 'streak' ? 'Active' : '+5%'}
+                    </Box>
                 </Box>
 
-                <Box sx={dashboardCardStyles.cardHeaderContentBox}>
-                    <Typography variant="caption" sx={dashboardCardStyles.platformText}>
-                        {card.platform}
-                    </Typography>
-                    <Typography variant="h6" sx={dashboardCardStyles.labelText}>
-                        {card.label}
-                    </Typography>
+                {/* Main Value */}
+                {loading ? (
+                    <Skeleton variant="text" width="60%" height={60} />
+                ) : (
+                    <Box sx={{ mt: 2, mb: 1 }}>
+                        {card.customRenderer ? (
+                            card.customRenderer(data)
+                        ) : (
+                            <Typography variant="h3" sx={{
+                                fontWeight: 800,
+                                fontSize: '2.25rem',
+                                color: theme.palette.mode === 'dark' ? 'white' : 'black',
+                                letterSpacing: '-1px'
+                            }}>
+                                {card.value}
+                            </Typography>
+                        )}
+                    </Box>
+                )}
 
-                    {loading ? (
-                        <Skeleton variant="text" width="60%" height={60} />
-                    ) : (
-                        <Typography variant="h3" sx={dashboardCardStyles.valueText(card.color)}>
-                            {card.value}
-                        </Typography>
-                    )}
-                </Box>
+                {/* Visual Description */}
+                <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500, fontSize: '0.875rem' }}>
+                    {card.description}
+                </Typography>
 
-                <Box sx={dashboardCardStyles.footerBox}>
-                    <TrendingUpIcon sx={dashboardCardStyles.trendingIcon} />
-                    <Typography variant="body2" sx={dashboardCardStyles.descriptionText}>
-                        {card.description}
-                    </Typography>
-                </Box>
+                {/* Sparkline decoration */}
+                {!card.customRenderer && (
+                    <Box sx={{ mt: 'auto', pt: 2, opacity: 0.8 }}>
+                        <svg viewBox="0 0 100 40" preserveAspectRatio="none" style={{ width: '100%', height: 40, overflow: 'visible' }}>
+                            <defs>
+                                <linearGradient id={gradientId} x1="0" x2="0" y1="0" y2="1">
+                                    <stop offset="0%" stopColor={card.color} stopOpacity="0.3" />
+                                    <stop offset="100%" stopColor={card.color} stopOpacity="0" />
+                                </linearGradient>
+                            </defs>
+                            <path
+                                d={areaPath}
+                                fill={`url(#${gradientId})`}
+                                stroke="none"
+                            />
+                            <path
+                                d={sparklinePath}
+                                fill="none"
+                                stroke={card.color}
+                                strokeWidth="3"
+                                strokeLinecap="round"
+                                vectorEffect="non-scaling-stroke"
+                            />
+                        </svg>
+                    </Box>
+                )}
             </CardContent>
 
-            <Box sx={dashboardCardStyles.progressBar(card.color)} />
+            {/* Drag Handle overlaid */}
+            {!isOverlay && (
+                <Box {...dragProps} className="drag-handle" sx={{
+                    position: 'absolute',
+                    top: 12,
+                    right: 12,
+                    opacity: 0,
+                    cursor: 'grab',
+                    transition: 'opacity 0.2s',
+                    p: 1,
+                }}>
+                    <DragIndicatorIcon fontSize="small" />
+                </Box>
+            )}
         </Card>
     );
 };
@@ -213,7 +267,7 @@ const SortableCard = ({ card, loading }: { card: CardData; loading: boolean }) =
     };
 
     return (
-        <Grid item xs={12} sm={6} md={4} ref={setNodeRef} style={style}>
+        <Grid item xs={card.colSpan?.xs || 12} sm={card.colSpan?.sm || 6} md={card.colSpan?.md || 4} ref={setNodeRef} style={style}>
             <DashboardCard
                 card={card}
                 loading={loading}
@@ -223,49 +277,29 @@ const SortableCard = ({ card, loading }: { card: CardData; loading: boolean }) =
     );
 };
 
-// Define explicit types for stats
-interface GithubStats {
-    profile: {
-        repos: number;
-        followers: number;
-        avatar: string;
-        username: string;
-    };
-}
-
-interface LeetcodeStats {
-    totalSolved: number;
-    ranking: number;
-    username: string;
-}
-
-interface CodeforcesStats {
-    rating: number;
-    rank: string;
-    avatar: string;
-}
-
 const Dashboard = () => {
-    const { user, fetchMe } = useAuth();
+    const { user } = useAuth();
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-    const [stats, setStats] = useState<{
-        github: GithubStats | null;
-        leetcode: LeetcodeStats | null;
-        codeforces: CodeforcesStats | null;
-        tasks: any[] | null;
+    const isTablet = useMediaQuery(theme.breakpoints.down('md'));
+
+    const [activityData, setActivityData] = useState<{
+        activity: any[];
+        stats: {
+            totalPosts: number;
+            totalLikes: number;
+            totalRating: number;
+            currentStreak: number;
+            longestStreak: number;
+            activeDays: number;
+        } | null;
     }>({
-        github: null,
-        leetcode: null,
-        codeforces: null,
-        tasks: null
+        activity: [],
+        stats: null
     });
 
     const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>({
-        github: false,
-        leetcode: false,
-        codeforces: false,
-        tasks: false
+        activity: false
     });
 
     const [cards, setCards] = useState<CardData[]>([]);
@@ -277,83 +311,141 @@ const Dashboard = () => {
     );
 
     useEffect(() => {
-        const fetchAllStats = async () => {
-            const handles = user?.socialHandles;
-
-            const platforms = [
-                { key: 'github', handle: handles?.github, url: '/social/github' },
-                { key: 'leetcode', handle: handles?.leetcode, url: '/social/leetcode' },
-                { key: 'codeforces', handle: handles?.codeforces, url: '/social/codeforces' },
-                { key: 'tasks', handle: true, url: '/tasks' }
-            ];
-
-            platforms.forEach(p => {
-                if (p.handle) {
-                    setLoadingStates(prev => ({ ...prev, [p.key]: true }));
-                }
-            });
-
-            await Promise.allSettled(
-                platforms.map(async (p) => {
-                    if (!p.handle) return;
-                    try {
-                        const { data } = await api.get(p.url);
-                        setStats(prev => ({ ...prev, [p.key]: data }));
-                    } catch (err) {
-                        console.error(`Failed to fetch ${p.key} stats`, err);
-                    } finally {
-                        setLoadingStates(prev => ({ ...prev, [p.key]: false }));
-                    }
-                })
-            );
+        const fetchActivity = async () => {
+            try {
+                setLoadingStates(prev => ({ ...prev, activity: true }));
+                const { data } = await api.get('/auth/activity');
+                setActivityData(data);
+            } catch (err) {
+                console.error("Failed to fetch activity", err);
+            } finally {
+                setLoadingStates(prev => ({ ...prev, activity: false }));
+            }
         };
 
-        if (user) fetchAllStats();
+        if (user) fetchActivity();
     }, [user]);
 
     useEffect(() => {
-        const platforms = [
-            { id: 'github', label: 'Public Repositories', platform: 'GitHub', icon: <GitHubIcon sx={dashboardCardStyles.platformIcon} />, color: '#10b981', description: 'Real-time repository sync' },
-            { id: 'leetcode', label: 'Solved Problems', platform: 'LeetCode', icon: <TerminalIcon sx={dashboardCardStyles.platformIcon} />, color: '#f59e0b', description: 'Real-time sync' },
-            { id: 'linkedin', label: 'Professional Index', platform: 'LinkedIn', icon: <LinkedInIcon sx={dashboardCardStyles.platformIcon} />, color: '#0a66c2', description: 'Weekly Profile Views' },
-            { id: 'codeforces', label: 'Global Rating', platform: 'Codeforces', icon: <EmojiEventsIcon sx={dashboardCardStyles.platformIcon} />, color: '#ef4444', description: 'Competitive Rank' },
-            { id: 'tasks', label: 'Active Progress', platform: 'Internal Tasks', icon: <TaskIcon sx={dashboardCardStyles.platformIcon} />, color: '#6366f1', description: 'Total tasks' }
+        const statsCards = [
+            {
+                id: 'posts',
+                label: 'Total Posts',
+                icon: <PostAddIcon sx={dashboardCardStyles.platformIcon} />,
+                color: '#8b5cf6',
+                description: 'Your Contributions',
+                value: activityData?.stats?.totalPosts || 0,
+                colSpan: { xs: 12, sm: 6, md: 3 }
+            },
+            {
+                id: 'likes',
+                label: 'Likes Received',
+                icon: <FavoriteIcon sx={dashboardCardStyles.platformIcon} />,
+                color: '#f43f5e',
+                description: 'Community Love',
+                value: activityData?.stats?.totalLikes || 0,
+                colSpan: { xs: 12, sm: 6, md: 3 }
+            },
+            {
+                id: 'streak',
+                label: 'Active Streak',
+                icon: <WhatshotIcon sx={dashboardCardStyles.platformIcon} />,
+                color: '#f59e0b',
+                description: 'Consecutive Days',
+                value: activityData?.stats?.currentStreak || 0,
+                colSpan: { xs: 12, sm: 6, md: 3 }
+            },
+            {
+                id: 'engagement',
+                label: 'Engagement Score',
+                icon: <EqualizerIcon sx={dashboardCardStyles.platformIcon} />,
+                color: '#10b981',
+                description: 'Based on interaction',
+                value: activityData?.stats?.totalRating || 0,
+                colSpan: { xs: 12, sm: 6, md: 3 }
+            },
+            {
+                id: 'heatmap',
+                label: 'Contribution Habits',
+                icon: <CalendarMonthIcon sx={dashboardCardStyles.platformIcon} />,
+                color: theme.palette.primary.main,
+                description: 'Your posting activity over the last year',
+                value: 'Heatmap',
+                colSpan: { xs: 12, md: 8 },
+                customRenderer: () => (
+                    <Box sx={{ mt: 2, height: '100%', width: '100%', overflow: 'hidden' }}>
+                        <CalendarHeatmap
+                            startDate={new Date(new Date().setMonth(new Date().getMonth() - (isTablet ? 3 : 12)))}
+                            endDate={new Date()}
+                            values={activityData?.activity || []}
+                            classForValue={(value) => {
+                                if (!value) {
+                                    return 'color-empty';
+                                }
+                                return `color-scale-${Math.min(value.count, 4)}`;
+                            }}
+                            transformDayElement={(element, value, index) => {
+                                const title = value && value.date ? `${format(new Date(value.date), 'MMM d, yyyy')}: ${value.count} posts` : 'No contributions';
+                                return (
+                                    <Tooltip key={index} title={title} placement="top" arrow>
+                                        <rect {...element} />
+                                    </Tooltip>
+                                );
+                            }}
+                            showWeekdayLabels={true}
+                        />
+                        <style>{`
+                            .react-calendar-heatmap { width: 100%; height: 100%; }
+                            .react-calendar-heatmap text { font-size: 9px; fill: ${theme.palette.text.secondary}; font-family: inherit; font-weight: 500; }
+                            .react-calendar-heatmap .react-calendar-heatmap-weekday-labels { display: none; }
+                            .react-calendar-heatmap rect { rx: 3px; ry: 3px; stroke: ${theme.palette.background.paper}; stroke-width: 1px; transition: all 0.2s ease; }
+                            .react-calendar-heatmap rect:hover { stroke: ${theme.palette.primary.main}; stroke-width: 2px; }
+                            .react-calendar-heatmap .color-empty { fill: ${theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}; }
+                            .react-calendar-heatmap .color-scale-1 { fill: ${theme.palette.primary.main}; opacity: 0.2; }
+                            .react-calendar-heatmap .color-scale-2 { fill: ${theme.palette.primary.main}; opacity: 0.4; }
+                            .react-calendar-heatmap .color-scale-3 { fill: ${theme.palette.primary.main}; opacity: 0.6; }
+                            .react-calendar-heatmap .color-scale-4 { fill: ${theme.palette.primary.main}; opacity: 0.8; }
+                        `}</style>
+                    </Box>
+                )
+            },
+            {
+                id: 'recent',
+                label: 'Quick Actions',
+                icon: <BoltIcon sx={dashboardCardStyles.platformIcon} />,
+                color: '#3b82f6',
+                description: 'Manage your content',
+                value: 'Actions',
+                colSpan: { xs: 12, md: 4 },
+                customRenderer: () => (
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, mt: 1 }}>
+                        <Button
+                            variant="outlined"
+                            startIcon={<PostAddIcon />}
+                            fullWidth
+                            component="a"
+                            href="/feed"
+                            sx={{ borderRadius: 3, py: 1, borderColor: 'divider', color: 'text.primary' }}
+                        >
+                            Create New Post
+                        </Button>
+                        <Button
+                            variant="outlined"
+                            startIcon={<ManageAccountsIcon />}
+                            fullWidth
+                            component="a"
+                            href="/profile"
+                            sx={{ borderRadius: 3, py: 1, borderColor: 'divider', color: 'text.primary' }}
+                        >
+                            Edit Profile
+                        </Button>
+                    </Box>
+                )
+            }
         ];
 
-        let initialOrder = user?.dashboardOrder?.length ? user.dashboardOrder : platforms.map(p => p.id);
-
-        initialOrder = initialOrder.filter(id => platforms.some(p => p.id === id));
-
-        platforms.forEach(p => {
-            if (!initialOrder.includes(p.id)) initialOrder.push(p.id);
-        });
-
-        const orderedCards = initialOrder.map(id => {
-            const p = platforms.find(x => x.id === id)!;
-            let value: string | number = '---';
-            let description = p.description;
-
-            if (id === 'github' && stats?.github) {
-                value = stats.github?.profile?.repos || 0;
-                description = `${stats.github.profile.followers} Followers`;
-            } else if (id === 'tasks' && stats.tasks) {
-                value = stats.tasks.length;
-                description = `${stats.tasks.filter((t: any) => t.status === 'Completed').length} completed`;
-            } else if (id === 'leetcode' && stats.leetcode) {
-                value = stats.leetcode.totalSolved || '---';
-                description = `Rank: ${stats.leetcode.ranking || 'N/A'}`;
-            } else if (id === 'linkedin') {
-                value = user?.socialHandles?.linkedin ? 'Active' : 'N/A';
-            } else if (id === 'codeforces' && stats.codeforces) {
-                value = stats.codeforces.rating || '---';
-                description = stats.codeforces.rank || 'N/A';
-            }
-
-            return { ...p, value, description };
-        });
-
-        setCards(orderedCards);
-    }, [stats, user]);
+        setCards(statsCards as CardData[]);
+    }, [activityData, theme]);
 
     const handleDragStart = (event: DragStartEvent) => {
         setActiveId(event.active.id as string);
@@ -369,23 +461,15 @@ const Dashboard = () => {
 
             const newCards = arrayMove(cards, oldIndex, newIndex);
             setCards(newCards);
-
-            try {
-                const newOrder = newCards.map(c => c.id);
-                await api.put("/auth/dashboard-order", { order: newOrder });
-                if (fetchMe) await fetchMe();
-            } catch (err) {
-                console.error("Failed to save dashboard order", err);
-            }
         }
     };
 
     const activeCard = activeId ? cards.find(c => c.id === activeId) : null;
 
     const styles = {
-        container: { pb: 8, px: { xs: 1, sm: 2, md: 0 }, minHeight:"100vh" },
+        container: { pb: 8, px: { xs: 1, sm: 2, md: 0 }, minHeight: "100vh" },
         header: {
-            mb: { xs: 4, md: 8 },
+            mb: { xs: 4, md: 6 },
             mt: { xs: 2, md: 4 },
             display: 'flex',
             flexDirection: { xs: 'column', md: 'row' },
@@ -398,16 +482,15 @@ const Dashboard = () => {
             fontSize: { xs: '0.7rem', sm: '0.875rem' },
             verticalAlign: 'middle',
             ml: { xs: 1, sm: 2 },
-            bgcolor: 'primary.main',
+            bgcolor: 'common.black',
             color: 'white',
             px: { xs: 1, sm: 2 },
             py: 0.75,
-            borderRadius: 2,
+            borderRadius: 8,
             fontWeight: 900,
             display: 'inline-flex',
             alignItems: 'center',
-            boxShadow: '0 4px 15px rgba(99, 102, 241, 0.4)',
-            border: '1px solid rgba(255,255,255,0.2)'
+            boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
         },
         profileBox: { display: 'flex', alignItems: 'center', gap: { xs: 1.5, sm: 2.5 }, mt: 2 },
         avatar: { width: { xs: 40, sm: 48 }, height: { xs: 40, sm: 48 }, border: '2.5px solid', borderColor: 'primary.main', p: 0.3 },
@@ -416,10 +499,12 @@ const Dashboard = () => {
         actionsBox: { display: 'flex', gap: 2, width: { xs: '100%', md: 'auto' }, mt: { xs: 2, md: 0 } },
         verifiedChip: {
             fontWeight: 900,
-            borderRadius: 3,
-            flex: { xs: 1, md: 'none' },
+            borderRadius: '50%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
             height: 44,
-            px: 1,
+            width: 44,
             fontSize: { xs: '0.75rem', sm: '0.875rem' },
             boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
         },
@@ -433,10 +518,7 @@ const Dashboard = () => {
             boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
             cursor: 'pointer',
             transition: 'all 0.2s ease-in-out',
-            '&:hover': {
-                transform: 'scale(1.05)',
-                boxShadow: '0 6px 15px rgba(0,0,0,0.1)',
-            },
+            boxSizing: 'border-box'
         }
     };
 
@@ -448,20 +530,20 @@ const Dashboard = () => {
                         <Typography variant="h2" sx={styles.title}>
                             Overview
                             <Box component="span" sx={styles.platformBadge}>
-                                PLATFORMS
+                                INSIGHTS
                             </Box>
                         </Typography>
 
                         <Box sx={styles.profileBox}>
                             <Avatar
-                                src={stats.github?.profile?.avatar || stats.codeforces?.avatar || undefined}
+                                src={user?.avatar}
                                 sx={styles.avatar}
                             >
                                 {user?.email?.[0]?.toUpperCase() || '?'}
                             </Avatar>
                             <Box>
                                 <Typography variant="h6" sx={styles.username}>
-                                    {stats.github?.profile?.username || stats.leetcode?.username || user?.email.split('@')[0]}
+                                    {user?.name || user?.email.split('@')[0]}
                                 </Typography>
                                 <Typography variant="caption" color="text.secondary" sx={styles.tagline}>
                                     Your unified digital presence console
@@ -471,6 +553,16 @@ const Dashboard = () => {
                     </Box>
 
                     <Box sx={styles.actionsBox}>
+                        <Chip
+                            component="a"
+                            href="/infinite"
+                            variant="outlined"
+                            label={"See Infinite"}
+                            icon={<AllInclusiveIcon fontSize="large" />}
+
+                            color="primary"
+                            sx={styles.addfeedChip}
+                        />
                         <Chip
                             component="a"
                             href="/feed"
@@ -483,12 +575,12 @@ const Dashboard = () => {
 
                         <Chip
                             icon={user?.isVerified ? <VerifiedIcon /> : <UnverifiedIcon />}
-                            label={user?.isVerified ? "Verified Status" : "Action Required"}
                             color={user?.isVerified ? "success" : "warning"}
                             sx={styles.verifiedChip}
                         />
                     </Box>
                 </Box>
+
 
                 <DndContext
                     sensors={sensors}
@@ -502,7 +594,7 @@ const Dashboard = () => {
                     >
                         <Grid container spacing={3.5}>
                             {cards.map((card) => (
-                                <SortableCard key={card.id} card={card} loading={loadingStates[card.id] || false} />
+                                <SortableCard key={card.id} card={card} loading={loadingStates.activity || false} />
                             ))}
                         </Grid>
                     </SortableContext>
@@ -518,7 +610,7 @@ const Dashboard = () => {
                     }}>
                         {activeCard ? (
                             <Box sx={dashboardCardStyles.overlayBox(isMobile)}>
-                                <DashboardCard card={activeCard} loading={loadingStates[activeCard.id] || false} isOverlay />
+                                <DashboardCard card={activeCard} loading={loadingStates.activity || false} isOverlay />
                             </Box>
                         ) : null}
                     </DragOverlay>

@@ -23,14 +23,14 @@ const LandingPage: React.FC = () => {
             <PublicNavbar />
             <QuoteBanner />
             <HeroSection />
-            <PlatformShowcase />
-            <ProjectVision />
-            <TerminalShowcaseSection />
-            <DevCardHighlight />
             <FeaturesSection />
+            <PlatformShowcase />
+            <TerminalShowcaseSection />
+            <ProjectVision />
+            <DevCardHighlight />
             <ResumeShowcaseSection />
-            <AboutSection />
             <HowItWorksSection />
+            <AboutSection />
             <SupportSection />
             <CTASection />
             <LandingFooter />
