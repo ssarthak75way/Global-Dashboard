@@ -11,7 +11,9 @@ export interface IPost extends Document {
     content: string;
     author: mongoose.Types.ObjectId;
     imageUrl?: string;
+    tags: string[];
     likes: mongoose.Types.ObjectId[];
+    savedBy: mongoose.Types.ObjectId[];
     comments: IComment[];
     ratings: { user: mongoose.Types.ObjectId; score: number }[];
     createdAt: Date;
@@ -30,7 +32,9 @@ const postSchema = new Schema(
         content: { type: String, required: true },
         author: { type: Schema.Types.ObjectId, ref: "User", required: true },
         imageUrl: { type: String },
+        tags: [{ type: String }],
         likes: [{ type: Schema.Types.ObjectId, ref: "User" }],
+        savedBy: [{ type: Schema.Types.ObjectId, ref: "User" }],
         comments: [commentSchema],
         ratings: [
             {

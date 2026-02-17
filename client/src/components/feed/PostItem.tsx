@@ -2,28 +2,25 @@ import {
     Typography,
     Avatar,
     Stack,
-    Divider,
-    IconButton,
-    Card,
+    Box,
+    Tooltip,
+    Chip,
     CardContent,
-    CardHeader,
+    IconButton,
     Grow,
+    Card,
     Collapse,
     Grid,
-    Box,
-    Rating,
-    Tooltip,
-    Badge
+    CardHeader
 } from "@mui/material";
 import {
     Favorite as LikeIcon,
     FavoriteBorder as LikeBorderIcon,
     ChatBubbleOutline as CommentIcon,
-    AccessTime as TimeIcon,
     Edit as EditIcon,
     Delete as DeleteIcon,
-    Send as SendIcon,
-    StarBorder as StarBorderIcon
+    BookmarkBorder as SaveIcon,
+    Bookmark as SavedIcon
 } from "@mui/icons-material";
 import { formatDistanceToNow } from "date-fns";
 import { useState } from "react";
@@ -52,7 +49,9 @@ interface Post {
         email: string;
     };
     imageUrl?: string;
+    tags?: string[];
     likes: string[];
+    savedBy: string[];
     comments: Comment[];
     ratings: { user: string; score: number }[];
     createdAt: string;
@@ -70,6 +69,7 @@ interface PostItemProps {
     openCommentModal?: (postId: string) => void;
     handleDeleteComment?: (postId: string, commentId: string) => void;
     handleRate?: (postId: string, score: number) => void;
+    handleSave?: (postId: string) => void;
 }
 
 const PostItem = ({
@@ -83,11 +83,11 @@ const PostItem = ({
     isCommentsExpanded,
     openCommentModal,
     handleDeleteComment,
-    handleRate
+    handleSave
 }: PostItemProps) => {
     const styles = {
         postCard: {
-            maxWidth: '90vw',
+            maxWidth: '100%',
             borderRadius: 2,
             border: "1px solid",
             borderColor: "divider",
@@ -199,6 +199,25 @@ const PostItem = ({
         <>
             <Grow in timeout={500 + index * 100}>
                 <Card elevation={0} sx={styles.postCard}>
+                    {post.imageUrl && (
+                        <Box sx={{
+                            height: 200,
+                            overflow: 'hidden',
+                            borderBottom: '1px solid',
+                            borderColor: 'divider'
+                        }}>
+                            <Box
+                                component="img"
+                                src={post.imageUrl}
+                                alt={post.title}
+                                sx={{
+                                    width: '100%',
+                                    height: '100%',
+                                    objectFit: 'cover'
+                                }}
+                            />
+                        </Box>
+                    )}
                     <CardHeader
                         sx={styles.postCardHeader}
                         avatar={
@@ -207,10 +226,9 @@ const PostItem = ({
                                 {!post.author?.avatar && (post.author?.name?.[0]?.toUpperCase() || post.author?.email?.[0]?.toUpperCase() || '?')}
                             </Avatar>
                         }
-                        title={<Typography sx={styles.postCardHeaderTitle}>{post.author.name || "Unknown Author"}</Typography>}
-                        subheader={
-                            <Stack direction="row" spacing={1} alignItems="center">
-                                <TimeIcon sx={styles.postCardTimeIcon} />
+                        title={
+                            <Stack>
+                                <Typography sx={styles.postCardHeaderTitle}>{post.author.name || "Unknown Author"}</Typography>
                                 <Typography variant="caption" color="text.disabled">
                                     {formatDistanceToNow(new Date(post.createdAt))} ago
                                 </Typography>
@@ -234,89 +252,88 @@ const PostItem = ({
                         }
                     />
                     <CardContent sx={styles.postContent}>
-                        <Typography variant="h5" sx={styles.postTitle}>
-                            {post.title}
-                        </Typography>
+                        <Box sx={{ pl: { sm: 7 } }}>
+                            <Typography variant="h4" sx={{ ...styles.postTitle, mb: 1 }}>
+                                {post.title}
+                            </Typography>
 
-                        {post.imageUrl && (
-                            <Box sx={styles.postImageContainer}>
-                                <Box component="img" src={post.imageUrl} alt={post.title} sx={styles.postImage} />
-                            </Box>
-                        )}
+                            {post.tags && post.tags.length > 0 && (
+                                <Stack direction="row" spacing={1} mb={2} flexWrap="wrap" gap={1}>
+                                    {post.tags.map((tag, idx) => (
+                                        <Chip
+                                            key={idx}
+                                            label={`#${tag.trim()}`}
+                                            size="small"
+                                            sx={{
+                                                bgcolor: 'transparent',
+                                                border: '1px solid',
+                                                borderColor: 'divider',
+                                                '&:hover': {
+                                                    borderColor: 'primary.main',
+                                                    color: 'primary.main',
+                                                    bgcolor: 'action.hover'
+                                                }
+                                            }}
+                                        />
+                                    ))}
+                                </Stack>
+                            )}
 
-                        <Box
-                            sx={styles.postHtmlContent}
-                            dangerouslySetInnerHTML={{ __html: post.content }}
-                        />
+                            <Box
+                                sx={styles.postHtmlContent}
+                                dangerouslySetInnerHTML={{ __html: post.content }}
+                            />
 
-                        <Divider sx={styles.divider} />
+                            <Stack direction="row" justifyContent="space-between" alignItems="center">
+                                <Stack direction="row" spacing={3} alignItems="center">
+                                    <Stack direction="row" spacing={0.5} alignItems="center"
+                                        sx={{ cursor: 'pointer', opacity: 0.8, "&:hover": { opacity: 1 } }}
+                                        onClick={() => handleLike?.(post._id)}
+                                    >
+                                        <IconButton size="small" sx={{ color: post.likes.includes(user?._id || "") ? "error.main" : "inherit", p: 0.5 }}>
+                                            {post.likes.includes(user?._id || "") ? <LikeIcon /> : <LikeBorderIcon />}
+                                        </IconButton>
+                                        <Typography variant="body2">{post.likes.length} Reactions</Typography>
+                                    </Stack>
 
-                        <Stack direction="row" spacing={3} alignItems="center">
-                            <Stack direction="row" spacing={0.5} alignItems="center"
-                                sx={{ cursor: 'pointer', opacity: 0.8, "&:hover": { opacity: 1 } }}
-                                onClick={() => handleLike?.(post._id)}
-                            >
-                                <IconButton size="small" sx={{ color: post.likes.includes(user?._id || "") ? "error.main" : "inherit", p: 0.5 }}>
-                                    {post.likes.includes(user?._id || "") ? <LikeIcon /> : <LikeBorderIcon />}
-                                </IconButton>
-                                <Typography variant="body2" sx={{ fontWeight: 700 }}>{post.likes.length}</Typography>
-                            </Stack>
-                            <Stack direction="row" spacing={0.5} alignItems="center"
-                                sx={{ cursor: 'pointer', opacity: 0.8, "&:hover": { opacity: 1 } }}
-                                onClick={() => toggleComments?.(post._id)}
-                            >
-                                <IconButton size="small" sx={{ p: 0.5 }}>
-                                    <CommentIcon />
-                                </IconButton>
-                                <Typography variant="body2" sx={{ fontWeight: 700 }}>{post.comments.length}</Typography>
-                            </Stack>
+                                    <Stack direction="row" spacing={0.5} alignItems="center"
+                                        sx={{ cursor: 'pointer', opacity: 0.8, "&:hover": { opacity: 1 } }}
+                                        onClick={() => toggleComments?.(post._id)}
+                                    >
+                                        <IconButton size="small" sx={{ p: 0.5 }}>
+                                            <CommentIcon />
+                                        </IconButton>
+                                        <Typography variant="body2">{post.comments.length} Comments</Typography>
+                                    </Stack>
+                                </Stack>
 
-                            <Stack direction="row" spacing={0.5} alignItems="center"
-                                sx={{ cursor: 'pointer', opacity: 0.8, "&:hover": { opacity: 1 } }}
-                                onClick={() => setShareModalOpen(true)}
-                            >
-                                <IconButton size="small" sx={{ p: 0.5 }}>
-                                    <SendIcon />
-                                </IconButton>
-                                <Typography variant="body2" sx={{ fontWeight: 700 }}>Share</Typography>
-                            </Stack>
+                                <Stack direction="row" spacing={1}>
+                                    <Typography variant="caption" color="text.secondary" sx={{ display: 'flex', alignItems: 'center' }}>
+                                        {Math.ceil(post.content.length / 500)} min read
+                                    </Typography>
 
-                            <Box sx={{ flexGrow: 1 }} />
-
-                            <Tooltip title={!user ? "Login to rate" : ""}>
-                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                    <Rating
-                                        name={`rating-${post._id}`}
-                                        value={post.ratings?.reduce((acc: number, r: any) => acc + r.score, 0) / (post.ratings?.length || 1)}
-                                        onChange={(_event, newValue) => {
-                                            if (user && newValue) {
-                                                handleRate?.(post._id, newValue);
-                                            }
-                                        }}
-                                        precision={0.5}
-                                        readOnly={!user}
-                                        emptyIcon={<StarBorderIcon fontSize="inherit" />}
+                                    <IconButton
                                         size="small"
-                                    />
-                                    {post.ratings?.length > 0 && (
-                                        <Typography variant="caption" color="text.secondary" sx={{ ml: 0.5 }}>
-                                            ({post.ratings.length})
-                                        </Typography>
-                                    )}
-                                </Box>
-                            </Tooltip>
-                        </Stack>
+                                        onClick={() => handleSave?.(post._id)}
+                                        sx={{
+                                            bgcolor: post.savedBy?.includes(user?._id || "") ? 'primary.light' : 'action.hover',
+                                            color: post.savedBy?.includes(user?._id || "") ? 'primary.main' : 'inherit',
+                                            '&:hover': { bgcolor: 'primary.light', color: 'primary.main' }
+                                        }}
+                                    >
+                                        {post.savedBy?.includes(user?._id || "") ? <SavedIcon /> : <SaveIcon />}
+                                    </IconButton>
+                                </Stack>
+                            </Stack>
+                        </Box>
 
                         {/* Comments Section */}
                         <Collapse in={isCommentsExpanded}>
                             <Box sx={styles.commentsSection}>
                                 <Box sx={{ ...styles.commentsHeader, display: 'flex', alignItems: 'center', mb: 2 }}>
                                     <Typography variant="subtitle2" color="text.secondary">
-                                        Comments
+                                        Discussion ({post.comments.length})
                                     </Typography>
-                                    <Badge badgeContent={post.comments.length} color="primary" sx={{ ml: 1, mr: 1 }}>
-                                        <CommentIcon sx={{ fontSize: 16, opacity: 0.6 }} />
-                                    </Badge>
                                     {user && (
                                         <Tooltip title="Add Comment">
                                             <IconButton
@@ -374,7 +391,7 @@ const PostItem = ({
                                     {post.comments.length === 0 && (
                                         <Grid item xs={12}>
                                             <Typography variant="body2" color="text.secondary" align="center" sx={{ py: 2 }}>
-                                                No comments yet. Be the first to share your thoughts!
+                                                No comments yet. Start the discussion!
                                             </Typography>
                                         </Grid>
                                     )}

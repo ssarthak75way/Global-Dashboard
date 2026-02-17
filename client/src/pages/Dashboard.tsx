@@ -383,7 +383,7 @@ const Dashboard = () => {
     const activeCard = activeId ? cards.find(c => c.id === activeId) : null;
 
     const styles = {
-        container: { pb: 8, px: { xs: 1, sm: 2, md: 0 }, minHeight:"100vh" },
+        container: { pb: 8, px: { xs: 1, sm: 2, md: 0 }, minHeight: "100vh" },
         header: {
             mb: { xs: 4, md: 8 },
             mt: { xs: 2, md: 4 },
@@ -489,6 +489,7 @@ const Dashboard = () => {
                         />
                     </Box>
                 </Box>
+
 
                 <DndContext
                     sensors={sensors}
