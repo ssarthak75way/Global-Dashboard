@@ -1,38 +1,55 @@
 import React from 'react';
-import { Box, Container, Typography, Button, useTheme } from '@mui/material';
+import { Box, Container, Typography, Button, useTheme, alpha } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import DashboardIcon from '@mui/icons-material/Dashboard';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
 const CTASection: React.FC = () => {
     const { isAuthenticated } = useAuth();
     const theme = useTheme();
     const navigate = useNavigate();
 
-    const styles = {
-        section: {
-            py: { xs: 8, md: 12 }
-        },
-        ctaButton: {
-            px: 4,
-            py: 1.5,
-            fontSize: '1.1rem',
-            fontWeight: 700,
-            borderRadius: 2,
-            textTransform: 'none',
-            boxShadow: `0 8px 24px ${theme.palette.primary.main}40`
-        }
-    };
-
     return (
-        <Box sx={{ ...styles.section, bgcolor: 'primary.main', color: 'white', textAlign: 'center' }}>
-            <Container maxWidth="md">
-                <Typography variant="h2" sx={{ fontWeight: 900, mb: 3 }}>
+        <Box sx={{
+            py: { xs: 10, md: 16 },
+            position: 'relative',
+            overflow: 'hidden',
+            background: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.secondary.dark} 100%)`,
+            color: 'white',
+            textAlign: 'center'
+        }}>
+            {/* Background Mesh/Glow */}
+            <Box sx={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                background: `radial-gradient(circle at 50% 50%, ${alpha(theme.palette.primary.main, 0.4)} 0%, transparent 60%)`,
+                zIndex: 0
+            }} />
+
+            <Box sx={{
+                position: 'absolute',
+                top: '-50%',
+                left: '-20%',
+                width: '60%',
+                height: '200%',
+                background: `radial-gradient(circle, ${alpha(theme.palette.secondary.main, 0.1)} 0%, transparent 50%)`,
+                transform: 'rotate(-45deg)',
+                zIndex: 0
+            }} />
+
+            <Container maxWidth="md" sx={{ position: 'relative', zIndex: 1 }}>
+                <Typography variant="h2" sx={{ fontWeight: 900, mb: 3, fontSize: { xs: '2.5rem', md: '3.5rem' } }}>
                     Ready to Start Your Journey?
                 </Typography>
-                <Typography variant="h6" sx={{ mb: 4, opacity: 0.9 }}>
-                    Join thousands of developers already using DevConnect
+                <Typography variant="h6" sx={{ mb: 6, opacity: 0.9, fontWeight: 500, maxWidth: 600, mx: 'auto', lineHeight: 1.6 }}>
+                    Join thousands of developers building their future with DevConnect.
+                    Create, collaborate, and grow—all in one place.
                 </Typography>
+
                 {isAuthenticated ? (
                     <Button
                         variant="contained"
@@ -40,11 +57,18 @@ const CTASection: React.FC = () => {
                         startIcon={<DashboardIcon />}
                         onClick={() => navigate('/dashboard')}
                         sx={{
-                            ...styles.ctaButton,
-                            bgcolor: 'white !important',
-                            color: '#000',
+                            px: 5,
+                            py: 2,
+                            borderRadius: '50px',
+                            fontSize: '1.2rem',
+                            fontWeight: 800,
+                            bgcolor: 'white',
+                            color: 'primary.main',
+                            boxShadow: '0 20px 40px -10px rgba(0,0,0,0.3)',
                             '&:hover': {
-                                bgcolor: 'grey.100'
+                                bgcolor: '#f8fafc',
+                                transform: 'translateY(-3px)',
+                                boxShadow: '0 25px 50px -10px rgba(0,0,0,0.4)'
                             }
                         }}
                     >
@@ -54,17 +78,25 @@ const CTASection: React.FC = () => {
                     <Button
                         variant="contained"
                         size="large"
+                        endIcon={<ArrowForwardIcon />}
                         onClick={() => navigate('/signup')}
                         sx={{
-                            ...styles.ctaButton,
-                            bgcolor: 'white !important',
-                            color: '#000',
+                            px: 5,
+                            py: 2,
+                            borderRadius: '50px',
+                            fontSize: '1.2rem',
+                            fontWeight: 800,
+                            bgcolor: 'white',
+                            color: 'primary.main',
+                            boxShadow: '0 20px 40px -10px rgba(0,0,0,0.3)',
                             '&:hover': {
-                                bgcolor: 'grey.100'
+                                bgcolor: '#f8fafc',
+                                transform: 'translateY(-3px)',
+                                boxShadow: '0 25px 50px -10px rgba(0,0,0,0.4)'
                             }
                         }}
                     >
-                        Create Free Account
+                        Get Started Free
                     </Button>
                 )}
             </Container>

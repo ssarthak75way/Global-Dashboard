@@ -79,8 +79,8 @@ const Feed = () => {
     // Debounce search
     useEffect(() => {
         const timer = setTimeout(() => {
-            setPage(1);
-            fetchPosts(1, true);
+            setPage(page);
+            fetchPosts(page, true);
         }, 500);
 
         return () => clearTimeout(timer);

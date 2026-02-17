@@ -84,6 +84,7 @@ export const getPosts = async (req: Request, res: Response): Promise<void> => {
         const page = parseInt(req.query.page as string) || 1;
         const limit = parseInt(req.query.limit as string) || 10;
         const skip = (page - 1) * limit;
+        const random = req.query.random === 'true';
 
         let posts;
         if (Object.keys(query).length > 0) {
@@ -94,6 +95,26 @@ export const getPosts = async (req: Request, res: Response): Promise<void> => {
                 .sort({ createdAt: -1 })
                 .skip(skip)
                 .limit(limit);
+        } else if (random) {
+            // New: Explicit Random Feed Mode
+            const randomPosts = await Post.aggregate([
+                { $sample: { size: limit } }
+            ]);
+
+            const populatedPosts = await Post.populate(randomPosts, [
+                { path: "author", select: "email avatar name" },
+                { path: "comments.user", select: "name avatar" }
+            ]);
+
+            posts = populatedPosts.map((p: any) => {
+                const postObj = p.toObject ? p.toObject() : p;
+                return {
+                    ...postObj,
+                    _id: uuidv4(),
+                    originalId: postObj._id,
+                    isRandom: true
+                };
+            });
         } else {
             // Feed mode: Infinite Loop
             const totalPosts = await Post.countDocuments();

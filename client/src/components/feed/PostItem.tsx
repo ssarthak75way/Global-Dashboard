@@ -20,7 +20,8 @@ import {
     Edit as EditIcon,
     Delete as DeleteIcon,
     BookmarkBorder as SaveIcon,
-    Bookmark as SavedIcon
+    Bookmark as SavedIcon,
+    Share as ShareIcon
 } from "@mui/icons-material";
 import { formatDistanceToNow } from "date-fns";
 import { useState } from "react";
@@ -304,6 +305,16 @@ const PostItem = ({
                                             <CommentIcon />
                                         </IconButton>
                                         <Typography variant="body2">{post.comments.length} Comments</Typography>
+                                    </Stack>
+
+                                    <Stack direction="row" spacing={0.5} alignItems="center"
+                                        sx={{ cursor: 'pointer', opacity: 0.8, "&:hover": { opacity: 1 } }}
+                                        onClick={() => setShareModalOpen(true)}
+                                    >
+                                        <IconButton size="small" sx={{ p: 0.5 }}>
+                                            <ShareIcon />
+                                        </IconButton>
+                                        <Typography variant="body2">Share</Typography>
                                     </Stack>
                                 </Stack>
 

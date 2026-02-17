@@ -24,6 +24,7 @@ import {
 import { searchUsersForChat, sendMessage } from "../../services/chatService";
 import { getNetwork } from "../../services/socialService";
 import { useAuth } from "../../context/AuthContext";
+import { useToast } from "../../context/ToastContext";
 
 interface User {
     _id: string;
@@ -41,6 +42,7 @@ interface SharePostModalProps {
 
 const SharePostModal = ({ open, onClose, postId, postTitle }: SharePostModalProps) => {
     const { user: currentUser } = useAuth();
+    const { showToast } = useToast();
     const [searchQuery, setSearchQuery] = useState("");
     const [users, setUsers] = useState<User[]>([]);
     const [followings, setFollowings] = useState<User[]>([]);
@@ -98,15 +100,17 @@ const SharePostModal = ({ open, onClose, postId, postTitle }: SharePostModalProp
         setSending(targetUserId);
         try {
             await sendMessage(targetUserId, `Shared a post: ${postTitle}`, postId);
+            showToast("Post shared successfully!", "success");
             onClose();
         } catch (error) {
             console.error("Send failed", error);
+            showToast("Failed to share post. Please try again.", "error");
         } finally {
             setSending(null);
         }
     };
 
-    
+
     return (
         <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
             <DialogTitle sx={{ m: 0, p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
