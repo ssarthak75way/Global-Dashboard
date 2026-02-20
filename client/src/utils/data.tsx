@@ -502,9 +502,9 @@ export interface GettingStartedStep {
 export const gettingStartedSteps: GettingStartedStep[] = [
     {
         title: '1. Clone the Repository',
-        description: 'Clone the DevConnect repository to your local machine',
-        code: `git clone https://github.com/your-org/devconnect.git
-cd devconnect`,
+        description: 'Clone the D. Connect repository to your local machine',
+        code: `git clone https://github.com/your-org/d-connect.git
+cd d-connect`,
         notes: ['Ensure you have Git installed on your system']
     },
     {
@@ -524,7 +524,7 @@ npm install`,
         description: 'Set up environment variables for both client and server',
         code: `# Server .env file
 PORT=5000
-MONGODB_URI=mongodb://localhost:27017/devconnect
+MONGODB_URI=mongodb://localhost:27017/dconnect
 JWT_SECRET=your_jwt_secret_key
 GOOGLE_CLIENT_ID=your_google_client_id
 GOOGLE_CLIENT_SECRET=your_google_client_secret
@@ -863,7 +863,7 @@ export const faqs: FAQItem[] = [
     {
         category: 'Getting Started',
         question: 'What are the system requirements?',
-        answer: 'DevConnect works on all modern browsers (Chrome, Firefox, Safari, Edge). For development, you need Node.js 18+, npm 9+, and MongoDB 5.0+. The platform is fully responsive and works on desktop, tablet, and mobile devices.'
+        answer: 'D. Connect works on all modern browsers (Chrome, Firefox, Safari, Edge). For development, you need Node.js 18+, npm 9+, and MongoDB 5.0+. The platform is fully responsive and works on desktop, tablet, and mobile devices.'
     },
     {
         category: 'Profile & Resume',

@@ -64,7 +64,7 @@ interface Post {
 interface PostItemProps {
     post: Post;
     index: number;
-    user: { _id: string } | null;
+    user: { _id: string; name?: string; avatar?: string; } | null;
     handleEditInitiate?: (post: Post) => void;
     handleDelete?: (postId: string) => void;
     handleLike?: (postId: string) => void;
@@ -100,7 +100,7 @@ const PostItem = ({
     const styles = {
         postCard: {
             maxWidth: '100%',
-            borderRadius: 4,
+            borderRadius: 1,
             border: "1px solid",
             borderColor: (theme: any) => theme.palette.mode === 'light'
                 ? alpha(theme.palette.divider, 0.4)
@@ -180,21 +180,48 @@ const PostItem = ({
             letterSpacing: '0.05em'
         },
         postHtmlContent: {
+            width: '100%',
+            overflow: 'hidden',
+            wordBreak: 'break-word',
             mb: 3.5,
-            color: "text.secondary",
-            lineHeight: 1.6,
-            "& p": { mb: 2, fontSize: { xs: "0.95rem", sm: "1.05rem" } },
-            "& h1, h2, h3": { mb: 2, fontWeight: 800, fontSize: '1.3rem', mt: 2.5, color: 'text.primary' },
+            color: "text.primary",
+            lineHeight: 1.7,
+            letterSpacing: '0.01em',
+            "& p": {
+                mb: 2,
+                fontSize: { xs: "1rem", sm: "1.08rem" },
+                '&:last-child': { mb: 0 }
+            },
+            "& h1, h2, h3": {
+                mb: 2,
+                fontWeight: 800,
+                fontSize: { xs: '1.2rem', sm: '1.4rem' },
+                mt: 3,
+                color: 'text.primary',
+                lineHeight: 1.3
+            },
             "& blockquote": {
                 borderLeft: "4px solid",
                 borderColor: "primary.main",
-                bgcolor: (theme: any) => alpha(theme.palette.primary.main, 0.03),
-                p: 2,
-                pl: 3,
-                borderRadius: '0 8px 8px 0',
+                bgcolor: (theme: any) => alpha(theme.palette.primary.main, 0.04),
+                p: 2.5,
+                pl: 3.5,
+                borderRadius: '4px 12px 12px 4px',
                 fontStyle: "italic",
-                my: 3,
-                mx: 0
+                my: 3.5,
+                mx: 0,
+                boxShadow: (theme: any) => `inset 10px 0 20px -10px ${alpha(theme.palette.primary.main, 0.1)}`
+            },
+            "& ul, & ol": {
+                pl: 3,
+                mb: 2,
+                '& li': { mb: 1 }
+            },
+            "& img": {
+                maxWidth: '100%',
+                height: 'auto',
+                borderRadius: 2,
+                my: 2
             }
         },
         interactionRow: {
@@ -238,21 +265,65 @@ const PostItem = ({
             borderTop: "1px dashed",
             borderColor: "divider"
         },
-        commentsHeader: { display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 },
+        commentsHeader: {
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            mb: 2.5,
+            cursor: 'pointer',
+            '&:hover': {
+                '& .MuiTypography-subtitle2': { color: 'primary.main' }
+            }
+        },
+        commentTrigger: {
+            display: 'flex',
+            alignItems: 'center',
+            gap: 2,
+            p: 1.5,
+            m: 4,
+            bgcolor: (theme: any) => alpha(theme.palette.action.hover, 0.5),
+            borderRadius: 1,
+            cursor: 'pointer',
+            border: '1px solid transparent',
+            transition: 'all 0.2s',
+            '&:hover': {
+                bgcolor: (theme: any) => alpha(theme.palette.action.hover, 0.8),
+                borderColor: 'primary.main',
+                boxShadow: (theme: any) => `0 4px 12px ${alpha(theme.palette.primary.main, 0.05)}`
+            }
+        },
         commentBox: {
             p: 2,
-            bgcolor: (theme: any) => alpha(theme.palette.action.hover, 0.4),
-            borderRadius: 3,
+            bgcolor: (theme: any) => theme.palette.mode === 'light'
+                ? alpha('#fff', 0.6)
+                : alpha(theme.palette.background.paper, 0.4),
+            borderRadius: 1,
             border: '1px solid',
-            borderColor: (theme: any) => alpha(theme.palette.divider, 0.5),
+            borderColor: (theme: any) => alpha(theme.palette.divider, 0.4),
+            transition: 'all 0.2s',
+            '&:hover': {
+                borderColor: (theme: any) => alpha(theme.palette.primary.main, 0.3),
+                transform: 'translateX(4px)',
+                bgcolor: (theme: any) => theme.palette.mode === 'light'
+                    ? '#fff'
+                    : alpha(theme.palette.background.paper, 0.6),
+            }
         },
         commentHeaderStack: { mb: 1 },
-        commentAvatar: { width: 30, height: 30, fontSize: '0.75rem', border: '1px solid', borderColor: 'divider' },
-        commentAuthor: { fontWeight: 800, fontSize: '0.85rem' },
+        commentAvatar: {
+            width: 32,
+            height: 32,
+            fontSize: '0.8rem',
+            border: '1.5px solid',
+            borderColor: 'background.paper',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
+        },
+        commentAuthor: { fontWeight: 800, fontSize: '0.9rem', color: 'text.primary' },
         commentText: {
-            fontSize: '0.92rem',
+            fontSize: '0.95rem',
             color: 'text.secondary',
-            lineHeight: 1.5
+            lineHeight: 1.6,
+            '& p': { mb: 0 }
         }
     };
 
@@ -378,6 +449,7 @@ const PostItem = ({
                         <Box
                             sx={styles.postHtmlContent}
                             dangerouslySetInnerHTML={{ __html: post.content }}
+
                         />
 
                         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={styles.interactionRow}>
@@ -390,13 +462,52 @@ const PostItem = ({
                                     <Typography variant="body2" sx={{ fontWeight: 800 }}>{post.likes.length}</Typography>
                                 </Box>
 
-                                <Box
-                                    sx={{ ...styles.actionButton }}
-                                    onClick={() => toggleComments?.(post._id)}
-                                >
-                                    <CommentIcon />
-                                    <Typography variant="body2" sx={{ fontWeight: 800 }}>{post.comments.length}</Typography>
-                                </Box>
+                                <Stack direction="row" spacing={1} alignItems="center">
+                                    <Tooltip title="Add Comment">
+                                        <IconButton
+                                            size="small"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                openCommentModal?.(post._id);
+                                            }}
+                                            sx={{
+                                                color: 'primary.main',
+                                                bgcolor: (theme) => alpha(theme.palette.primary.main, 0.05),
+                                                '&:hover': { bgcolor: (theme) => alpha(theme.palette.primary.main, 0.1) }
+                                            }}
+                                        >
+                                            <CommentIcon fontSize="small" />
+                                        </IconButton>
+                                    </Tooltip>
+
+                                    <Box
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            toggleComments?.(post._id);
+                                        }}
+                                        sx={{
+                                            cursor: 'pointer',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: 0.5,
+                                            px: 1,
+                                            py: 0.5,
+                                            borderRadius: 2,
+                                            transition: 'all 0.2s',
+                                            '&:hover': {
+                                                bgcolor: 'action.hover',
+                                                '& .MuiTypography-root': { color: 'primary.main' }
+                                            }
+                                        }}
+                                    >
+                                        <Typography variant="body2" sx={{ fontWeight: 800 }}>
+                                            {post.comments.length}
+                                        </Typography>
+                                        <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.secondary', display: { xs: 'none', sm: 'block' } }}>
+                                            {post.comments.length === 1 ? 'comment' : 'comments'}
+                                        </Typography>
+                                    </Box>
+                                </Stack>
 
                                 <Box
                                     sx={{ ...styles.actionButton }}
@@ -437,27 +548,37 @@ const PostItem = ({
                     {/* Comments Section */}
                     <Collapse in={isCommentsExpanded}>
                         <Box sx={styles.commentsSection}>
-                            <Box sx={{ ...styles.commentsHeader, display: 'flex', alignItems: 'center', mb: 2.5 }}>
-                                <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.secondary' }}>
+                            <Box
+                                sx={styles.commentsHeader}
+                                onClick={() => toggleComments?.(post._id)}
+                            >
+                                <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.secondary', display: 'flex', alignItems: 'center', gap: 1 }}>
                                     Reviews & Discussion ({post.comments.length})
+                                    <Typography variant="caption" sx={{ fontWeight: 600, opacity: 0.6 }}>
+                                        — {isCommentsExpanded ? 'Hide' : 'Show'}
+                                    </Typography>
                                 </Typography>
-                                {user && (
-                                    <Tooltip title="Add Comment">
-                                        <IconButton
-                                            size="small"
-                                            onClick={() => openCommentModal?.(post._id)}
-                                            sx={{
-                                                bgcolor: 'primary.main',
-                                                color: 'white',
-                                                p: 0.5,
-                                                '&:hover': { bgcolor: 'primary.dark' }
-                                            }}
-                                        >
-                                            <CommentIcon sx={{ fontSize: 14 }} />
-                                        </IconButton>
-                                    </Tooltip>
-                                )}
                             </Box>
+
+                            {user && (
+                                <Box
+                                    sx={styles.commentTrigger}
+                                    onClick={() => openCommentModal?.(post._id)}
+                                >
+                                    <Avatar
+                                        src={user.avatar}
+                                        sx={{ width: 32, height: 32, border: '1px solid', borderColor: 'divider' }}
+                                    >
+                                        {user.name?.[0]?.toUpperCase()}
+                                    </Avatar>
+                                    <Typography variant="body2" sx={{ color: 'text.disabled', fontWeight: 500 }}>
+                                        Write a comment...
+                                    </Typography>
+                                    <IconButton size="small" sx={{ ml: 'auto', color: 'secondry.main' }}>
+                                        <CommentIcon fontSize="small" />
+                                    </IconButton>
+                                </Box>
+                            )}
 
                             <Grid container spacing={2}>
                                 {post.comments.map(comment => (
@@ -481,7 +602,10 @@ const PostItem = ({
                                                 {comment.user?._id === user?._id && handleDeleteComment && (
                                                     <IconButton
                                                         size="small"
-                                                        onClick={() => handleDeleteComment(post._id, comment._id)}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleDeleteComment(post._id, comment._id);
+                                                        }}
                                                         sx={{ ml: 'auto', opacity: 0.5, '&:hover': { opacity: 1, color: 'error.main' } }}
                                                     >
                                                         <DeleteIcon fontSize="small" />
@@ -489,7 +613,7 @@ const PostItem = ({
                                                 )}
                                             </Stack>
                                             <Box
-                                                sx={{ ...styles.commentText, mt: 1, ml: { xs: 0, sm: 5.5 } }}
+                                                sx={{ ...styles.commentText, mt: 1, ml: { xs: 0, sm: 5.8 } }}
                                                 dangerouslySetInnerHTML={{ __html: comment.text }}
                                             />
                                         </Box>
@@ -497,9 +621,20 @@ const PostItem = ({
                                 ))}
                                 {post.comments.length === 0 && (
                                     <Grid item xs={12}>
-                                        <Typography variant="body2" color="text.secondary" align="center" sx={{ py: 3, opacity: 0.6, fontStyle: 'italic' }}>
-                                            No comments yet. Start the discussion!
-                                        </Typography>
+                                        <Box
+                                            sx={{
+                                                py: 4,
+                                                textAlign: 'center',
+                                                bgcolor: (theme: any) => alpha(theme.palette.action.hover, 0.3),
+                                                borderRadius: 4,
+                                                border: '1px dashed',
+                                                borderColor: 'divider'
+                                            }}
+                                        >
+                                            <Typography variant="body2" color="text.secondary" sx={{ opacity: 0.7, fontStyle: 'italic', fontWeight: 600 }}>
+                                                No comments yet. Start the discussion!
+                                            </Typography>
+                                        </Box>
                                     </Grid>
                                 )}
                             </Grid>

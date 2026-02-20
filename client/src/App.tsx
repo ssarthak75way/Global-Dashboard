@@ -26,8 +26,22 @@ const CommentedPosts = lazy(() => import("./pages/CommentedPosts"));
 const InfiniteFeed = lazy(() => import("./pages/InfiniteFeed"));
 import { SocketProvider } from "./context/SocketContext";
 const PublicDocumentation = lazy(() => import("./pages/PublicDocumentation"));
+const Privacy = lazy(() => import("./pages/Privacy"));
+const Terms = lazy(() => import("./pages/Terms"));
+const Security = lazy(() => import("./pages/Security"));
+const Status = lazy(() => import("./pages/Status"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 import ScrollToTop from "./components/ScrollToTop";
+import CursorFollower from "./components/common/CursorFollower";
+import { Outlet } from "react-router-dom";
+
+const LayoutWrapper = () => (
+  <>
+    <ScrollToTop />
+    <CursorFollower />
+    <Outlet />
+  </>
+);
 
 const LoadingFallback = () => (
   <Box
@@ -69,159 +83,196 @@ const ErrorFallback = ({ error, resetErrorBoundary }: FallbackProps) => {
 
 const router = createBrowserRouter([
   {
-    path: "/",
-    element: (
-      <Suspense fallback={<LoadingFallback />}>
-        <LandingPage />
-      </Suspense>
-    )
-  },
-  {
-    path: "/guide",
-    element: (
-      <Suspense fallback={<LoadingFallback />}>
-        <PublicDocumentation />
-      </Suspense>
-    )
-  },
-  {
-    element: <PublicLayout />,
+    element: <LayoutWrapper />,
     children: [
       {
-        path: "/signup",
+        path: "/",
         element: (
           <Suspense fallback={<LoadingFallback />}>
-            <Signup />
+            <LandingPage />
           </Suspense>
         )
       },
       {
-        path: "/verify-otp",
+        path: "/guide",
         element: (
           <Suspense fallback={<LoadingFallback />}>
-            <VerifyOtp />
+            <PublicDocumentation />
           </Suspense>
         )
       },
+      {
+        path: "/privacy",
+        element: (
+          <Suspense fallback={<LoadingFallback />}>
+            <Privacy />
+          </Suspense>
+        )
+      },
+      {
+        path: "/terms",
+        element: (
+          <Suspense fallback={<LoadingFallback />}>
+            <Terms />
+          </Suspense>
+        )
+      },
+      {
+        path: "/security",
+        element: (
+          <Suspense fallback={<LoadingFallback />}>
+            <Security />
+          </Suspense>
+        )
+      },
+      {
+        path: "/status",
+        element: (
+          <Suspense fallback={<LoadingFallback />}>
+            <Status />
+          </Suspense>
+        )
+      },
+      {
+        element: <PublicLayout />,
+        children: [
+          {
+            path: "/signup",
+            element: (
+              <Suspense fallback={<LoadingFallback />}>
+                <Signup />
+              </Suspense>
+            )
+          },
+          {
+            path: "/verify-otp",
+            element: (
+              <Suspense fallback={<LoadingFallback />}>
+                <VerifyOtp />
+              </Suspense>
+            )
+          },
 
+          {
+            path: "/login",
+            element: (
+              <Suspense fallback={<LoadingFallback />}>
+                <Login />
+              </Suspense>
+            )
+          }
+        ]
+      },
       {
-        path: "/login",
+        element: <PrivateLayout />,
+        children: [
+          {
+            path: "/dashboard",
+            element: (
+              <Suspense fallback={<LoadingFallback />}>
+                <Dashboard />
+              </Suspense>
+            )
+          },
+          {
+            path: "/profile",
+            element: (
+              <Suspense fallback={<LoadingFallback />}>
+                <Profile />
+              </Suspense>
+            )
+          },
+          {
+            path: "/profile/:userId",
+            element: (
+              <Suspense fallback={<LoadingFallback />}>
+                <Profile />
+              </Suspense>
+            )
+          },
+          {
+            path: "/board",
+            element: (
+              <Suspense fallback={<LoadingFallback />}>
+                <Board />
+              </Suspense>
+            )
+          },
+          {
+            path: "/feed",
+            element: (
+              <Suspense fallback={<LoadingFallback />}>
+                <Feed />
+              </Suspense>
+            )
+          },
+          {
+            path: "/resume",
+            element: (
+              <Suspense fallback={<LoadingFallback />}>
+                <Resume />
+              </Suspense>
+            )
+          },
+          {
+            path: "/messages",
+            element: (
+              <Suspense fallback={<LoadingFallback />}>
+                <Messages />
+              </Suspense>
+            )
+          },
+          {
+            path: "/documentation",
+            element: (
+              <Suspense fallback={<LoadingFallback />}>
+                <Documentation />
+              </Suspense>
+            )
+          },
+          {
+            path: "/settings",
+            element: (
+              <Suspense fallback={<LoadingFallback />}>
+                <Settings />
+              </Suspense>
+            )
+          },
+          {
+            path: "/settings/likes",
+            element: (
+              <Suspense fallback={<LoadingFallback />}>
+                <LikedPosts />
+              </Suspense>
+            )
+          },
+          {
+            path: "/settings/comments",
+            element: (
+              <Suspense fallback={<LoadingFallback />}>
+                <CommentedPosts />
+              </Suspense>
+            )
+          },
+          {
+            path: "/infinite",
+            element: (
+              <Suspense fallback={<LoadingFallback />}>
+                <InfiniteFeed />
+              </Suspense>
+            )
+          }
+        ]
+      },
+      {
+        path: "*",
         element: (
           <Suspense fallback={<LoadingFallback />}>
-            <Login />
+            <NotFound />
           </Suspense>
         )
       }
     ]
-  },
-  {
-    element: <PrivateLayout />,
-    children: [
-      {
-        path: "/dashboard",
-        element: (
-          <Suspense fallback={<LoadingFallback />}>
-            <Dashboard />
-          </Suspense>
-        )
-      },
-      {
-        path: "/profile",
-        element: (
-          <Suspense fallback={<LoadingFallback />}>
-            <Profile />
-          </Suspense>
-        )
-      },
-      {
-        path: "/profile/:userId",
-        element: (
-          <Suspense fallback={<LoadingFallback />}>
-            <Profile />
-          </Suspense>
-        )
-      },
-      {
-        path: "/board",
-        element: (
-          <Suspense fallback={<LoadingFallback />}>
-            <Board />
-          </Suspense>
-        )
-      },
-      {
-        path: "/feed",
-        element: (
-          <Suspense fallback={<LoadingFallback />}>
-            <Feed />
-          </Suspense>
-        )
-      },
-      {
-        path: "/resume",
-        element: (
-          <Suspense fallback={<LoadingFallback />}>
-            <Resume />
-          </Suspense>
-        )
-      },
-      {
-        path: "/messages",
-        element: (
-          <Suspense fallback={<LoadingFallback />}>
-            <Messages />
-          </Suspense>
-        )
-      },
-      {
-        path: "/documentation",
-        element: (
-          <Suspense fallback={<LoadingFallback />}>
-            <Documentation />
-          </Suspense>
-        )
-      },
-      {
-        path: "/settings",
-        element: (
-          <Suspense fallback={<LoadingFallback />}>
-            <Settings />
-          </Suspense>
-        )
-      },
-      {
-        path: "/settings/likes",
-        element: (
-          <Suspense fallback={<LoadingFallback />}>
-            <LikedPosts />
-          </Suspense>
-        )
-      },
-      {
-        path: "/settings/comments",
-        element: (
-          <Suspense fallback={<LoadingFallback />}>
-            <CommentedPosts />
-          </Suspense>
-        )
-      },
-      {
-        path: "/infinite",
-        element: (
-          <Suspense fallback={<LoadingFallback />}>
-            <InfiniteFeed />
-          </Suspense>
-        )
-      }
-    ]
-  },
-  {
-    path: "*",
-    element: (
-      <Suspense fallback={<LoadingFallback />}>
-        <NotFound />
-      </Suspense>
-    )
   }
 ]);
 
@@ -236,7 +287,6 @@ const AppContent = () => {
     <MuiThemeProvider theme={muiTheme}>
       <CssBaseline />
       <RouterProvider router={router} />
-      <ScrollToTop />
     </MuiThemeProvider>
   );
 };

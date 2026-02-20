@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Container, Typography, Grid, Button, Stack, useTheme } from '@mui/material';
+import { Box, Container, Typography, Grid, Button, Stack, useTheme, alpha } from '@mui/material';
 import { Verified as VerifiedIcon } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
 import { getLandingColors } from '../../utils/landingTheme';
@@ -36,9 +36,9 @@ const DevCardHighlight: React.FC = () => {
                                     px: 4,
                                     py: 2,
                                     fontWeight: 900,
-                                    background: 'linear-gradient(45deg, #6366f1, #a855f7)',
+                                    background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
                                     color: 'white',
-                                    '&:hover': { transform: 'translateY(-2px)', boxShadow: '0 10px 25px rgba(99,102,241,0.4)' }
+                                    '&:hover': { transform: 'translateY(-2px)', boxShadow: `0 10px 25px ${alpha(theme.palette.primary.main, 0.4)}` }
                                 }}
                             >
                                 Claim Your Identity
@@ -77,8 +77,8 @@ const DevCardHighlight: React.FC = () => {
 
                                 <Stack direction="row" justifyContent="space-between" sx={{ mb: 4 }}>
                                     <Stack direction="row" spacing={1} alignItems="center">
-                                        <Box sx={{ width: 24, height: 24, borderRadius: '6px', background: 'linear-gradient(45deg, #6366f1, #a855f7)' }} />
-                                        <Typography variant="caption" sx={{ fontWeight: 900, color: 'white', letterSpacing: 1 }}>DEVCONNECT</Typography>
+                                        <Box sx={{ width: 24, height: 24, borderRadius: '6px', background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})` }} />
+                                        <Typography variant="caption" sx={{ fontWeight: 900, color: 'white', letterSpacing: 1 }}>D. CONNECT</Typography>
                                     </Stack>
                                     <Box sx={{ px: 1, py: 0.1, borderRadius: 4, bgcolor: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.3)' }}>
                                         <Typography variant="caption" sx={{ fontWeight: 900, color: '#818cf8', fontSize: '10px' }}>PRO</Typography>

@@ -46,7 +46,7 @@ const CTASection: React.FC = () => {
                     Ready to Start Your Journey?
                 </Typography>
                 <Typography variant="h6" sx={{ mb: 6, opacity: 0.9, fontWeight: 500, maxWidth: 600, mx: 'auto', lineHeight: 1.6 }}>
-                    Join thousands of developers building their future with DevConnect.
+                    Join thousands of developers building their future with D. Connect.
                     Create, collaborate, and grow—all in one place.
                 </Typography>
 
@@ -64,11 +64,12 @@ const CTASection: React.FC = () => {
                             fontWeight: 800,
                             bgcolor: 'white',
                             color: 'primary.main',
-                            boxShadow: '0 20px 40px -10px rgba(0,0,0,0.3)',
+                            boxShadow: `0 20px 40px -10px ${alpha(theme.palette.primary.main, 0.3)}`,
+                            transition: 'all 0.3s ease',
                             '&:hover': {
                                 bgcolor: '#f8fafc',
-                                transform: 'translateY(-3px)',
-                                boxShadow: '0 25px 50px -10px rgba(0,0,0,0.4)'
+                                transform: 'translateY(-4px)',
+                                boxShadow: `0 25px 50px -12px ${alpha(theme.palette.secondary.main, 0.4)}`
                             }
                         }}
                     >
@@ -88,11 +89,12 @@ const CTASection: React.FC = () => {
                             fontWeight: 800,
                             bgcolor: 'white',
                             color: 'primary.main',
-                            boxShadow: '0 20px 40px -10px rgba(0,0,0,0.3)',
+                            boxShadow: `0 20px 40px -10px ${alpha(theme.palette.primary.main, 0.3)}`,
+                            transition: 'all 0.3s ease',
                             '&:hover': {
                                 bgcolor: '#f8fafc',
-                                transform: 'translateY(-3px)',
-                                boxShadow: '0 25px 50px -10px rgba(0,0,0,0.4)'
+                                transform: 'translateY(-4px)',
+                                boxShadow: `0 25px 50px -12px ${alpha(theme.palette.secondary.main, 0.4)}`
                             }
                         }}
                     >

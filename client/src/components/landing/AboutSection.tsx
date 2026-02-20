@@ -27,10 +27,10 @@ const AboutSection: React.FC = () => {
                 <Grid container spacing={6} alignItems="center">
                     <Grid item xs={12} md={6}>
                         <Typography variant="h2" sx={{ ...styles.sectionTitle, textAlign: 'left' }}>
-                            What is DevConnect?
+                            What is D. Connect?
                         </Typography>
                         <Typography sx={{ fontSize: '1.1rem', color: colors.textSecondary, mb: 3 }}>
-                            DevConnect is your complete professional platform designed specifically for developers. Whether you're a student, freelancer, or experienced professional, DevConnect helps you establish a strong online presence and manage your career growth.
+                            D. Connect is your complete professional platform designed specifically for developers. Whether you're a student, freelancer, or experienced professional, D. Connect helps you establish a strong online presence and manage your career growth.
                         </Typography>
                         <Typography sx={{ fontSize: '1.1rem', color: colors.textSecondary, mb: 3 }}>
                             <strong style={{ color: colors.text }}>What you get:</strong> A professional profile that showcases your skills and experience, an ATS-optimized resume builder for job applications, a task management system to stay organized, social features to network with developers, and analytics to track your growth.
@@ -62,7 +62,7 @@ const AboutSection: React.FC = () => {
                             }}
                         >
                             <Typography variant="h4" sx={{ fontWeight: 900, mb: 3, textAlign: 'center' }}>
-                                How to Use DevConnect
+                                How to Use D. Connect
                             </Typography>
 
                             <Stack spacing={3}>

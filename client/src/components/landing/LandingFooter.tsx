@@ -5,11 +5,11 @@ import {
     LinkedIn as LinkedInIcon,
     GitHub as GitHubIcon,
     Twitter as TwitterIcon,
-    Email as EmailIcon,
-    Gamepad as LogoIcon
+    Email as EmailIcon
 } from '@mui/icons-material';
 import { useAuth } from '../../context/AuthContext';
 import { getLandingColors } from '../../utils/landingTheme';
+import Logo from '../common/Logo';
 
 const LandingFooter: React.FC = () => {
     const { isAuthenticated } = useAuth();
@@ -34,23 +34,7 @@ const LandingFooter: React.FC = () => {
                     {/* Brand Section */}
                     <Grid item xs={12} md={4}>
                         <Stack spacing={3}>
-                            <Stack direction="row" spacing={1.5} alignItems="center">
-                                <Box sx={{
-                                    width: 45,
-                                    height: 45,
-                                    borderRadius: '12px',
-                                    background: 'linear-gradient(45deg, #6366f1, #a855f7)',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    boxShadow: '0 0 20px rgba(99, 102, 241, 0.3)'
-                                }}>
-                                    <LogoIcon sx={{ color: 'white' }} />
-                                </Box>
-                                <Typography variant="h5" sx={{ fontWeight: 900, letterSpacing: -0.5 }}>
-                                    DevConnect
-                                </Typography>
-                            </Stack>
+                            <Logo color="white" />
                             <Typography sx={{ color: colors.textMuted, lineHeight: 1.8, maxWidth: 320 }}>
                                 The elite professional ecosystem for global engineers. Build your identity, manage your growth, and connect with the best.
                             </Typography>
@@ -129,6 +113,7 @@ const LandingFooter: React.FC = () => {
                                     '&:hover': { opacity: 1 }
                                 }}>
                                     <iframe
+                                        title="FITNESS STUDIO Headquarters"
                                         src='https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3617.7955797420777!2d82.83031028479296!3d24.93903288508543!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x398fb3a31d2d0f03%3A0x3880a314aaf28c29!2sSarthak%20Singh(prinsh)&#39;home!5e0!3m2!1sen!2sin!4v1770901618368!5m2!1sen!2sin'
                                         width="100%"
                                         height="100%"
@@ -147,12 +132,28 @@ const LandingFooter: React.FC = () => {
 
                 <Stack direction={{ xs: 'column', md: 'row' }} justifyContent="space-between" alignItems="center" spacing={3}>
                     <Typography sx={{ color: '#94a3b8', fontSize: '0.85rem', fontWeight: 500 }}>
-                        © {new Date().getFullYear()} DevConnect Ecosystem. All rights architectural.
+                        © {new Date().getFullYear()} D. Connect Ecosystem. All rights architectural.
                     </Typography>
                     <Stack direction="row" spacing={4}>
-                        {['Privacy', 'Terms', 'Security', 'Status'].map((link, i) => (
-                            <Link key={i} href="#" sx={{ color: '#94a3b8', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 500, '&:hover': { color: '#fff' } }}>
-                                {link}
+                        {[
+                            { name: 'Privacy', path: '/privacy' },
+                            { name: 'Terms', path: '/terms' },
+                            { name: 'Security', path: '/security' },
+                            { name: 'Status', path: '/status' }
+                        ].map((link, i) => (
+                            <Link
+                                key={i}
+                                component={RouterLink}
+                                to={link.path}
+                                sx={{
+                                    color: '#94a3b8',
+                                    textDecoration: 'none',
+                                    fontSize: '0.85rem',
+                                    fontWeight: 500,
+                                    '&:hover': { color: '#fff' }
+                                }}
+                            >
+                                {link.name}
                             </Link>
                         ))}
                     </Stack>

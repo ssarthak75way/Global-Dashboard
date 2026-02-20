@@ -53,7 +53,7 @@ const PlatformShowcase: React.FC = () => {
                         The Developer Ecosystem
                     </Typography>
                     <Typography variant="h6" sx={{ color: colors.textMuted, maxWidth: 700, mx: 'auto', fontWeight: 500 }}>
-                        DevConnect combines career management, productivity tools, and social networking into one unified workspace.
+                        D. Connect combines career management, productivity tools, and social networking into one unified workspace.
                     </Typography>
                 </Box>
 

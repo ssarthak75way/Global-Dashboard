@@ -87,7 +87,7 @@ const FeaturesSection: React.FC = () => {
                     >
                         Everything you need to <br />
                         <Box component="span" sx={{
-                            background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                            background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
                             WebkitBackgroundClip: 'text',
                             WebkitTextFillColor: 'transparent'
                         }}>
