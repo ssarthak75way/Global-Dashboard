@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import {
     AppBar,
     Toolbar,
-    Typography,
     Button,
     Box,
     IconButton,
@@ -30,6 +29,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import UserMenu from './UserMenu';
+import Logo from './common/Logo';
 
 const PublicNavbar: React.FC = () => {
     const { isAuthenticated, user } = useAuth();
@@ -78,30 +78,7 @@ const PublicNavbar: React.FC = () => {
             px: { xs: 2, md: 4 }
         },
         logo: {
-            display: 'flex',
-            alignItems: 'center',
-            gap: 1.5,
             cursor: 'pointer'
-        },
-        logoImage: {
-            width: 40,
-            height: 40,
-            borderRadius: 1,
-            background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontWeight: 900,
-            color: 'white',
-            fontSize: '1.2rem'
-        },
-        logoText: {
-            fontWeight: 900,
-            fontSize: { xs: '1.1rem', sm: '1.3rem', md: '1.5rem' },
-            background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            letterSpacing: -0.5
         },
         navButton: {
             mx: 0.25,
@@ -144,9 +121,7 @@ const PublicNavbar: React.FC = () => {
     const drawer = (
         <Box>
             <Box sx={styles.drawerHeader}>
-                <Typography variant="h6" sx={styles.logoText}>
-                    DevConnect
-                </Typography>
+                <Logo />
                 <IconButton onClick={handleDrawerToggle}>
                     <CloseIcon />
                 </IconButton>
@@ -212,11 +187,8 @@ const PublicNavbar: React.FC = () => {
             <AppBar position="sticky" sx={styles.appBar}>
                 <Container maxWidth="xl">
                     <Toolbar sx={styles.toolbar} disableGutters>
-                        <Box sx={styles.logo} onClick={() => scrollToSection('#home')}>
-                            <Box sx={styles.logoImage}>D</Box>
-                            <Typography variant="h6" sx={styles.logoText}>
-                                DevConnect
-                            </Typography>
+                        <Box sx={styles.logo}>
+                            <Logo onClick={() => scrollToSection('#home')} />
                         </Box>
 
                         <Box sx={{ flexGrow: 1 }} />

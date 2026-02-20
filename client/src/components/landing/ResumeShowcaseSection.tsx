@@ -186,10 +186,10 @@ const ResumeShowcaseSection: React.FC = () => {
         resumeSectionTitle: {
             fontWeight: 700,
             fontSize: '0.95rem',
-            color: '#667eea',
+            color: '#6366f1',
             mb: 1.5,
             pb: 0.8,
-            borderBottom: '2px solid #667eea',
+            borderBottom: '2px solid #6366f1',
             textTransform: 'uppercase',
             letterSpacing: '1px'
         },
@@ -221,12 +221,12 @@ const ResumeShowcaseSection: React.FC = () => {
         skillChip: {
             height: 28,
             fontSize: '0.8rem',
-            bgcolor: 'rgba(102, 126, 234, 0.1)',
-            color: '#667eea',
+            bgcolor: 'rgba(99, 102, 241, 0.1)',
+            color: '#6366f1',
             fontWeight: 700,
             borderRadius: 1.5,
             '&:hover': {
-                bgcolor: 'rgba(102, 126, 234, 0.2)'
+                bgcolor: 'rgba(99, 102, 241, 0.2)'
             }
         }
     };
@@ -299,7 +299,7 @@ const ResumeShowcaseSection: React.FC = () => {
                                         Auto-Sync Profile
                                     </Typography>
                                     <Typography sx={styles.featureDesc}>
-                                        Keep your resume updated by syncing directly with your DevConnect professional profile data.
+                                        Keep your resume updated by syncing directly with your D. Connect professional profile data.
                                     </Typography>
                                 </Box>
                             </Box>

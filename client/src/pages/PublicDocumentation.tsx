@@ -432,7 +432,7 @@ const PublicDocumentation: React.FC = () => {
                                 <ScrollReveal>
                                     <Box>
                                         <Typography variant="h1" sx={styles.title}>
-                                            Welcome to DevConnect
+                                            Welcome to D. Connect
                                         </Typography>
                                         <Typography sx={styles.subtitle}>
                                             Your all-in-one platform to showcase your developer journey, connect with peers, and build a professional presence.
@@ -483,7 +483,7 @@ const PublicDocumentation: React.FC = () => {
                                             <Box sx={{ mt: 6, p: 4, borderRadius: 4, bgcolor: `${colors.primary}10`, border: `1px solid ${colors.primary}20`, position: 'relative', overflow: 'hidden', transition: '0.3s', '&:hover': { background: `${colors.primary}15`, transform: 'scale(1.01)' } }}>
                                                 <Box sx={{ position: 'absolute', top: 0, left: 0, height: 4, bgcolor: colors.primary, width: '33%', borderRadius: '0 2px 2px 0' }} />
                                                 <Typography variant="h6" fontWeight={800} gutterBottom>Ready to join?</Typography>
-                                                <Typography variant="body1" sx={{ mb: 3 }}>Thousands of developers are already building their IDs on DevConnect.</Typography>
+                                                <Typography variant="body1" sx={{ mb: 3 }}>Thousands of developers are already building their IDs on D. Connect.</Typography>
                                                 <Button variant="contained"
                                                     onClick={() => navigate('/signup')}
                                                     endIcon={<ArrowForwardIcon />} sx={{ borderRadius: 2, px: 4, py: 1.5, fontWeight: 700, textTransform: 'none', boxShadow: `0 8px 24px ${colors.primary}40` }}>
@@ -502,7 +502,7 @@ const PublicDocumentation: React.FC = () => {
                                         <Grid container spacing={4} alignItems="center">
                                             <Grid item xs={12} md={6}>
                                                 <Typography variant="body1" color="text.secondary" sx={{ mb: 4, fontSize: '1.1rem', lineHeight: 1.7 }}>
-                                                    In DevConnect, your profile is more than just a page—it's your digital identity in the tech world. Showcase your true potential with data-driven insights.
+                                                    In D. Connect, your profile is more than just a page—it's your digital identity in the tech world. Showcase your true potential with data-driven insights.
                                                 </Typography>
                                                 <Stack spacing={2}>
                                                     <Zoom in timeout={600}>
@@ -627,7 +627,7 @@ const PublicDocumentation: React.FC = () => {
                                     {/* Core Benefits */}
                                     <TabPanel value={tabValue} index={4}>
                                         <Typography variant="h4" sx={styles.sectionTitle}>
-                                            <StarsIcon color="primary" sx={{ fontSize: 32 }} /> Why DevConnect?
+                                            <StarsIcon color="primary" sx={{ fontSize: 32 }} /> Why D. Connect?
                                         </Typography>
 
                                         <ScrollReveal delay={200}>

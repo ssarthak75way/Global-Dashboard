@@ -126,7 +126,8 @@ const Signup = () => {
     const styles = {
         paper: {
             p: { xs: 3, sm: 4, md: 5 },
-            borderRadius: 3,
+            borderRadius: 2,
+            width:"60vw",
             border: '1px solid',
             borderColor: 'divider',
             background: (theme: Theme) => theme.palette.mode === 'light'

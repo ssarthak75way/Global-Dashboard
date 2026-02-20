@@ -24,9 +24,9 @@ export const getLandingColors = (theme: Theme) => {
 
         // Brand colors (consistent across themes)
         primary: '#6366f1',
-        secondary: '#a855f7',
-        accent: '#ec4899',
-        accentAlt: '#818cf8',
+        secondary: '#ec4899',
+        accent: '#818cf8',
+        accentAlt: '#f472b6',
 
         // Border colors
         border: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.08)',

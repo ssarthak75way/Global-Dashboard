@@ -17,7 +17,8 @@ import {
     Tooltip,
     useMediaQuery,
     useTheme as useMuiTheme,
-    Fade
+    Fade,
+    alpha
 } from "@mui/material";
 import {
     Menu as MenuIcon,
@@ -36,13 +37,14 @@ import {
     MenuBook as DocumentationIcon,
     Chat as ChatIcon,
     Settings as SettingsIcon,
-    Code as DevIcon,
     AllInclusive as AllInclusiveIcon
 } from "@mui/icons-material";
 import TokenCountdown from "../components/TokenCountdown";
 import UserSearch from "../components/UserSearch";
 import UserMenu from "../components/UserMenu";
+import Logo from "../components/common/Logo";
 import React from 'react';
+import LandingFooter from "../components/landing/LandingFooter";
 
 const DRAWER_WIDTH = 280;
 const COLLAPSED_DRAWER_WIDTH = 88;
@@ -83,7 +85,7 @@ const PrivateLayout = () => {
         { text: 'Settings', icon: <SettingsIcon />, path: '/settings' },
     ];
 
-    const currentTitle = menuItems.find(i => i.path === location.pathname)?.text || 'DevConnect';
+    const currentTitle = menuItems.find(i => i.path === location.pathname)?.text || 'D. Connect';
 
     return (
         <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: 'background.default' }}>
@@ -106,9 +108,10 @@ const PrivateLayout = () => {
                         height: '100%',
                         display: 'flex',
                         flexDirection: 'column',
-                        bgcolor: 'background.paper',
+                        bgcolor: theme === 'dark' ? 'rgba(17, 24, 39, 0.7)' : 'rgba(255, 255, 255, 0.7)',
+                        backdropFilter: 'blur(20px)',
                         borderRight: '1px solid',
-                        borderColor: 'divider',
+                        borderColor: alpha(theme === 'dark' ? '#fff' : '#000', 0.1),
                         overflow: 'hidden',
                         position: 'relative'
                     }}
@@ -122,18 +125,9 @@ const PrivateLayout = () => {
                         height: 80
                     }}>
                         {open ? (
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                <Avatar sx={{ bgcolor: theme === 'dark' ? '#BB86FC' : 'common.black', width: 32, height: 32 }}>
-                                    <DevIcon sx={{ fontSize: 20, color: theme === 'dark' ? 'common.black' : 'common.white' }} />
-                                </Avatar>
-                                <Typography variant="h5" sx={{ fontWeight: 800, color: 'text.primary' }}>
-                                    MyBoard
-                                </Typography>
-                            </Box>
+                            <Logo fontSize="1.3rem" />
                         ) : (
-                            <Avatar sx={{ bgcolor: theme === 'dark' ? '#BB86FC' : 'common.black', width: 40, height: 40 }}>
-                                <DevIcon sx={{ color: theme === 'dark' ? 'common.black' : 'common.white' }} />
-                            </Avatar>
+                            <Logo withText={false} />
                         )}
                         {open && !isMobile && (
                             <IconButton onClick={toggleDrawer} size="small" sx={{ color: 'text.secondary' }}>
@@ -162,29 +156,45 @@ const PrivateLayout = () => {
                                             justifyContent: open ? 'initial' : 'center',
                                             px: 2.5,
                                             mx: 1,
-                                            borderRadius: '30px', // Pill shape from reference
-                                            bgcolor: isActive
-                                                ? (theme === 'dark' ? '#BB86FC' : 'common.black')
-                                                : 'transparent',
-                                            color: isActive
-                                                ? (theme === 'dark' ? 'common.black' : 'common.white')
-                                                : 'text.secondary',
+                                            borderRadius: '16px',
+                                            bgcolor: 'transparent',
+                                            color: isActive ? 'primary.main' : 'text.secondary',
+                                            position: 'relative',
+                                            '&::before': isActive ? {
+                                                content: '""',
+                                                position: 'absolute',
+                                                inset: 0,
+                                                borderRadius: '16px',
+                                                padding: '2px',
+                                                background: `linear-gradient(135deg, ${muiTheme.palette.primary.main}, ${muiTheme.palette.secondary.main})`,
+                                                WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+                                                WebkitMaskComposite: 'xor',
+                                                maskComposite: 'exclude',
+                                                opacity: 0.5
+                                            } : {},
+                                            '&::after': isActive ? {
+                                                content: '""',
+                                                position: 'absolute',
+                                                inset: 0,
+                                                borderRadius: '16px',
+                                                background: `linear-gradient(135deg, ${alpha(muiTheme.palette.primary.main, 0.08)}, ${alpha(muiTheme.palette.secondary.main, 0.08)})`,
+                                                zIndex: -1
+                                            } : {},
                                             '&:hover': {
-                                                bgcolor: isActive
-                                                    ? (theme === 'dark' ? '#BB86FC' : 'common.black')
-                                                    : 'action.hover',
-                                                color: isActive
-                                                    ? (theme === 'dark' ? 'common.black' : 'common.white')
-                                                    : 'text.primary',
-                                                transform: 'translateX(4px)'
+                                                bgcolor: isActive ? 'transparent' : alpha(muiTheme.palette.primary.main, 0.04),
+                                                color: isActive ? 'primary.main' : 'text.primary',
+                                                transform: 'translateX(4px)',
+                                                '& .MuiListItemIcon-root': {
+                                                    color: 'primary.main',
+                                                    transform: 'scale(1.1)'
+                                                }
                                             },
                                             '& .MuiListItemIcon-root': {
-                                                color: isActive
-                                                    ? (theme === 'dark' ? 'common.black' : 'common.white')
-                                                    : 'inherit'
+                                                color: isActive ? 'primary.main' : 'text.secondary',
+                                                transition: 'all 0.2s ease'
                                             },
-                                            transition: 'all 0.2s',
-                                            boxShadow: isActive ? '0 4px 12px rgba(0,0,0,0.1)' : 'none'
+                                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                            boxShadow: isActive ? `0 10px 20px -10px ${alpha(muiTheme.palette.primary.main, 0.3)}` : 'none'
                                         }}
                                     >
                                         <ListItemIcon
@@ -216,9 +226,13 @@ const PrivateLayout = () => {
                             onClick={logout}
                             sx={{
                                 justifyContent: open ? 'flex-start' : 'center',
-                                borderRadius: '30px',
+                                borderRadius: '16px',
                                 color: 'error.main',
-                                '&:hover': { bgcolor: 'error.light', color: 'error.contrastText' }
+                                '&:hover': {
+                                    bgcolor: alpha(muiTheme.palette.error.main, 0.08),
+                                    '& .MuiListItemIcon-root': { transform: 'translateX(-4px)' }
+                                },
+                                transition: 'all 0.2s ease'
                             }}
                         >
                             <ListItemIcon sx={{ minWidth: 0, mr: open ? 2 : 0, color: 'inherit' }}>
@@ -315,7 +329,8 @@ const PrivateLayout = () => {
                     component="main"
                     sx={{
                         flexGrow: 1,
-                        p: { xs: 2, md: 4 },
+                        px: { xs: 2, md: 4 },
+                        py: { xs: 2, md: 8 },
                         overflowX: 'hidden',
                         position: 'relative'
                     }}
@@ -326,8 +341,10 @@ const PrivateLayout = () => {
                         </Box>
                     </Fade>
                 </Box>
+                <LandingFooter />
             </Box>
-        </Box>
+
+        </Box >
     );
 };
 

@@ -189,78 +189,78 @@ const NotFound = () => {
     };
 
     return (
-     <>
-     <PublicNavbar/>
-        <Box sx={styles.container}>
-            <Box sx={styles.blob} />
+        <>
+            <PublicNavbar />
+            <Box sx={styles.container}>
+                <Box sx={styles.blob} />
 
-            <Fade in timeout={600}>
-                <Paper elevation={0} sx={styles.paper}>
-                    <Grow in timeout={800}>
-                        <Box sx={styles.iconBox}>
-                            <NotFoundIcon sx={styles.icon} />
-                        </Box>
-                    </Grow>
+                <Fade in timeout={600}>
+                    <Paper elevation={0} sx={styles.paper}>
+                        <Grow in timeout={800}>
+                            <Box sx={styles.iconBox}>
+                                <NotFoundIcon sx={styles.icon} />
+                            </Box>
+                        </Grow>
 
-                    <Grow in timeout={900}>
-                        <Typography
-                            variant="h1"
-                            sx={{
-                                ...styles.errorCode,
-                                fontSize: { xs: '4rem', sm: '6rem', md: '8rem' }
-                            }}
-                        >
-                            404
-                        </Typography>
-                    </Grow>
-
-                    <Grow in timeout={1000}>
-                        <Typography
-                            variant="h4"
-                            sx={{
-                                ...styles.title,
-                                fontSize: { xs: '1.5rem', sm: '2rem', md: '2.5rem' }
-                            }}
-                        >
-                            Page Not Found
-                        </Typography>
-                    </Grow>
-
-                    <Grow in timeout={1100}>
-                        <Typography variant="body1" sx={styles.description}>
-                            Oops! The page you're looking for seems to have wandered off.
-                            <br />
-                            Don't worry, let's get you back on track.
-                        </Typography>
-                    </Grow>
-
-                    <Grow in timeout={1200}>
-                        <Stack sx={styles.buttonStack}>
-                            <Button
-                                variant="contained"
-                                size="large"
-                                startIcon={<HomeIcon />}
-                                onClick={() => navigate('/')}
-                                sx={styles.primaryButton}
+                        <Grow in timeout={900}>
+                            <Typography
+                                variant="h1"
+                                sx={{
+                                    ...styles.errorCode,
+                                    fontSize: { xs: '4rem', sm: '6rem', md: '8rem' }
+                                }}
                             >
-                                Go Home
-                            </Button>
+                                404
+                            </Typography>
+                        </Grow>
 
-                            <Button
-                                variant="outlined"
-                                size="large"
-                                startIcon={<BackIcon />}
-                                onClick={() => navigate(-1)}
-                                sx={styles.secondaryButton}
+                        <Grow in timeout={1000}>
+                            <Typography
+                                variant="h4"
+                                sx={{
+                                    ...styles.title,
+                                    fontSize: { xs: '1.5rem', sm: '2rem', md: '2.5rem' }
+                                }}
                             >
-                                Go Back
-                            </Button>
-                        </Stack>
-                    </Grow>
-                </Paper>
-            </Fade>
-        </Box>
-        <LandingFooter/></>
+                                Page Not Found
+                            </Typography>
+                        </Grow>
+
+                        <Grow in timeout={1100}>
+                            <Typography variant="body1" sx={styles.description}>
+                                Oops! The page you're looking for seems to have wandered off.
+                                <br />
+                                Don't worry, let's get you back on track.
+                            </Typography>
+                        </Grow>
+
+                        <Grow in timeout={1200}>
+                            <Stack sx={styles.buttonStack}>
+                                <Button
+                                    variant="contained"
+                                    size="large"
+                                    startIcon={<HomeIcon />}
+                                    onClick={() => navigate('/')}
+                                    sx={styles.primaryButton}
+                                >
+                                    Go Home
+                                </Button>
+
+                                <Button
+                                    variant="outlined"
+                                    size="large"
+                                    startIcon={<BackIcon />}
+                                    onClick={() => navigate(-1)}
+                                    sx={styles.secondaryButton}
+                                >
+                                    Go Back
+                                </Button>
+                            </Stack>
+                        </Grow>
+                    </Paper>
+                </Fade>
+            </Box>
+            <LandingFooter /></>
     );
 };
 

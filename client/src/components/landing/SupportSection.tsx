@@ -67,8 +67,8 @@ const SupportSection: React.FC = () => {
                                 <Typography sx={{ color: '#94a3b8', mb: 2 }}>
                                     Get help via email
                                 </Typography>
-                                <Link href="mailto:support@devconnect.com" underline="hover">
-                                    support@devconnect.com
+                                <Link href="mailto:support@dconnect.com" underline="hover">
+                                    support@dconnect.com
                                 </Link>
                             </CardContent>
                         </Card>

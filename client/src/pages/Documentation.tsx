@@ -64,6 +64,7 @@ import {
 } from '../utils/data.tsx';
 import TerminalDemo from '../components/TerminalDemo';
 import CodeBlock from '../components/CodeBlock';
+import Logo from '../components/common/Logo.tsx';
 
 interface TabPanelProps {
     children?: React.ReactNode;
@@ -390,9 +391,7 @@ const Documentation: React.FC = () => {
                             <Box sx={styles.header}>
                                 <Fade in timeout={800}>
                                     <Box>
-                                        <Typography variant="h1" sx={styles.title}>
-                                            DevConnect
-                                        </Typography>
+                                       <Logo/>
                                         <Typography sx={styles.subtitle}>
                                             The ultimate platform for modern developers to build, connect, and showcase their journey.
                                         </Typography>
@@ -461,7 +460,7 @@ const Documentation: React.FC = () => {
                                             <DescriptionIcon color="primary" sx={{ fontSize: 32 }} /> Project Overview
                                         </Typography>
                                         <Typography variant="body1" sx={{ mb: 4, fontSize: '1.1rem', lineHeight: 1.7 }}>
-                                            DevConnect is a decentralized hub designed to empower developers worldwide. It bridges the gap between professional growth and social interaction.
+                                            D. Connect is a decentralized hub designed to empower developers worldwide. It bridges the gap between professional growth and social interaction.
                                         </Typography>
 
                                         <Grid container spacing={3}>

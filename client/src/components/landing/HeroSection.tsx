@@ -86,7 +86,9 @@ const HeroSection: React.FC = () => {
                                 >
                                     Build. Ship. <br />
                                     <Box component="span" sx={{
-                                        color: 'primary.main',
+                                        background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                                        WebkitBackgroundClip: 'text',
+                                        WebkitTextFillColor: 'transparent',
                                         position: 'relative',
                                         whiteSpace: 'nowrap',
                                         '&::after': {
@@ -96,7 +98,7 @@ const HeroSection: React.FC = () => {
                                             left: 0,
                                             width: '100%',
                                             height: '30%',
-                                            bgcolor: alpha(theme.palette.primary.main, 0.2),
+                                            bgcolor: alpha(theme.palette.primary.main, 0.1),
                                             zIndex: -1,
                                             transform: 'skewX(-10deg)'
                                         }
@@ -135,12 +137,13 @@ const HeroSection: React.FC = () => {
                                             borderRadius: '50px',
                                             fontSize: '1.1rem',
                                             fontWeight: 700,
-                                            background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
-                                            boxShadow: `0 8px 20px -4px ${alpha(theme.palette.primary.main, 0.5)}`,
+                                            background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
+                                            boxShadow: `0 8px 25px -5px ${alpha(theme.palette.primary.main, 0.4)}`,
                                             transition: 'all 0.3s ease',
                                             '&:hover': {
-                                                transform: 'translateY(-2px)',
-                                                boxShadow: `0 12px 24px -4px ${alpha(theme.palette.primary.main, 0.6)}`,
+                                                transform: 'translateY(-3px)',
+                                                boxShadow: `0 12px 30px -5px ${alpha(theme.palette.secondary.main, 0.5)}`,
+                                                filter: 'brightness(1.1)'
                                             }
                                         }}
                                     >
